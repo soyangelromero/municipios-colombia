@@ -11,6 +11,7 @@ from typing import Any
 from openpyxl import load_workbook
 from scrapling.fetchers import Fetcher
 
+from municipios.comun.contexto import Contexto, Resultado
 from municipios.comun.modelos import Observacion
 
 FUENTE = "dane_proyecciones_poblacion"
@@ -21,11 +22,12 @@ URL = (
 HOJA = "PobMunicipalxÁrea"
 
 # Área geográfica del DANE -> indicador del proyecto.
-INDICADORES = {
+AREAS = {
     "Total": "poblacion",
     "Cabecera Municipal": "poblacion_cabecera",
     "Centros Poblados y Rural Disperso": "poblacion_rural",
 }
+INDICADORES = tuple(AREAS.values())
 
 
 def descargar(directorio: Path, refrescar: bool = False) -> Path:
@@ -82,7 +84,7 @@ def normalizar(
     observaciones: list[Observacion] = []
     sin_cruce: dict[str, int] = {}
     for fila in filas:
-        indicador = INDICADORES.get(fila["area"])
+        indicador = AREAS.get(fila["area"])
         if indicador is None:
             raise ValueError(f"Área geográfica desconocida: {fila['area']!r}")
         if fila["codigo"] not in divipolas:
@@ -100,3 +102,10 @@ def normalizar(
         )
     observaciones.sort(key=lambda o: (o.divipola, o.indicador, o.periodo))
     return observaciones, sin_cruce
+
+
+def ejecutar(contexto: Contexto) -> Resultado:
+    ruta = descargar(contexto.dir_crudos / "dane", contexto.refrescar)
+    observaciones, sin_cruce = normalizar(leer_filas(ruta), contexto.codigos)
+    sin_dato = sorted(contexto.codigos - {o.divipola for o in observaciones})
+    return Resultado(observaciones, sin_cruce=sin_cruce, notas={"sin_dato": sin_dato})

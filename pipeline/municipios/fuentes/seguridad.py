@@ -8,6 +8,8 @@ from dataclasses import dataclass
 from datetime import date
 from typing import Any
 
+from municipios.comun import periodos
+from municipios.comun.contexto import Contexto, Resultado
 from municipios.comun.modelos import Observacion
 from municipios.comun.socrata import ClienteSocrata
 
@@ -25,6 +27,7 @@ DELITOS = (
     Delito("homicidios", "m8fd-ahd9", "mindefensa_homicidios"),
     Delito("hurto_personas", "4rxi-8m8d", "mindefensa_hurto_personas"),
 )
+INDICADORES = tuple(d.indicador for d in DELITOS)
 
 
 def descargar(
@@ -48,8 +51,8 @@ def descargar(
 def periodo(anio: int, ultima_fecha: date) -> str:
     """Año completo ('2025') o rango parcial del año en curso ('2026-01/2026-08')."""
     if anio == ultima_fecha.year and (ultima_fecha.month, ultima_fecha.day) != (12, 31):
-        return f"{anio}-01/{anio}-{ultima_fecha.month:02d}"
-    return str(anio)
+        return periodos.anual(anio, ultima_fecha.month)
+    return periodos.anual(anio)
 
 
 def normalizar(
@@ -87,3 +90,15 @@ def normalizar(
         for anio in range(ANIO_INICIAL, ultima_fecha.year + 1)
     ]
     return observaciones, sin_cruce
+
+
+def ejecutar(contexto: Contexto) -> Resultado:
+    resultado = Resultado([])
+    for delito in DELITOS:
+        filas, ultima = descargar(contexto.cliente, delito, contexto.refrescar)
+        observaciones, sin_cruce = normalizar(filas, delito, ultima, contexto.codigos)
+        resultado.observaciones.extend(observaciones)
+        if sin_cruce:
+            resultado.sin_cruce[delito.indicador] = sin_cruce
+        resultado.notas[f"{delito.indicador}_datos_hasta"] = ultima.isoformat()
+    return resultado

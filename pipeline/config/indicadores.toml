@@ -1,0 +1,233 @@
+# Ficha de cada indicador que produce el pipeline.
+# sentido: «mayor_mejor», «menor_mejor» o «contexto» (se muestra, pero no puntúa por sí solo).
+# Los indicadores derivados (tasas, porcentajes) se definen en la fase 3, junto con el índice.
+
+# --- Territorio y población ---
+[poblacion]
+etiqueta = "Población"
+unidad = "personas (proyección)"
+sentido = "contexto"
+fuente = "dane_proyecciones_poblacion"
+
+[poblacion_cabecera]
+etiqueta = "Población en la cabecera municipal"
+unidad = "personas (proyección)"
+sentido = "contexto"
+fuente = "dane_proyecciones_poblacion"
+
+[poblacion_rural]
+etiqueta = "Población en centros poblados y rural disperso"
+unidad = "personas (proyección)"
+sentido = "contexto"
+fuente = "dane_proyecciones_poblacion"
+
+[superficie_km2]
+etiqueta = "Superficie"
+unidad = "km²"
+sentido = "contexto"
+fuente = "dane_mgn"
+
+# --- Seguridad ---
+[homicidios]
+etiqueta = "Homicidios"
+unidad = "hechos reportados"
+sentido = "menor_mejor"
+fuente = "mindefensa_homicidios"
+
+[hurto_personas]
+etiqueta = "Hurtos a personas"
+unidad = "hechos reportados"
+sentido = "menor_mejor"
+fuente = "mindefensa_hurto_personas"
+
+# --- Transparencia y gestión institucional ---
+[ita_autodiagnostico]
+etiqueta = "Índice de Transparencia y Acceso a la Información (autodiagnóstico)"
+unidad = "puntos de 0 a 100"
+sentido = "mayor_mejor"
+fuente = "pgn_ita"
+descripcion = "Lo reporta la propia alcaldía; no es una verificación."
+
+[ita_auditoria]
+etiqueta = "Índice de Transparencia y Acceso a la Información (auditoría de la Procuraduría)"
+unidad = "puntos de 0 a 100"
+sentido = "mayor_mejor"
+fuente = "pgn_ita"
+
+[indice_gobierno_digital]
+etiqueta = "Índice de Gobierno Digital"
+unidad = "puntos de 0 a 100"
+sentido = "mayor_mejor"
+fuente = "mintic_gobierno_digital"
+
+[politica_gobierno_digital]
+etiqueta = "Política de Gobierno Digital (FURAG)"
+unidad = "puntos de 0 a 100"
+sentido = "mayor_mejor"
+fuente = "mintic_gobierno_digital"
+
+[furag_desempeno_institucional]
+etiqueta = "Índice de Desempeño Institucional (FURAG)"
+unidad = "puntos de 0 a 100"
+sentido = "mayor_mejor"
+fuente = "funcion_publica_furag"
+
+[furag_control_interno]
+etiqueta = "Control interno (FURAG)"
+unidad = "puntos de 0 a 100"
+sentido = "mayor_mejor"
+fuente = "funcion_publica_furag"
+
+[furag_publicacion_contractual]
+etiqueta = "Registro y publicación contractual en las plataformas (FURAG)"
+unidad = "puntos de 0 a 100"
+sentido = "mayor_mejor"
+fuente = "funcion_publica_furag"
+
+[furag_estado_abierto]
+etiqueta = "Estado abierto (FURAG)"
+unidad = "puntos de 0 a 100"
+sentido = "mayor_mejor"
+fuente = "funcion_publica_furag"
+
+# --- Finanzas (CUIPO, vigencia actual, pesos corrientes) ---
+[gasto_compromisos]
+etiqueta = "Gasto comprometido"
+unidad = "pesos corrientes"
+sentido = "contexto"
+fuente = "cgr_cuipo_gastos"
+
+[gasto_obligaciones]
+etiqueta = "Gasto obligado"
+unidad = "pesos corrientes"
+sentido = "contexto"
+fuente = "cgr_cuipo_gastos"
+
+[gasto_pagos]
+etiqueta = "Gasto pagado"
+unidad = "pesos corrientes"
+sentido = "contexto"
+fuente = "cgr_cuipo_gastos"
+
+[gasto_funcionamiento]
+etiqueta = "Gasto de funcionamiento (comprometido)"
+unidad = "pesos corrientes"
+sentido = "contexto"
+fuente = "cgr_cuipo_gastos"
+
+[gasto_servicio_deuda]
+etiqueta = "Servicio de la deuda (comprometido)"
+unidad = "pesos corrientes"
+sentido = "contexto"
+fuente = "cgr_cuipo_gastos"
+
+[gasto_inversion]
+etiqueta = "Gasto de inversión (comprometido)"
+unidad = "pesos corrientes"
+sentido = "contexto"
+fuente = "cgr_cuipo_gastos"
+
+[presupuesto_gastos_definitivo]
+etiqueta = "Presupuesto de gastos (apropiación definitiva)"
+unidad = "pesos corrientes"
+sentido = "contexto"
+fuente = "cgr_cuipo_programacion"
+
+[ingresos_total]
+etiqueta = "Ingresos recaudados"
+unidad = "pesos corrientes"
+sentido = "contexto"
+fuente = "cgr_cuipo_ingresos"
+
+[ingresos_corrientes]
+etiqueta = "Ingresos corrientes"
+unidad = "pesos corrientes"
+sentido = "contexto"
+fuente = "cgr_cuipo_ingresos"
+
+[ingresos_tributarios]
+etiqueta = "Ingresos tributarios"
+unidad = "pesos corrientes"
+sentido = "contexto"
+fuente = "cgr_cuipo_ingresos"
+
+[ingresos_no_tributarios]
+etiqueta = "Ingresos no tributarios"
+unidad = "pesos corrientes"
+sentido = "contexto"
+fuente = "cgr_cuipo_ingresos"
+
+[transferencias_corrientes]
+etiqueta = "Transferencias corrientes recibidas"
+unidad = "pesos corrientes"
+sentido = "contexto"
+fuente = "cgr_cuipo_ingresos"
+
+[recursos_capital]
+etiqueta = "Recursos de capital"
+unidad = "pesos corrientes"
+sentido = "contexto"
+fuente = "cgr_cuipo_ingresos"
+
+# --- Contratación (SECOP II, alcaldía) ---
+[contratos_numero]
+etiqueta = "Contratos firmados"
+unidad = "contratos"
+sentido = "contexto"
+fuente = "cce_secop2_contratos"
+
+[contratos_valor]
+etiqueta = "Valor de los contratos firmados"
+unidad = "pesos corrientes"
+sentido = "contexto"
+fuente = "cce_secop2_contratos"
+
+[contratos_directa_numero]
+etiqueta = "Contratos por contratación directa"
+unidad = "contratos"
+sentido = "contexto"
+fuente = "cce_secop2_contratos"
+
+[contratos_directa_valor]
+etiqueta = "Valor contratado por contratación directa"
+unidad = "pesos corrientes"
+sentido = "contexto"
+fuente = "cce_secop2_contratos"
+
+# --- Educación (MEN) ---
+[educacion_cobertura_neta]
+etiqueta = "Cobertura neta en educación básica y media"
+unidad = "%"
+sentido = "mayor_mejor"
+fuente = "men_estadisticas_educacion"
+
+[educacion_cobertura_bruta]
+etiqueta = "Cobertura bruta en educación básica y media"
+unidad = "%"
+sentido = "contexto"
+fuente = "men_estadisticas_educacion"
+
+[educacion_desercion]
+etiqueta = "Deserción escolar"
+unidad = "%"
+sentido = "menor_mejor"
+fuente = "men_estadisticas_educacion"
+
+[educacion_reprobacion]
+etiqueta = "Reprobación escolar"
+unidad = "%"
+sentido = "menor_mejor"
+fuente = "men_estadisticas_educacion"
+
+# --- Salud (ADRES) ---
+[afiliados_subsidiado]
+etiqueta = "Afiliados activos al régimen subsidiado"
+unidad = "personas"
+sentido = "contexto"
+fuente = "adres_bdua_subsidiado"
+
+[afiliados_contributivo]
+etiqueta = "Afiliados activos al régimen contributivo"
+unidad = "personas"
+sentido = "contexto"
+fuente = "adres_bdua_contributivo"

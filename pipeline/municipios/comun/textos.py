@@ -16,6 +16,11 @@ def sin_tildes(texto: str) -> str:
     return "".join(c for c in descompuesto if not unicodedata.combining(c))
 
 
+def sin_separador_miles(texto: str) -> str:
+    """'6,418' -> '6418'. Algunos conjuntos publican códigos y años con separador de miles."""
+    return texto.replace(",", "").replace(".", "").strip()
+
+
 def slug(texto: str) -> str:
     """'El Carmen de Viboral' -> 'el-carmen-de-viboral'."""
     base = sin_tildes(texto).lower()

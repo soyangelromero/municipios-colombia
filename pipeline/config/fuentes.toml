@@ -32,6 +32,86 @@ conjunto = "m8fd-ahd9"
 licencia = "Por verificar en la ficha del conjunto (datos.gov.co)"
 oficial = true
 
+[pgn_ita]
+organismo = "Procuraduría General de la Nación"
+titulo = "ITA (Índice de Transparencia y Acceso a la Información)"
+url = "https://www.datos.gov.co/d/im79-n45d"
+conjunto = "im79-n45d"
+licencia = "Por verificar en la ficha del conjunto (datos.gov.co)"
+oficial = true
+
+[mintic_gobierno_digital]
+organismo = "Ministerio de Tecnologías de la Información y las Comunicaciones (MinTIC)"
+titulo = "Índice de Gobierno Digital - Histórico"
+url = "https://www.datos.gov.co/d/rtai-k9uh"
+conjunto = "rtai-k9uh"
+licencia = "Por verificar en la ficha del conjunto (datos.gov.co)"
+oficial = true
+
+[funcion_publica_furag]
+organismo = "Departamento Administrativo de la Función Pública"
+titulo = "FURAG – Medición del desempeño institucional"
+url = "https://www.datos.gov.co/d/daed-z4fw"
+conjunto = "daed-z4fw"
+licencia = "Por verificar en la ficha del conjunto (datos.gov.co)"
+oficial = true
+
+[cgr_cuipo_gastos]
+organismo = "Contraloría General de la República (CHIP – CUIPO)"
+titulo = "OVCF – CUIPO – Ejecución de gastos"
+url = "https://www.datos.gov.co/d/4f7r-epif"
+conjunto = "4f7r-epif"
+licencia = "Por verificar en la ficha del conjunto (datos.gov.co)"
+oficial = true
+
+[cgr_cuipo_programacion]
+organismo = "Contraloría General de la República (CHIP – CUIPO)"
+titulo = "OVCF – CUIPO – Programación de gastos"
+url = "https://www.datos.gov.co/d/d9mu-h6ar"
+conjunto = "d9mu-h6ar"
+licencia = "Por verificar en la ficha del conjunto (datos.gov.co)"
+oficial = true
+
+[cgr_cuipo_ingresos]
+organismo = "Contraloría General de la República (CHIP – CUIPO)"
+titulo = "OVCF – CUIPO – Ejecución de ingresos"
+url = "https://www.datos.gov.co/d/9axr-9gnb"
+conjunto = "9axr-9gnb"
+licencia = "Por verificar en la ficha del conjunto (datos.gov.co)"
+oficial = true
+
+[cce_secop2_contratos]
+organismo = "Agencia Nacional de Contratación Pública – Colombia Compra Eficiente"
+titulo = "SECOP II – Contratos Electrónicos"
+url = "https://www.datos.gov.co/d/jbjy-vk9h"
+conjunto = "jbjy-vk9h"
+licencia = "Por verificar en la ficha del conjunto (datos.gov.co)"
+oficial = true
+
+[men_estadisticas_educacion]
+organismo = "Ministerio de Educación Nacional"
+titulo = "Estadísticas en educación preescolar, básica y media por municipio"
+url = "https://www.datos.gov.co/d/nudc-7mev"
+conjunto = "nudc-7mev"
+licencia = "Por verificar en la ficha del conjunto (datos.gov.co)"
+oficial = true
+
+[adres_bdua_subsidiado]
+organismo = "Administradora de los Recursos del SGSSS (ADRES)"
+titulo = "Población Base de Datos Única de Afiliados (BDUA) del régimen subsidiado"
+url = "https://www.datos.gov.co/d/d7a5-cnra"
+conjunto = "d7a5-cnra"
+licencia = "Por verificar en la ficha del conjunto (datos.gov.co)"
+oficial = true
+
+[adres_bdua_contributivo]
+organismo = "Administradora de los Recursos del SGSSS (ADRES)"
+titulo = "Población Base de Datos Única de Afiliados (BDUA) del régimen contributivo"
+url = "https://www.datos.gov.co/d/tq4m-hmg2"
+conjunto = "tq4m-hmg2"
+licencia = "Por verificar en la ficha del conjunto (datos.gov.co)"
+oficial = true
+
 [mindefensa_hurto_personas]
 organismo = "Ministerio de Defensa Nacional – Policía Nacional (SIEDCO)"
 titulo = "Hurto personas"

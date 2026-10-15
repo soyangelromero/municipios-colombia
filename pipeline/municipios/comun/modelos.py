@@ -15,6 +15,16 @@ class Fuente:
 
 
 @dataclass(frozen=True, slots=True)
+class Indicador:
+    clave: str
+    etiqueta: str
+    unidad: str
+    sentido: str  # mayor_mejor | menor_mejor | contexto
+    fuente: str
+    descripcion: str = ""
+
+
+@dataclass(frozen=True, slots=True)
 class Municipio:
     divipola: str
     nombre: str

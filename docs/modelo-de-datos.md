@@ -35,11 +35,26 @@ Al publicarse para la web, las observaciones se compactan en tuplas `[valor, per
 
 ## Indicadores disponibles
 
-| Indicador | Unidad | Período | Fuente |
-|---|---|---|---|
-| `poblacion`, `poblacion_cabecera`, `poblacion_rural` | personas | año proyectado (2018-2042) | `dane_proyecciones_poblacion` |
-| `superficie_km2` | km² | versión del MGN (2025) | `dane_mgn` |
-| `homicidios`, `hurto_personas` | hechos | año o rango parcial | `mindefensa_*` |
+La lista completa, con etiqueta, unidad y sentido, está en [`pipeline/config/indicadores.toml`](../pipeline/config/indicadores.toml). Una prueba verifica que todo indicador producido tenga su ficha.
+
+| Grupo | Indicadores | Período |
+|---|---|---|
+| Territorio | `poblacion`, `poblacion_cabecera`, `poblacion_rural`, `superficie_km2` | año proyectado; versión del MGN |
+| Seguridad | `homicidios`, `hurto_personas` | año o rango parcial |
+| Transparencia | `ita_autodiagnostico`, `ita_auditoria`, `indice_gobierno_digital`, `politica_gobierno_digital` | año (`2019-S2` para el semestre del ITA) |
+| Institucional | `furag_desempeno_institucional`, `furag_control_interno`, `furag_publicacion_contractual`, `furag_estado_abierto` | vigencia |
+| Finanzas | `gasto_*`, `presupuesto_gastos_definitivo`, `ingresos_*`, `transferencias_corrientes`, `recursos_capital` | año o rango parcial |
+| Contratación | `contratos_numero`, `contratos_valor`, `contratos_directa_numero`, `contratos_directa_valor` | año o rango parcial |
+| Educación | `educacion_cobertura_neta`, `educacion_cobertura_bruta`, `educacion_desercion`, `educacion_reprobacion` | año |
+| Salud | `afiliados_subsidiado`, `afiliados_contributivo` | mes de actualización (`AAAA-MM`) |
+
+## Cómo se agrega una fuente
+
+Cada módulo de `pipeline/municipios/fuentes/` expone:
+- `INDICADORES`: los indicadores que produce;
+- `ejecutar(contexto) -> Resultado`: las observaciones, lo que no cruzó (`sin_cruce`) y notas para revisar.
+
+El contexto da acceso al cliente de datos.gov.co, a los municipios y al cruce por nombre. La CLI la registra en `FUENTES` y la guarda en `datos/intermedios/<nombre>.json`.
 
 ## Indicador
 

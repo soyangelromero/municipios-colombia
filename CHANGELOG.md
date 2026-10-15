@@ -4,6 +4,21 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). S
 
 ## [Sin publicar]
 
+### Agregado (fase 2: indicadores automáticos)
+- Fuentes:
+  - transparencia (ITA de la Procuraduría);
+  - Gobierno Digital (MinTIC);
+  - desempeño institucional (FURAG);
+  - finanzas (CUIPO: gastos, presupuesto e ingresos);
+  - contratación (SECOP II);
+  - educación (MEN);
+  - salud (ADRES).
+- Cruce por nombre de departamento y municipio, con alias verificados y corrección de la «Ñ» mal codificada.
+- Registro de indicadores (`pipeline/config/indicadores.toml`): cada indicador tiene ficha y una prueba lo verifica.
+- Patrón común de fuentes (`ejecutar(contexto) -> Resultado`) y CLI genérica.
+- Modo `--tolerante` para `todo`: una fuente que falla no detiene el despliegue.
+- GitHub Pages: el sitio se publica en cada push a `main`.
+
 ### Agregado (fase 1: base territorial)
 - Fuente **población** (DANE): proyecciones municipales 2018-2042 por área (total, cabecera y rural), versión del 30 de julio de 2025.
 - Fuente **MGN 2025** (DANE): contornos de los 1.122 municipios y 33 departamentos desde el WFS oficial, y superficie oficial en km².

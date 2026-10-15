@@ -8,6 +8,7 @@ import hashlib
 import json
 import logging
 from collections.abc import Callable
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -86,6 +87,20 @@ class ClienteSocrata:
                 {"conjunto": conjunto, "params": params, "consultado": ahora_iso(), "filas": filas},
             )
         return filas
+
+    def fecha_actualizacion(self, conjunto: str) -> str:
+        """Fecha (AAAA-MM-DD) de la última actualización de los datos del conjunto.
+
+        Sirve como período de las fuentes que son una «foto» del momento (por ejemplo, afiliados
+        activos). No se guarda en caché: cambia con cada actualización de la fuente.
+        """
+        url = f"https://{self.dominio}/api/views/{conjunto}.json"
+        headers = {"X-App-Token": self.token} if self.token else {}
+        meta = self.transporte(url, {}, headers)
+        marca = meta.get("rowsUpdatedAt") or meta.get("viewLastModified")
+        if not marca:
+            raise ErrorSocrata(f"{conjunto} no informa su fecha de actualización")
+        return datetime.fromtimestamp(int(marca), UTC).date().isoformat()
 
     def _descargar_todo(self, conjunto: str, params: dict[str, str]) -> list[dict[str, Any]]:
         url = f"https://{self.dominio}/resource/{conjunto}.json"
