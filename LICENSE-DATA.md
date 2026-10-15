@@ -10,7 +10,7 @@ Los datos producidos por este proyecto se publican bajo la licencia [Creative Co
 
 Puedes copiarlos, adaptarlos y usarlos con cualquier fin, también comercial, siempre que cites la fuente:
 
-> Municipios Colombia (año). *Nombre del conjunto de datos*. URL del proyecto.
+> Municipios Colombia (año). *Nombre del conjunto de datos*. https://github.com/soyangelromero/municipios-colombia
 
 ## Datos de terceros
 

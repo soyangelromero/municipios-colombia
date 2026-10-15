@@ -11,4 +11,4 @@ En resumen, nos comprometemos a:
 
 ## Cómo reportar
 
-Escribe a **[correo de contacto del proyecto — pendiente]**. Los reportes se tratan con confidencialidad. Las personas que mantienen el proyecto pueden advertir, suspender temporalmente o expulsar a quien incumpla este código.
+Escribe a **[iangelromero@outlook.com](mailto:iangelromero@outlook.com)**. Los reportes se tratan con confidencialidad. Las personas que mantienen el proyecto pueden advertir, suspender temporalmente o expulsar a quien incumpla este código.

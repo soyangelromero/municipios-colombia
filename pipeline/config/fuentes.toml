@@ -10,6 +10,20 @@ conjunto = "gdxc-w37w"
 licencia = "Por verificar en la ficha del conjunto (datos.gov.co)"
 oficial = true
 
+[dane_proyecciones_poblacion]
+organismo = "Departamento Administrativo Nacional de Estadística (DANE)"
+titulo = "Proyecciones de población municipal por área geográfica 2018-2042 (actualizadas el 30 de julio de 2025)"
+url = "https://www.dane.gov.co/index.php/estadisticas-por-tema/demografia-y-poblacion/proyecciones-de-poblacion"
+licencia = "Por verificar en los términos de uso del DANE"
+oficial = true
+
+[dane_mgn]
+organismo = "Departamento Administrativo Nacional de Estadística (DANE)"
+titulo = "Marco Geoestadístico Nacional (MGN), versión 2025 – servicio WFS"
+url = "https://portalgis.dane.gov.co/mparcgis/services/MGN2025/Serv_CapasMGN_2025/MapServer/WFSServer?service=WFS&request=GetCapabilities"
+licencia = "Por verificar en los términos de uso del DANE"
+oficial = true
+
 [mindefensa_homicidios]
 organismo = "Ministerio de Defensa Nacional – Policía Nacional (SIEDCO)"
 titulo = "Homicidio"

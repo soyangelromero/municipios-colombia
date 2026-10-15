@@ -33,6 +33,14 @@ Cada dato es una observación:
 
 Al publicarse para la web, las observaciones se compactan en tuplas `[valor, periodo, fuente]` para ahorrar espacio. Los nombres largos viven una sola vez en la tabla de fuentes.
 
+## Indicadores disponibles
+
+| Indicador | Unidad | Período | Fuente |
+|---|---|---|---|
+| `poblacion`, `poblacion_cabecera`, `poblacion_rural` | personas | año proyectado (2018-2042) | `dane_proyecciones_poblacion` |
+| `superficie_km2` | km² | versión del MGN (2025) | `dane_mgn` |
+| `homicidios`, `hurto_personas` | hechos | año o rango parcial | `mindefensa_*` |
+
 ## Indicador
 
 Cada indicador tiene una ficha (en `pipeline/config/indicadores.toml`, desde la fase 2):

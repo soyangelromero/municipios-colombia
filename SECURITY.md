@@ -2,7 +2,7 @@
 
 ## Reportar una vulnerabilidad
 
-**No abras un *issue* público.** Usa la opción de [reporte privado de vulnerabilidades de GitHub](https://docs.github.com/es/code-security/security-advisories/guidance-on-reporting-and-writing-information-about-vulnerabilities/privately-reporting-a-security-vulnerability), en la pestaña *Security* del repositorio, o escribe a **[correo de contacto del proyecto — pendiente]**.
+**No abras un *issue* público.** Usa la opción de [reporte privado de vulnerabilidades de GitHub](https://docs.github.com/es/code-security/security-advisories/guidance-on-reporting-and-writing-information-about-vulnerabilities/privately-reporting-a-security-vulnerability), en la pestaña [*Security* del repositorio](https://github.com/soyangelromero/municipios-colombia/security), o escribe a **[iangelromero@outlook.com](mailto:iangelromero@outlook.com)**.
 
 Incluye:
 - una descripción del problema,

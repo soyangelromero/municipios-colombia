@@ -24,6 +24,9 @@ __pycache__/
 build/
 dist/
 
+# Configuración local de herramientas
+.claude/
+
 # Sistema y editores
 .DS_Store
 Thumbs.db

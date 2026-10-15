@@ -8,7 +8,7 @@ Observatorio cívico, abierto y neutral sobre los **1.104 municipios de Colombia
 
 Cada cifra lleva su fuente oficial.
 
-> Estado: **fase 0, fundaciones**. El pipeline ya descarga la lista oficial de municipios (DIVIPOLA) y las cifras de homicidios y hurtos. El sitio web todavía no tiene contenido.
+> Estado: **fase 1, base territorial**. El pipeline ya descarga la lista oficial de municipios (DIVIPOLA), la población proyectada por el DANE, los contornos del Marco Geoestadístico Nacional (y con ellos genera los mapas SVG) y las cifras de homicidios y hurtos. El sitio web todavía no tiene contenido.
 
 ## Cómo está hecho
 
@@ -31,17 +31,26 @@ Más detalle en [docs/arquitectura.md](docs/arquitectura.md) y en las [decisione
 Requisitos: Python 3.12 o superior y git.
 
 ```bash
-git clone <url-del-repositorio> municipios-colombia
+git clone https://github.com/soyangelromero/municipios-colombia.git
 cd municipios-colombia
 python -m venv .venv
 # Windows: .venv\Scripts\activate    ·    macOS/Linux: source .venv/bin/activate
 pip install -e "pipeline[dev]"
 python -m municipios fuentes          # lista las fuentes registradas
-python -m municipios todo             # descarga y normaliza DIVIPOLA y seguridad
+python -m municipios todo             # corre todas las fuentes (la primera vez tarda unos minutos)
 pytest pipeline                       # corre las pruebas
 ```
 
-Los resultados quedan en `datos/intermedios/`, que no se versiona. Las descargas se guardan en caché en `datos/crudos/`; para forzar una descarga nueva, usa `--refrescar`.
+También se puede correr cada paso por separado: `divipola`, `poblacion`, `mapas` y `seguridad`.
+
+- Los resultados quedan en `datos/intermedios/` y los mapas en `web/data/mapas/`. Ninguna de las dos carpetas se versiona.
+- Las descargas se guardan en caché en `datos/crudos/`; la del MGN pesa unos 240 MB. Para forzar una descarga nueva, usa `--refrescar`.
+
+Para ver los mapas generados, sirve la carpeta `web/` y abre http://localhost:8000/data/mapas/:
+
+```bash
+python -m http.server 8000 --directory web
+```
 
 ### Token de datos.gov.co (opcional)
 
@@ -65,6 +74,11 @@ Sin token, la API de datos.gov.co funciona, pero con un límite de peticiones m�
 ## Contribuir
 
 ¿Encontraste un dato equivocado, una fuente mejor o un error? Lee [CONTRIBUTING.md](CONTRIBUTING.md). Todas las personas que participan se comprometen con el [código de conducta](CODE_OF_CONDUCT.md).
+
+## Contacto
+
+- Errores en datos, propuestas y preguntas: abre un [*issue*](https://github.com/soyangelromero/municipios-colombia/issues).
+- Asuntos privados o vulnerabilidades de seguridad: [iangelromero@outlook.com](mailto:iangelromero@outlook.com) (ver [SECURITY.md](SECURITY.md)).
 
 ## Licencias
 

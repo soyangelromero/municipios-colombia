@@ -10,13 +10,17 @@ from municipios.comun.modelos import Municipio
 from municipios.comun.registro import cargar_fuentes
 from municipios.comun.salida import ahora_iso, escribir_json, leer_json
 from municipios.comun.socrata import ClienteSocrata
-from municipios.config import DIR_CRUDOS, DIR_INTERMEDIOS, cargar_env
-from municipios.fuentes import divipola, seguridad
+from municipios.config import DIR_CRUDOS, DIR_INTERMEDIOS, RAIZ, cargar_env
+from municipios.exportar import mapas
+from municipios.fuentes import divipola, mgn, poblacion, seguridad
 
 log = logging.getLogger("municipios")
 
 RUTA_MUNICIPIOS = DIR_INTERMEDIOS / "municipios.json"
 RUTA_SEGURIDAD = DIR_INTERMEDIOS / "seguridad.json"
+RUTA_POBLACION = DIR_INTERMEDIOS / "poblacion.json"
+RUTA_TERRITORIO = DIR_INTERMEDIOS / "territorio.json"
+DIR_MAPAS = RAIZ / "web" / "data" / "mapas"
 
 
 def comando_fuentes(_: ClienteSocrata, __: bool) -> None:
@@ -25,6 +29,7 @@ def comando_fuentes(_: ClienteSocrata, __: bool) -> None:
 
 
 def comando_divipola(cliente: ClienteSocrata, refrescar: bool) -> list[Municipio]:
+    """Descarga DIVIPOLA. Va primero en `todo` porque las demás fuentes cruzan con ella."""
     municipios = divipola.normalizar(divipola.descargar(cliente, refrescar))
     escribir_json(
         RUTA_MUNICIPIOS,
@@ -35,11 +40,69 @@ def comando_divipola(cliente: ClienteSocrata, refrescar: bool) -> list[Municipio
     return municipios
 
 
-def comando_seguridad(cliente: ClienteSocrata, refrescar: bool) -> None:
+def _municipios(cliente: ClienteSocrata, refrescar: bool) -> dict[str, Municipio]:
+    """Municipios por código: del archivo intermedio si existe, si no los descarga."""
     if RUTA_MUNICIPIOS.exists() and not refrescar:
-        codigos = {m["divipola"] for m in leer_json(RUTA_MUNICIPIOS)["municipios"]}
+        lista = [Municipio(**m) for m in leer_json(RUTA_MUNICIPIOS)["municipios"]]
     else:
-        codigos = {m.divipola for m in comando_divipola(cliente, refrescar)}
+        lista = comando_divipola(cliente, refrescar)
+    return {m.divipola: m for m in lista}
+
+
+def _avisar_sin_cruce(que: str, codigos: dict[str, object]) -> None:
+    if codigos:
+        detalle = ", ".join(f"{c} ({v})" for c, v in sorted(codigos.items())[:10])
+        log.warning("%s: %d códigos sin cruce con DIVIPOLA: %s", que, len(codigos), detalle)
+
+
+def comando_poblacion(cliente: ClienteSocrata, refrescar: bool) -> None:
+    codigos = set(_municipios(cliente, refrescar=False))
+    ruta = poblacion.descargar(DIR_CRUDOS / "dane", refrescar)
+    observaciones, sin_cruce = poblacion.normalizar(poblacion.leer_filas(ruta), codigos)
+    _avisar_sin_cruce("Población", sin_cruce)
+    cubiertos = {o.divipola for o in observaciones}
+    faltantes = sorted(codigos - cubiertos)
+    if faltantes:
+        log.warning("Población: %d municipios sin dato: %s", len(faltantes), faltantes)
+    escribir_json(
+        RUTA_POBLACION,
+        {
+            "generado": ahora_iso(),
+            "sin_cruce": sin_cruce,
+            "sin_dato": faltantes,
+            "observaciones": observaciones,
+        },
+    )
+    log.info("Población: %d observaciones → %s", len(observaciones), RUTA_POBLACION)
+
+
+def comando_mapas(cliente: ClienteSocrata, refrescar: bool) -> None:
+    municipios = _municipios(cliente, refrescar=False)
+    cache = DIR_CRUDOS / "mgn"
+    resultado = mapas.construir(
+        mgn.leer(mgn.descargar(mgn.MUNICIPIOS, cache, refrescar), mgn.MUNICIPIOS),
+        mgn.leer(mgn.descargar(mgn.DEPARTAMENTOS, cache, refrescar), mgn.DEPARTAMENTOS),
+        municipios,
+        DIR_MAPAS,
+    )
+    _avisar_sin_cruce("MGN", resultado.sin_divipola)
+    if resultado.sin_geometria:
+        sin_geo = [f"{c} {municipios[c].nombre}" for c in resultado.sin_geometria]
+        log.warning("Sin contorno en el MGN (no aparecen en el mapa): %s", ", ".join(sin_geo))
+    escribir_json(
+        RUTA_TERRITORIO,
+        {
+            "generado": ahora_iso(),
+            "sin_geometria": resultado.sin_geometria,
+            "sin_divipola": resultado.sin_divipola,
+            "observaciones": resultado.superficie,
+        },
+    )
+    log.info("%d mapas → %s (vista previa: index.html)", len(resultado.archivos), DIR_MAPAS)
+
+
+def comando_seguridad(cliente: ClienteSocrata, refrescar: bool) -> None:
+    codigos = set(_municipios(cliente, refrescar=False))
 
     observaciones, sin_cruce, ultimas = [], {}, {}
     for delito in seguridad.DELITOS:
@@ -49,13 +112,7 @@ def comando_seguridad(cliente: ClienteSocrata, refrescar: bool) -> None:
         ultimas[delito.indicador] = ultima.isoformat()
         if faltantes:
             sin_cruce[delito.indicador] = faltantes
-            log.warning(
-                "%s: %d códigos sin cruce con DIVIPOLA (%d hechos): %s",
-                delito.indicador,
-                len(faltantes),
-                sum(faltantes.values()),
-                ", ".join(sorted(faltantes)[:10]),
-            )
+            _avisar_sin_cruce(delito.indicador, faltantes)
         log.info("%s: %d observaciones, datos hasta %s", delito.indicador, len(obs), ultima)
 
     escribir_json(
@@ -72,12 +129,15 @@ def comando_seguridad(cliente: ClienteSocrata, refrescar: bool) -> None:
 
 def comando_todo(cliente: ClienteSocrata, refrescar: bool) -> None:
     comando_divipola(cliente, refrescar)
-    comando_seguridad(cliente, refrescar=False)
+    for comando in (comando_poblacion, comando_mapas, comando_seguridad):
+        comando(cliente, refrescar)
 
 
 COMANDOS = {
     "fuentes": (comando_fuentes, "Lista las fuentes registradas"),
     "divipola": (comando_divipola, "Descarga y normaliza la lista oficial de municipios"),
+    "poblacion": (comando_poblacion, "Descarga las proyecciones de población del DANE"),
+    "mapas": (comando_mapas, "Descarga el MGN y genera los mapas SVG (≈180 MB la primera vez)"),
     "seguridad": (comando_seguridad, "Descarga homicidios y hurtos por municipio y año"),
     "todo": (comando_todo, "Corre todas las fuentes disponibles"),
 }
