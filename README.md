@@ -8,7 +8,7 @@ Observatorio cívico, abierto y neutral sobre los **1.104 municipios de Colombia
 
 Cada cifra lleva su fuente oficial.
 
-> Estado: **fase 2, indicadores automáticos**. El pipeline descarga y cruza con DIVIPOLA 11 fuentes oficiales: población, mapas, seguridad, transparencia, gobierno digital, desempeño institucional, finanzas, contratación, educación y salud. El sitio web todavía no muestra los datos.
+> Estado: **fase 3, índice municipal v0.1**. El pipeline descarga y cruza con DIVIPOLA 12 fuentes oficiales y calcula el índice municipal (ver [docs/metodologia.md](docs/metodologia.md)). El sitio web todavía no muestra los datos.
 
 **Sitio (en construcción):** https://soyangelromero.github.io/municipios-colombia/ · Mapas generados: https://soyangelromero.github.io/municipios-colombia/data/mapas/
 
@@ -43,7 +43,7 @@ python -m municipios todo             # corre todas las fuentes (la primera vez 
 pytest pipeline                       # corre las pruebas
 ```
 
-También se puede correr cada paso por separado (`python -m municipios --help` los lista): `divipola`, `poblacion`, `seguridad`, `transparencia`, `gobierno_digital`, `desempeno_institucional`, `finanzas`, `contratacion`, `educacion`, `salud` y `mapas`.
+También se puede correr cada paso por separado (`python -m municipios --help` los lista): `divipola`, `poblacion`, `seguridad`, `transparencia`, `gobierno_digital`, `desempeno_institucional`, `finanzas`, `contratacion`, `educacion`, `salud`, `grupos`, `indice` y `mapas`.
 
 - Los resultados quedan en `datos/intermedios/` y los mapas en `web/data/mapas/`. Ninguna de las dos carpetas se versiona.
 - Las descargas se guardan en caché en `datos/crudos/`; la del MGN pesa unos 240 MB. Para forzar una descarga nueva, usa `--refrescar`.

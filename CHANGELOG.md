@@ -4,6 +4,18 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). S
 
 ## [Sin publicar]
 
+### Agregado (fase 3: índice municipal v0.1)
+- Fuente `grupos`: grupos de capacidades iniciales del DNP (MDM 2020) como pares del índice, con asignación documentada para dos municipios nuevos.
+- Índice municipal v0.1 (`python -m municipios indice`), configurado en `pipeline/config/indice.toml`:
+  - 4 pilares: transparencia 40, servicios y seguridad 30, gestión 15, control 15;
+  - puntajes absolutos o percentil entre pares;
+  - obligaciones no reportadas cuentan como 0;
+  - tope de 39,9 sin cuentas;
+  - tasas de delitos suavizadas;
+  - puestos nacional, departamental y en el grupo;
+  - rango de puestos con pesos ±10 puntos.
+- `docs/metodologia.md`.
+
 ### Agregado (fase 2: indicadores automáticos)
 - Fuentes:
   - transparencia (ITA de la Procuraduría);

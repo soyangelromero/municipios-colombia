@@ -1,0 +1,198 @@
+# Índice municipal: única fuente de verdad. El cálculo (pipeline/municipios/indice/) y la página
+# de metodología se generan desde este archivo; cambiar algo aquí exige anotarlo en CHANGELOG.md.
+
+version = "0.1"
+nombre = "Índice municipal"
+
+# Semáforo sobre el índice final (0 a 100).
+[semaforo]
+rojo_menor_a = 40
+verde_desde = 70
+
+[reglas]
+# Si el municipio no reportó su ejecución presupuestal (CUIPO) del último año completo, el índice
+# no puede pasar de este valor: no hay cuentas que revisar.
+tope_sin_cuentas = 39.9
+# Un pilar vale solo si tiene datos para al menos esta fracción de su peso.
+cobertura_minima_pilar = 0.6
+# El índice exige al menos este número de pilares válidos, y siempre el de transparencia.
+pilares_minimos = 3
+# Grupos de pares con menos municipios que esto se comparan contra todo el país.
+pares_minimos = 10
+# Análisis de sensibilidad: se mueve el peso de cada pilar en ± estos puntos.
+sensibilidad_puntos = 10
+# Un dato más viejo que esto (en años, contra el año en curso) no entra al índice.
+antiguedad_maxima_anios = 3
+# Suavizado de tasas de delitos: población ficticia que se suma con la tasa de su grupo, para que
+# en un municipio muy pequeño un solo hecho no dispare la tasa.
+suavizado_poblacion = 20000
+
+# Cada componente tiene:
+# - puntaje = «absoluto»: el valor ya está en 0-100 (o es un sí/no) y se usa tal cual. Se aplica
+#   a mediciones oficiales con la misma vara para todos (transparencia, control).
+# - puntaje = «pares»: percentil dentro del grupo de capacidades del DNP (0 = peor del grupo,
+#   100 = mejor del grupo).
+# - sentido: «mayor_mejor» o «menor_mejor».
+# - si_falta (opcional): puntaje para un municipio sin dato. Se usa en obligaciones legales
+#   (reportar el ITA o el FURAG): no reportar cuenta como 0. Sin este campo, el peso del
+#   componente se reparte entre los demás del pilar (por ejemplo, la auditoría del ITA depende
+#   del muestreo de la Procuraduría, no del municipio).
+
+[pilares.T]
+nombre = "Transparencia"
+peso = 40
+descripcion = "Si la alcaldía muestra sus cuentas y cumple sus obligaciones de información pública."
+
+[[pilares.T.componentes]]
+id = "ita_auditoria"
+nombre = "Índice de Transparencia, auditado por la Procuraduría"
+peso = 2
+puntaje = "absoluto"
+sentido = "mayor_mejor"
+
+[[pilares.T.componentes]]
+id = "ita_autodiagnostico"
+nombre = "Índice de Transparencia, autodiagnóstico de la alcaldía"
+peso = 0.5
+puntaje = "absoluto"
+sentido = "mayor_mejor"
+si_falta = 0
+
+[[pilares.T.componentes]]
+id = "publica_secop"
+nombre = "Publica sus contratos en SECOP II"
+peso = 1
+puntaje = "absoluto"
+sentido = "mayor_mejor"
+
+[[pilares.T.componentes]]
+id = "furag_publicacion_contractual"
+nombre = "Registro y publicación contractual (FURAG)"
+peso = 1
+puntaje = "absoluto"
+sentido = "mayor_mejor"
+si_falta = 0
+
+[[pilares.T.componentes]]
+id = "furag_estado_abierto"
+nombre = "Estado abierto (FURAG)"
+peso = 1
+puntaje = "absoluto"
+sentido = "mayor_mejor"
+si_falta = 0
+
+[[pilares.T.componentes]]
+id = "indice_gobierno_digital"
+nombre = "Índice de Gobierno Digital (MinTIC)"
+peso = 0.5
+puntaje = "absoluto"
+sentido = "mayor_mejor"
+si_falta = 0
+
+[[pilares.T.componentes]]
+id = "reporta_cuipo"
+nombre = "Reporta su ejecución presupuestal (CUIPO)"
+peso = 0.5
+puntaje = "absoluto"
+sentido = "mayor_mejor"
+
+[pilares.S]
+nombre = "Servicios y seguridad"
+peso = 30
+descripcion = "Qué recibe la población, comparado con municipios de capacidades parecidas."
+
+[[pilares.S.componentes]]
+id = "educacion_cobertura_neta"
+nombre = "Cobertura neta en educación"
+peso = 1
+puntaje = "pares"
+sentido = "mayor_mejor"
+
+[[pilares.S.componentes]]
+id = "educacion_desercion"
+nombre = "Deserción escolar"
+peso = 0.5
+puntaje = "pares"
+sentido = "menor_mejor"
+
+[[pilares.S.componentes]]
+id = "cobertura_salud"
+nombre = "Afiliación al sistema de salud"
+peso = 1
+puntaje = "pares"
+sentido = "mayor_mejor"
+
+[[pilares.S.componentes]]
+id = "tasa_homicidios"
+nombre = "Homicidios por cada 100.000 habitantes (promedio de 3 años)"
+peso = 1
+puntaje = "pares"
+sentido = "menor_mejor"
+
+[[pilares.S.componentes]]
+id = "tasa_hurto_personas"
+nombre = "Hurtos a personas por cada 100.000 habitantes (promedio de 3 años)"
+peso = 0.5
+puntaje = "pares"
+sentido = "menor_mejor"
+
+[pilares.G]
+nombre = "Gestión fiscal y contratación"
+peso = 15
+descripcion = "Cómo ejecuta su presupuesto y cómo contrata, frente a municipios parecidos."
+
+[[pilares.G.componentes]]
+id = "pct_inversion"
+nombre = "Inversión sobre el gasto total"
+peso = 1
+puntaje = "pares"
+sentido = "mayor_mejor"
+
+[[pilares.G.componentes]]
+id = "ejecucion_presupuestal"
+nombre = "Ejecución del presupuesto (comprometido sobre lo aprobado)"
+peso = 1
+puntaje = "pares"
+sentido = "mayor_mejor"
+
+[[pilares.G.componentes]]
+id = "pct_contratacion_directa"
+nombre = "Valor contratado por contratación directa"
+peso = 1
+puntaje = "pares"
+sentido = "menor_mejor"
+
+[pilares.C]
+nombre = "Control e institucionalidad"
+peso = 15
+descripcion = "Capacidad institucional y control interno, según la medición oficial (FURAG)."
+
+[[pilares.C.componentes]]
+id = "furag_desempeno_institucional"
+nombre = "Índice de Desempeño Institucional (FURAG)"
+peso = 1
+puntaje = "absoluto"
+sentido = "mayor_mejor"
+si_falta = 0
+
+[[pilares.C.componentes]]
+id = "furag_control_interno"
+nombre = "Control interno (FURAG)"
+peso = 1
+puntaje = "absoluto"
+sentido = "mayor_mejor"
+si_falta = 0
+
+# Datos de contexto: se muestran en cada ficha, pero no puntúan.
+[contexto]
+indicadores = [
+  "poblacion",
+  "superficie_km2",
+  "densidad",
+  "gasto_por_habitante",
+  "ingresos_tributarios_por_habitante",
+  "dependencia_transferencias",
+  "contratos_numero",
+  "contratos_valor",
+  "mdm_puntaje",
+]

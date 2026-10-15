@@ -24,6 +24,14 @@ url = "https://portalgis.dane.gov.co/mparcgis/services/MGN2025/Serv_CapasMGN_202
 licencia = "Por verificar en los términos de uso del DANE"
 oficial = true
 
+[dnp_mdm]
+organismo = "Departamento Nacional de Planeación (DNP)"
+titulo = "Medición del Desempeño Municipal (MDM)"
+url = "https://www.datos.gov.co/d/nkjx-rsq7"
+conjunto = "nkjx-rsq7"
+licencia = "Por verificar en la ficha del conjunto (datos.gov.co)"
+oficial = true
+
 [mindefensa_homicidios]
 organismo = "Ministerio de Defensa Nacional – Policía Nacional (SIEDCO)"
 titulo = "Homicidio"

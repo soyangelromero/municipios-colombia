@@ -5,6 +5,7 @@ import logging
 import os
 import sys
 from collections import Counter
+from datetime import date
 from types import ModuleType
 
 from municipios.comun.contexto import Contexto, Resultado
@@ -20,6 +21,7 @@ from municipios.fuentes import (
     educacion,
     furag,
     gobierno_digital,
+    grupos,
     ita,
     mgn,
     poblacion,
@@ -27,16 +29,22 @@ from municipios.fuentes import (
     secop,
     seguridad,
 )
+from municipios.indice.almacen import Almacen
+from municipios.indice.calculo import calcular as calcular_indice
+from municipios.indice.calculo import cargar_config
+from municipios.indice.derivados import Calculadora
 
 log = logging.getLogger("municipios")
 
 RUTA_MUNICIPIOS = DIR_INTERMEDIOS / "municipios.json"
+RUTA_INDICE = DIR_INTERMEDIOS / "indice.json"
 DIR_MAPAS = RAIZ / "web" / "data" / "mapas"
 
 # Fuentes que siguen el patrón `ejecutar(contexto) -> Resultado`. Cada una se guarda en
 # datos/intermedios/<nombre>.json. El orden es el de `todo`.
 FUENTES: dict[str, tuple[ModuleType, str]] = {
     "poblacion": (poblacion, "Proyecciones de población del DANE"),
+    "grupos": (grupos, "Grupos de capacidades iniciales del DNP (pares del índice)"),
     "seguridad": (seguridad, "Homicidios y hurtos por municipio y año (MinDefensa)"),
     "transparencia": (ita, "Índice de Transparencia y Acceso a la Información (Procuraduría)"),
     "gobierno_digital": (gobierno_digital, "Índice de Gobierno Digital (MinTIC)"),
@@ -126,6 +134,47 @@ def comando_fuente(nombre: str):
     return ejecutar
 
 
+def comando_indice(contexto: Contexto) -> None:
+    """Calcula el índice con lo que haya en datos/intermedios/ y lo guarda en indice.json."""
+    config = cargar_config()
+    almacen = Almacen.desde_directorio(DIR_INTERMEDIOS)
+    grupos = {
+        codigo: str(o.valor)
+        for codigo in contexto.municipios
+        if (o := almacen.ultimo(codigo, "grupo_capacidades")) is not None
+    }
+    calculadora = Calculadora(
+        almacen,
+        contexto.municipios,
+        grupos,
+        anio_actual=date.today().year,
+        antiguedad_maxima=int(config.reglas["antiguedad_maxima_anios"]),
+        suavizado_poblacion=float(config.reglas["suavizado_poblacion"]),
+    )
+    datos = calculadora.calcular()
+    resultado = calcular_indice(datos, contexto.municipios, grupos, config)
+    for codigo, fila in resultado.items():
+        fila["datos"] = datos[codigo]
+    escribir_json(
+        RUTA_INDICE,
+        {
+            "generado": ahora_iso(),
+            "version": config.version,
+            "anios_referencia": calculadora.ref,
+            "municipios": resultado,
+        },
+    )
+    con_indice = [f for f in resultado.values() if f["indice"] is not None]
+    semaforos = Counter(f["semaforo"] for f in con_indice)
+    log.info(
+        "Índice v%s: %d municipios con índice %s → %s",
+        config.version,
+        len(con_indice),
+        dict(semaforos),
+        RUTA_INDICE.name,
+    )
+
+
 def comando_todo(contexto: Contexto) -> None:
     """Corre todo en orden. Con --tolerante, una fuente que falla no detiene a las demás."""
     comando_divipola(contexto)
@@ -138,6 +187,7 @@ def comando_todo(contexto: Contexto) -> None:
                 raise
             log.exception("%s falló; se continúa con las demás fuentes", nombre)
             fallidas[nombre] = repr(error)[:300]
+    comando_indice(contexto)
     comando_mapas(contexto)
     escribir_json(DIR_INTERMEDIOS / "estado.json", {"generado": ahora_iso(), "fallidas": fallidas})
     if fallidas:
@@ -148,6 +198,7 @@ COMANDOS = {
     "fuentes": (comando_fuentes, "Lista las fuentes registradas"),
     "divipola": (comando_divipola, "Descarga y normaliza la lista oficial de municipios"),
     **{nombre: (comando_fuente(nombre), ayuda) for nombre, (_, ayuda) in FUENTES.items()},
+    "indice": (comando_indice, "Calcula el índice municipal con los datos descargados"),
     "mapas": (comando_mapas, "Descarga el MGN y genera los mapas SVG (≈240 MB la primera vez)"),
     "todo": (comando_todo, "Corre todo, en orden"),
 }

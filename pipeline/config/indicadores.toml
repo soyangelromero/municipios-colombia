@@ -231,3 +231,17 @@ etiqueta = "Afiliados activos al régimen contributivo"
 unidad = "personas"
 sentido = "contexto"
 fuente = "adres_bdua_contributivo"
+
+# --- Grupos de pares (DNP) ---
+[grupo_capacidades]
+etiqueta = "Grupo de capacidades iniciales (DNP)"
+unidad = "categoría (C, G1 a G5)"
+sentido = "contexto"
+fuente = "dnp_mdm"
+descripcion = "Agrupación oficial para comparar municipios con capacidades parecidas."
+
+[mdm_puntaje]
+etiqueta = "Medición de Desempeño Municipal (DNP)"
+unidad = "puntos de 0 a 100"
+sentido = "contexto"
+fuente = "dnp_mdm"
