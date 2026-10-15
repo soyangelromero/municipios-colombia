@@ -1,0 +1,10 @@
+# Datos del sitio publicado. Quien haga un fork solo necesita cambiar este archivo.
+
+nombre = "Municipios Colombia"
+lema = "¿Tu municipio muestra sus cuentas?"
+descripcion = "Transparencia, servicios, seguridad y control de los 1.104 municipios de Colombia, comparados con municipios de capacidades parecidas y con la fuente oficial de cada dato."
+# URL pública con barra final. Se usa para el sitemap y las etiquetas para compartir.
+url_base = "https://soyangelromero.github.io/municipios-colombia/"
+repositorio = "https://github.com/soyangelromero/municipios-colombia"
+correo = "iangelromero@outlook.com"
+idioma = "es-CO"

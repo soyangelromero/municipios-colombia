@@ -30,7 +30,16 @@ def fila_ita(sujeto, nit, auto, audit, municipio="MEDELLIN", periodo="2025"):
     }
 
 
-def test_ita_prefiere_la_alcaldia_y_arma_mapa_de_nits(cruce):
+def test_ita_es_alcaldia():
+    assert ita.es_alcaldia("ALCALDÍA DISTRITAL DE SANTA MARTA, DISTRITO TURÍSTICO")
+    assert ita.es_alcaldia("SECRETARIA GENERAL ALCALDIA MAYOR DE BOGOTA D.C.")
+    assert ita.es_alcaldia("MUNICIPIO DE ENVIGADO")
+    assert not ita.es_alcaldia("ALCALDIA LOCAL DE BOSA")
+    assert not ita.es_alcaldia("CONCEJO MUNICIPAL DE SAN PEDRO DE LOS MILAGROS")
+    assert not ita.es_alcaldia("EMPRESAS PUBLICAS DEL MUNICIPIO DE X")
+
+
+def test_ita_toma_solo_la_alcaldia_y_arma_mapa_de_nits(cruce):
     filas = [
         fila_ita("CONCEJO MUNICIPAL", "800000001", "50", None),
         fila_ita("ALCALDIA DE MEDELLIN", "8909052111", "98", "71.5"),

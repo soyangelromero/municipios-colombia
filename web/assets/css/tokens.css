@@ -1,34 +1,71 @@
 /* Tokens de diseño: todo color, tipografía y espacio del sitio sale de aquí. */
 :root {
-  --fondo: #f7f7f5;
+  color-scheme: light dark;
+
+  --fondo: #f5f6f8;
   --superficie: #ffffff;
-  --texto: #15171a;
-  --texto-suave: #4b5159;
-  --linea: #d9dce1;
-  --acento: #c8102e;
+  --superficie-2: #eef1f5;
+  --texto: #141922;
+  --texto-suave: #4a5363;
+  --linea: #dce1e8;
+  --acento: #1d4ed8;
+  --acento-fuerte: #0f2a5c;
+  --acento-texto: #ffffff;
+  --enfoque: #2563eb;
 
-  --bien: #1a7f37;
-  --regular: #b58100;
-  --mal: #c62828;
+  /* Semáforo del índice: color + texto, nunca solo color. */
+  --verde: #15803d;
+  --verde-suave: #e2f3e7;
+  --amarillo: #a16207;
+  --amarillo-suave: #fbf0d4;
+  --rojo: #b91c1c;
+  --rojo-suave: #fbe3e3;
 
-  --fuente: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --fuente-mono: ui-monospace, "Cascadia Mono", Menlo, monospace;
+  /* Escala de los mapas y barras: cinco tramos, de rojo a verde. */
+  --escala-e1: #d64545;
+  --escala-e2: #ee8a3c;
+  --escala-e3: #f2c14e;
+  --escala-e4: #9cc65a;
+  --escala-e5: #2f9e55;
+  --escala-sin: #c9cfd7;
 
-  --margen: clamp(16px, 4vw, 48px);
-  --radio: 12px;
+  --fuente: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --fuente-mono: ui-monospace, "Cascadia Mono", "SFMono-Regular", Menlo, monospace;
+
+  --margen: clamp(16px, 4vw, 40px);
+  --radio: 14px;
+  --radio-chico: 8px;
+  --sombra: 0 1px 2px rgb(15 23 42 / 6%), 0 4px 16px rgb(15 23 42 / 6%);
+  --transicion: 160ms ease;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --fondo: #0d0f12;
-    --superficie: #16191e;
-    --texto: #f2f3f5;
-    --texto-suave: #a4abb5;
-    --linea: #2a2f36;
-    --acento: #ff5a5f;
+    --fondo: #0d1117;
+    --superficie: #151b23;
+    --superficie-2: #1c2430;
+    --texto: #e7ebf0;
+    --texto-suave: #a2acba;
+    --linea: #2a3340;
+    --acento: #7aa2ff;
+    --acento-fuerte: #0f2a5c;
+    --acento-texto: #0d1117;
+    --enfoque: #93b4ff;
 
-    --bien: #3fb950;
-    --regular: #e3b341;
-    --mal: #f85149;
+    --verde: #4ade80;
+    --verde-suave: #12301e;
+    --amarillo: #fbbf24;
+    --amarillo-suave: #33270b;
+    --rojo: #f87171;
+    --rojo-suave: #3a1414;
+
+    --escala-e1: #e05b5b;
+    --escala-e2: #f0954a;
+    --escala-e3: #e8bd4f;
+    --escala-e4: #92bf55;
+    --escala-e5: #3fae63;
+    --escala-sin: #3a4350;
+
+    --sombra: 0 1px 2px rgb(0 0 0 / 40%), 0 4px 16px rgb(0 0 0 / 30%);
   }
 }

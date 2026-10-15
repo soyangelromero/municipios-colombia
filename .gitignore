@@ -10,10 +10,8 @@ privado/
 datos/crudos/
 datos/intermedios/
 
-# Archivos generados por el pipeline para la web
-web/data/
-web/m/
-web/d/
+# Sitio generado por el pipeline (python -m municipios sitio): se publica, no se versiona
+dist/
 
 # Python
 __pycache__/
@@ -22,7 +20,6 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 build/
-dist/
 
 # Configuración local de herramientas
 .claude/

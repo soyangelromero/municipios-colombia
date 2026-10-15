@@ -43,3 +43,6 @@ select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]
 [tool.ruff.lint.per-file-ignores]
 # GML de ejemplo copiado del servicio real: sus líneas son largas a propósito.
 "tests/test_mgn.py" = ["E501"]
+# Plantillas HTML: partir el marcado en líneas cortas lo vuelve más difícil de leer.
+"municipios/exportar/paginas.py" = ["E501"]
+"municipios/exportar/plantillas.py" = ["E501"]

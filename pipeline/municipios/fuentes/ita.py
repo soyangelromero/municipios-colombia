@@ -10,7 +10,7 @@ import re
 from typing import Any
 
 from municipios.comun.contexto import Contexto, Resultado
-from municipios.comun.cruce import Cruce
+from municipios.comun.cruce import Cruce, clave
 from municipios.comun.modelos import Observacion
 
 FUENTE = "pgn_ita"
@@ -26,7 +26,9 @@ def descargar(contexto: Contexto) -> list[dict[str, Any]]:
             " max(indicador_autodiagnostico::number) AS autodiagnostico,"
             " max(indicador_auditoria::number) AS auditoria"
         ),
-        where="naturaleza_juridica = 'ENTIDAD TERRITORIAL' AND tipo_orden = 'MUNICIPAL'",
+        # Bogotá y los distritos figuran como «DISTRITAL», y algunos con naturaleza «NA»: por eso
+        # no se filtra por naturaleza jurídica sino, después, por el nombre del sujeto obligado.
+        where="tipo_orden IN ('MUNICIPAL', 'DISTRITAL')",
         group="periodo_medicion, departamento, municipio, sujeto_obligado, numero_documento",
         refrescar=contexto.refrescar,
     )
@@ -43,32 +45,37 @@ def nit(texto: str) -> str:
     return re.sub(r"\D", "", texto)[:9]
 
 
-def _es_alcaldia(sujeto: str) -> bool:
-    return bool(re.search(r"ALCALD|MUNICIPIO", sujeto.upper()))
+# La alcaldía (o su secretaría general, en Bogotá), no concejos, empresas ni alcaldías locales.
+ES_ALCALDIA = re.compile(r"^(ALCALDIA (?!LOCAL)|MUNICIPIO DE |SECRETARIA GENERAL ALCALDIA MAYOR)")
+
+
+def es_alcaldia(sujeto: str) -> bool:
+    return bool(ES_ALCALDIA.match(clave(sujeto) + " "))
 
 
 def normalizar(filas: list[dict[str, Any]], cruce: Cruce) -> tuple[Resultado, dict[str, str]]:
-    """Observaciones por alcaldía y período, y el mapa NIT → DIVIPOLA.
+    """Observaciones de la alcaldía de cada municipio, por período, y el mapa NIT → DIVIPOLA.
 
-    Si en un municipio y período reporta más de una entidad territorial, se prefiere la que se
-    identifica como alcaldía o municipio.
+    Solo cuentan los sujetos obligados que son la alcaldía (ver `ES_ALCALDIA`). Si una alcaldía
+    reporta dos veces en un período, se toma el mayor puntaje.
     """
     elegidas: dict[tuple[str, str], dict[str, Any]] = {}
     nits: dict[str, str] = {}
     sin_cruce: dict[str, str] = {}
     for fila in filas:
+        if not es_alcaldia(fila["sujeto_obligado"]):
+            continue
         codigo = cruce.municipio(fila["departamento"], fila["municipio"])
         if codigo is None:
             sin_cruce[f"{fila['departamento']} / {fila['municipio']}"] = fila["sujeto_obligado"]
             continue
-        if _es_alcaldia(fila["sujeto_obligado"]):
-            nits[nit(fila["numero_documento"])] = codigo
-        clave = (codigo, periodo(fila["periodo_medicion"]))
-        actual = elegidas.get(clave)
-        if actual is None or (
-            _es_alcaldia(fila["sujeto_obligado"]) and not _es_alcaldia(actual["sujeto_obligado"])
+        nits[nit(fila["numero_documento"])] = codigo
+        llave = (codigo, periodo(fila["periodo_medicion"]))
+        actual = elegidas.get(llave)
+        if actual is None or float(fila.get("autodiagnostico") or 0) > float(
+            actual.get("autodiagnostico") or 0
         ):
-            elegidas[clave] = fila
+            elegidas[llave] = fila
 
     observaciones = [
         Observacion(codigo, indicador, round(float(fila[campo]), 2), per, FUENTE)

@@ -1,6 +1,6 @@
 name: Publicar sitio
 
-# Genera los datos con el pipeline y publica la carpeta web/ en GitHub Pages.
+# Genera los datos con el pipeline, arma el sitio en dist/ y lo publica en GitHub Pages.
 # Solo las descargas pesadas y estables (MGN ~240 MB, Excel de población del DANE) quedan en la
 # caché de Actions; las consultas a datos.gov.co se hacen frescas en cada ejecución.
 # Para forzar una nueva descarga del MGN o del Excel, sube la versión de la clave de caché.
@@ -54,7 +54,7 @@ jobs:
 
       - uses: actions/upload-pages-artifact@v5
         with:
-          path: web
+          path: dist
 
   publicar:
     name: Publicar en GitHub Pages

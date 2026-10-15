@@ -21,6 +21,7 @@ ALIAS_DEPARTAMENTOS = {
     "BOGOTA D C": "11",
     "DISTRITO CAPITAL": "11",
     "DISTRITO CAPITAL DE BOGOTA": "11",
+    "BOGOTA DISTRITO CAPITAL": "11",
     "SAN ANDRES": "88",
     "SAN ANDRES PROV": "88",  # ITA: «SAN ANDRES,  PROV.»
     "SAN ANDRES PROVIDENCIA Y SANTA CATALINA": "88",
@@ -34,6 +35,7 @@ ALIAS_DEPARTAMENTOS = {
 # resuelve solo. Cada alias vale solo dentro del departamento de su código. Agregar aquí, con un
 # comentario, cada caso que aparezca como «sin cruce» y se pueda verificar.
 ALIAS_MUNICIPIOS: dict[str, str] = {
+    "BOGOTA DISTRITO CAPITAL": "11001",  # ITA: «BOGOTÁ, DISTRITO CAPITAL»
     "SAN PEDRO": "05664",  # Antioquia: San Pedro de los Milagros (ITA y ADRES)
     "MOMPOS": "13468",  # Santa Cruz de Mompox
     "TUTASA": "15839",  # Tutazá

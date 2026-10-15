@@ -14,7 +14,8 @@ from municipios.comun.registro import cargar_fuentes, cargar_indicadores
 from municipios.comun.salida import ahora_iso, escribir_json, leer_json
 from municipios.comun.socrata import ClienteSocrata
 from municipios.config import DIR_CRUDOS, DIR_INTERMEDIOS, RAIZ, cargar_env
-from municipios.exportar import mapas
+from municipios.exportar import mapas, sitio
+from municipios.exportar.datos_web import DatosSitio
 from municipios.fuentes import (
     cuipo,
     divipola,
@@ -38,7 +39,9 @@ log = logging.getLogger("municipios")
 
 RUTA_MUNICIPIOS = DIR_INTERMEDIOS / "municipios.json"
 RUTA_INDICE = DIR_INTERMEDIOS / "indice.json"
-DIR_MAPAS = RAIZ / "web" / "data" / "mapas"
+DIR_WEB = RAIZ / "web"
+DIR_DIST = RAIZ / "dist"
+DIR_MAPAS = DIR_DIST / "data" / "mapas"
 
 # Fuentes que siguen el patrón `ejecutar(contexto) -> Resultado`. Cada una se guarda en
 # datos/intermedios/<nombre>.json. El orden es el de `todo`.
@@ -175,6 +178,16 @@ def comando_indice(contexto: Contexto) -> None:
     )
 
 
+def comando_sitio(_: Contexto) -> None:
+    """Arma dist/: páginas HTML, datos JSON y recursos de web/. Requiere `indice` y `mapas`."""
+    if not RUTA_INDICE.exists():
+        raise SystemExit(
+            "Falta datos/intermedios/indice.json: corre antes `python -m municipios indice`."
+        )
+    datos = DatosSitio.cargar(DIR_INTERMEDIOS, generado=date.today().isoformat())
+    sitio.construir(datos, DIR_WEB, DIR_DIST)
+
+
 def comando_todo(contexto: Contexto) -> None:
     """Corre todo en orden. Con --tolerante, una fuente que falla no detiene a las demás."""
     comando_divipola(contexto)
@@ -189,6 +202,7 @@ def comando_todo(contexto: Contexto) -> None:
             fallidas[nombre] = repr(error)[:300]
     comando_indice(contexto)
     comando_mapas(contexto)
+    comando_sitio(contexto)
     escribir_json(DIR_INTERMEDIOS / "estado.json", {"generado": ahora_iso(), "fallidas": fallidas})
     if fallidas:
         log.warning("Fuentes que fallaron: %s", ", ".join(fallidas))
@@ -200,6 +214,7 @@ COMANDOS = {
     **{nombre: (comando_fuente(nombre), ayuda) for nombre, (_, ayuda) in FUENTES.items()},
     "indice": (comando_indice, "Calcula el índice municipal con los datos descargados"),
     "mapas": (comando_mapas, "Descarga el MGN y genera los mapas SVG (≈240 MB la primera vez)"),
+    "sitio": (comando_sitio, "Arma el sitio publicable en dist/ (páginas y datos)"),
     "todo": (comando_todo, "Corre todo, en orden"),
 }
 

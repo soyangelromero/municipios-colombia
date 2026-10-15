@@ -8,7 +8,11 @@ Observatorio cívico, abierto y neutral sobre los **1.104 municipios de Colombia
 
 Cada cifra lleva su fuente oficial.
 
-> Estado: **fase 3, índice municipal v0.1**. El pipeline descarga y cruza con DIVIPOLA 12 fuentes oficiales y calcula el índice municipal (ver [docs/metodologia.md](docs/metodologia.md)). El sitio web todavía no muestra los datos.
+> Estado: **fase 4, sitio web**. El pipeline descarga y cruza con DIVIPOLA 12 fuentes oficiales, calcula el índice municipal (ver [docs/metodologia.md](docs/metodologia.md)) y genera el sitio completo:
+> - portada con mapa;
+> - una ficha por municipio;
+> - una página por departamento;
+> - ranking con filtros, comparador, metodología y fuentes.
 
 **Sitio (en construcción):** https://soyangelromero.github.io/municipios-colombia/ · Mapas generados: https://soyangelromero.github.io/municipios-colombia/data/mapas/
 
@@ -16,10 +20,10 @@ Cada cifra lleva su fuente oficial.
 
 ```
 fuentes oficiales ──► pipeline/ (Python, corre en tu PC o en GitHub Actions)
-                          │  descarga, normaliza y calcula
+                          │  descarga, normaliza, calcula el índice y genera las páginas
                           ▼
-                      web/ (HTML + CSS + JS puro, más PHP opcional para formularios)
-                          │  se sube tal cual a cualquier hosting
+   web/ (CSS, JS, PHP: escrito a mano) ──► dist/ (sitio completo: HTML + datos JSON)
+                                              │  se sube tal cual a cualquier hosting
 ```
 
 - **El sitio publicado no usa frameworks ni compilación.** Son HTML, CSS y JavaScript nativos. PHP solo hace falta para los formularios (reportar un error, contacto). Sin PHP, el sitio funciona igual, pero sin formularios.
@@ -43,15 +47,15 @@ python -m municipios todo             # corre todas las fuentes (la primera vez 
 pytest pipeline                       # corre las pruebas
 ```
 
-También se puede correr cada paso por separado (`python -m municipios --help` los lista): `divipola`, `poblacion`, `seguridad`, `transparencia`, `gobierno_digital`, `desempeno_institucional`, `finanzas`, `contratacion`, `educacion`, `salud`, `grupos`, `indice` y `mapas`.
+También se puede correr cada paso por separado (`python -m municipios --help` los lista): `divipola`, `poblacion`, `seguridad`, `transparencia`, `gobierno_digital`, `desempeno_institucional`, `finanzas`, `contratacion`, `educacion`, `salud`, `grupos`, `indice`, `mapas` y `sitio`.
 
-- Los resultados quedan en `datos/intermedios/` y los mapas en `web/data/mapas/`. Ninguna de las dos carpetas se versiona.
+- Los resultados quedan en `datos/intermedios/` y el sitio armado en `dist/`. Ninguna de las dos carpetas se versiona.
 - Las descargas se guardan en caché en `datos/crudos/`; la del MGN pesa unos 240 MB. Para forzar una descarga nueva, usa `--refrescar`.
 
-Para ver los mapas generados, sirve la carpeta `web/` y abre http://localhost:8000/data/mapas/:
+Para ver el sitio, sirve la carpeta `dist/` y abre http://localhost:8000:
 
 ```bash
-python -m http.server 8000 --directory web
+python -m http.server 8000 --directory dist
 ```
 
 ### Token de datos.gov.co (opcional)

@@ -17,10 +17,16 @@ def _serializable(obj: Any) -> Any:
     raise TypeError(f"No se puede serializar {type(obj).__name__}")
 
 
-def escribir_json(ruta: Path, datos: Any) -> None:
-    """Escribe JSON legible en UTF-8, creando la carpeta si hace falta."""
+def escribir_json(ruta: Path, datos: Any, compacto: bool = False) -> None:
+    """Escribe JSON en UTF-8, creando la carpeta si hace falta.
+
+    Por defecto, legible (para revisar los intermedios); `compacto` para lo que se publica.
+    """
     ruta.parent.mkdir(parents=True, exist_ok=True)
-    texto = json.dumps(datos, ensure_ascii=False, indent=1, default=_serializable)
+    if compacto:
+        texto = json.dumps(datos, ensure_ascii=False, separators=(",", ":"), default=_serializable)
+    else:
+        texto = json.dumps(datos, ensure_ascii=False, indent=1, default=_serializable)
     ruta.write_text(texto + "\n", encoding="utf-8")
 
 

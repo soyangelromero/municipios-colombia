@@ -44,11 +44,27 @@ Fases siguientes: `indice/` (pares, puntajes, sensibilidad), más exportaciones 
 - Cada `<path>` lleva `data-codigo` (DIVIPOLA) y `data-slug`. Los colores los pone la web con CSS. El SVG trae un estilo base con `:where()` (especificidad cero), fácil de reemplazar.
 - San Andrés y Providencia va en un recuadro en el mapa nacional, con una celda por isla principal y sin cayos lejanos. En su mapa departamental, cada municipio va en su propio panel.
 
-## Web (`web/`)
+## Web: `web/` (fuente) y `dist/` (generado)
 
-- `assets/css/tokens.css`: colores, tipografía y espacios. Modo claro y oscuro.
-- `assets/js/config.js`: configuración (por ejemplo `endpoint` del PHP; `null` = sin formularios).
-- `api/`: PHP 8.1+ con PDO SQLite. La configuración y la base viven en `privado/`, fuera de la carpeta pública.
+- **`web/`:** lo escrito a mano.
+  - `assets/css/`: `tokens.css` (colores y tipografía, modo claro y oscuro), `base.css` y `componentes.css`.
+  - `assets/js/`: módulos ES sin dependencias.
+    - `comun.js`: carga de datos y formato.
+    - `busqueda.js`: buscador accesible.
+    - `mapa.js`: interacción de los mapas.
+    - `inicio.js`, `departamento.js`, `ficha.js` (mapa, compartir y modo historia), `tablas.js` (orden y filtros) y `comparar.js`.
+  - `assets/img/`.
+  - `api/` (fase 6): PHP 8.1+ con PDO SQLite. La configuración y la base viven en `privado/`, fuera de la carpeta pública.
+- **`dist/`:** lo genera `python -m municipios sitio` y no se versiona.
+  - Copia `web/`.
+  - Escribe todas las páginas HTML (`exportar/paginas.py`, con las cifras ya en el HTML) y los datos JSON compactos en `data/`:
+    - `pais.json`: resumen de todos los municipios;
+    - `m/<codigo>.json`: ficha de cada municipio;
+    - `indice.json`: configuración, fichas y fuentes;
+    - `mapas/*.svg`.
+  - Además genera `sitemap.xml`, `robots.txt` y `404.html`.
+- **Rutas relativas:** cada página conoce su profundidad (`<meta name="raiz">`), así el sitio funciona igual en un dominio propio o en una subcarpeta como GitHub Pages.
+- **Mapas sin JavaScript:** se incrustan en el HTML con una regla de color por municipio. El JavaScript solo agrega el dato al pasar el cursor, la navegación y el cambio de capa.
 
 ## Despliegue
 

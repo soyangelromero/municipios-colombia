@@ -245,3 +245,86 @@ etiqueta = "Medición de Desempeño Municipal (DNP)"
 unidad = "puntos de 0 a 100"
 sentido = "contexto"
 fuente = "dnp_mdm"
+
+# --- Derivados: los calcula el índice (pipeline/municipios/indice/derivados.py) ---
+[densidad]
+etiqueta = "Densidad de población"
+unidad = "habitantes por km²"
+sentido = "contexto"
+fuente = "dane_proyecciones_poblacion"
+descripcion = "Población del año en curso ÷ superficie del MGN."
+
+[tasa_homicidios]
+etiqueta = "Homicidios por cada 100.000 habitantes"
+unidad = "por cada 100.000 habitantes (promedio de 3 años)"
+sentido = "menor_mejor"
+fuente = "mindefensa_homicidios"
+descripcion = "Homicidios de los últimos 3 años completos ÷ población de esos años × 100.000. Para puntuar se suaviza hacia la tasa del grupo."
+
+[tasa_hurto_personas]
+etiqueta = "Hurtos a personas por cada 100.000 habitantes"
+unidad = "por cada 100.000 habitantes (promedio de 3 años)"
+sentido = "menor_mejor"
+fuente = "mindefensa_hurto_personas"
+descripcion = "Hurtos a personas de los últimos 3 años completos ÷ población de esos años × 100.000. Para puntuar se suaviza hacia la tasa del grupo."
+
+[cobertura_salud]
+etiqueta = "Afiliación al sistema de salud"
+unidad = "% de la población"
+sentido = "mayor_mejor"
+fuente = "adres_bdua_subsidiado"
+descripcion = "Afiliados activos (subsidiado + contributivo) ÷ población proyectada × 100. Puede superar 100 por afiliados que viven en otro municipio; para puntuar se topa en 100."
+
+[pct_inversion]
+etiqueta = "Inversión sobre el gasto total"
+unidad = "% del gasto comprometido"
+sentido = "mayor_mejor"
+fuente = "cgr_cuipo_gastos"
+descripcion = "Gasto de inversión ÷ gasto total comprometido × 100 (vigencia actual)."
+
+[ejecucion_presupuestal]
+etiqueta = "Ejecución del presupuesto"
+unidad = "% de lo aprobado"
+sentido = "mayor_mejor"
+fuente = "cgr_cuipo_programacion"
+descripcion = "Gasto comprometido ÷ presupuesto de gastos definitivo × 100."
+
+[pct_contratacion_directa]
+etiqueta = "Contratación directa"
+unidad = "% del valor contratado"
+sentido = "menor_mejor"
+fuente = "cce_secop2_contratos"
+descripcion = "Valor de los contratos por contratación directa ÷ valor total contratado × 100."
+
+[reporta_cuipo]
+etiqueta = "Reporta su ejecución presupuestal (CUIPO)"
+unidad = "sí/no"
+sentido = "mayor_mejor"
+fuente = "cgr_cuipo_gastos"
+
+[publica_secop]
+etiqueta = "Publica contratos en SECOP II"
+unidad = "sí/no"
+sentido = "mayor_mejor"
+fuente = "cce_secop2_contratos"
+
+[gasto_por_habitante]
+etiqueta = "Gasto por habitante"
+unidad = "pesos por habitante"
+sentido = "contexto"
+fuente = "cgr_cuipo_gastos"
+descripcion = "Gasto total comprometido ÷ población del mismo año."
+
+[ingresos_tributarios_por_habitante]
+etiqueta = "Ingresos tributarios por habitante"
+unidad = "pesos por habitante"
+sentido = "contexto"
+fuente = "cgr_cuipo_ingresos"
+descripcion = "Impuestos recaudados por el municipio ÷ población del mismo año."
+
+[dependencia_transferencias]
+etiqueta = "Dependencia de transferencias"
+unidad = "% de los ingresos"
+sentido = "contexto"
+fuente = "cgr_cuipo_ingresos"
+descripcion = "Transferencias corrientes recibidas ÷ ingresos totales × 100."

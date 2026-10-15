@@ -4,6 +4,23 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). S
 
 ## [Sin publicar]
 
+### Agregado (fase 4: sitio web)
+- Generación del sitio completo en `dist/` (`python -m municipios sitio`):
+  - portada con buscador, cifras, mapa de departamentos con capas y listas de mejores y peores;
+  - una ficha por municipio: índice, puestos, rango, pilares, cada indicador con valor, período, puntaje y fuente, contexto y mapa del departamento;
+  - una página por departamento, con mapa coloreado y ranking;
+  - ranking nacional con filtros y orden;
+  - comparador con URL compartible;
+  - metodología (generada desde `indice.toml`), fuentes y acerca/privacidad;
+  - `sitemap.xml`, `robots.txt` y página 404.
+- Diseño propio (modo claro y oscuro, escala de color accesible) y JavaScript sin dependencias.
+- Fichas legibles en el celular: los indicadores se apilan como tarjetas.
+- Modo historia en cada ficha y botón para reportar un error, que abre un issue con el municipio ya cargado.
+- Configuración del sitio en `pipeline/config/sitio.toml`.
+
+### Corregido
+- ITA: Bogotá y los distritos (Barranquilla, Cartagena, Santa Marta, Tumaco, Buenaventura) figuran como «DISTRITAL» y quedaban sin dato. Ahora se identifica a la alcaldía por el nombre del sujeto obligado, sin alcaldías locales ni concejos. La cobertura pasa de 1.007 a 1.091 alcaldías.
+
 ### Agregado (fase 3: índice municipal v0.1)
 - Fuente `grupos`: grupos de capacidades iniciales del DNP (MDM 2020) como pares del índice, con asignación documentada para dos municipios nuevos.
 - Índice municipal v0.1 (`python -m municipios indice`), configurado en `pipeline/config/indice.toml`:
