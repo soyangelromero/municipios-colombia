@@ -1,0 +1,34 @@
+/* Tokens de diseño: todo color, tipografía y espacio del sitio sale de aquí. */
+:root {
+  --fondo: #f7f7f5;
+  --superficie: #ffffff;
+  --texto: #15171a;
+  --texto-suave: #4b5159;
+  --linea: #d9dce1;
+  --acento: #c8102e;
+
+  --bien: #1a7f37;
+  --regular: #b58100;
+  --mal: #c62828;
+
+  --fuente: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --fuente-mono: ui-monospace, "Cascadia Mono", Menlo, monospace;
+
+  --margen: clamp(16px, 4vw, 48px);
+  --radio: 12px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fondo: #0d0f12;
+    --superficie: #16191e;
+    --texto: #f2f3f5;
+    --texto-suave: #a4abb5;
+    --linea: #2a2f36;
+    --acento: #ff5a5f;
+
+    --bien: #3fb950;
+    --regular: #e3b341;
+    --mal: #f85149;
+  }
+}

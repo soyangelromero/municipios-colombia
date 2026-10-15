@@ -1,0 +1,40 @@
+name: Error en un dato
+description: Un valor publicado no coincide con la fuente oficial o está desactualizado.
+title: "[Dato] <municipio>: <indicador>"
+labels: ["datos", "error-en-dato"]
+body:
+  - type: input
+    id: municipio
+    attributes:
+      label: Municipio
+      description: Nombre y departamento, o el enlace a su ficha.
+      placeholder: Hispania, Antioquia
+    validations:
+      required: true
+  - type: input
+    id: indicador
+    attributes:
+      label: Dato o indicador
+      placeholder: Homicidios 2025
+    validations:
+      required: true
+  - type: input
+    id: publicado
+    attributes:
+      label: Valor publicado
+  - type: input
+    id: correcto
+    attributes:
+      label: Valor correcto
+  - type: input
+    id: fuente
+    attributes:
+      label: Fuente oficial que lo respalda
+      description: Enlace al documento o conjunto de datos oficial.
+    validations:
+      required: true
+  - type: textarea
+    id: detalle
+    attributes:
+      label: Detalle
+      description: Cualquier contexto útil. No incluyas datos personales de terceros.

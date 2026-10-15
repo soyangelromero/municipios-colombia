@@ -1,0 +1,23 @@
+name: Error en el sitio o el código
+description: Algo no funciona como debería.
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: que-paso
+    attributes:
+      label: ¿Qué pasó?
+    validations:
+      required: true
+  - type: textarea
+    id: esperado
+    attributes:
+      label: ¿Qué esperabas que pasara?
+  - type: textarea
+    id: pasos
+    attributes:
+      label: Pasos para reproducirlo
+  - type: input
+    id: entorno
+    attributes:
+      label: Navegador, sistema operativo o versión de Python

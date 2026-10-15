@@ -1,0 +1,27 @@
+# Registro de fuentes. Cada observación del pipeline apunta a una de estas claves.
+# Campos: organismo, titulo, url, conjunto (id en datos.gov.co, si aplica), licencia, oficial.
+# Antes de agregar una fuente, revisa sus términos de uso y anótalos en «licencia».
+
+[dane_divipola]
+organismo = "Departamento Administrativo Nacional de Estadística (DANE)"
+titulo = "DIVIPOLA – Códigos municipios"
+url = "https://www.datos.gov.co/d/gdxc-w37w"
+conjunto = "gdxc-w37w"
+licencia = "Por verificar en la ficha del conjunto (datos.gov.co)"
+oficial = true
+
+[mindefensa_homicidios]
+organismo = "Ministerio de Defensa Nacional – Policía Nacional (SIEDCO)"
+titulo = "Homicidio"
+url = "https://www.datos.gov.co/d/m8fd-ahd9"
+conjunto = "m8fd-ahd9"
+licencia = "Por verificar en la ficha del conjunto (datos.gov.co)"
+oficial = true
+
+[mindefensa_hurto_personas]
+organismo = "Ministerio de Defensa Nacional – Policía Nacional (SIEDCO)"
+titulo = "Hurto personas"
+url = "https://www.datos.gov.co/d/4rxi-8m8d"
+conjunto = "4rxi-8m8d"
+licencia = "Por verificar en la ficha del conjunto (datos.gov.co)"
+oficial = true

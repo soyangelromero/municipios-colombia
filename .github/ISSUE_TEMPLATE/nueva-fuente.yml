@@ -1,0 +1,33 @@
+name: Nueva fuente de datos
+description: Propón una fuente oficial para sumar un indicador.
+title: "[Fuente] <organismo>: <conjunto de datos>"
+labels: ["datos", "nueva-fuente"]
+body:
+  - type: input
+    id: organismo
+    attributes:
+      label: Organismo que publica
+      placeholder: DANE, DNP, Contraloría…
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: Enlace al conjunto de datos
+    validations:
+      required: true
+  - type: textarea
+    id: mide
+    attributes:
+      label: ¿Qué mide y para qué serviría?
+    validations:
+      required: true
+  - type: checkboxes
+    id: requisitos
+    attributes:
+      label: Requisitos
+      options:
+        - label: Tiene el código DIVIPOLA del municipio o permite cruzarlo sin ambigüedad.
+        - label: Cubre todos (o casi todos) los municipios del país.
+        - label: Se actualiza periódicamente.
+        - label: Revisé su licencia o sus términos de uso.
