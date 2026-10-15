@@ -52,4 +52,9 @@ Fases siguientes: `indice/` (pares, puntajes, sensibilidad), más exportaciones 
 
 ## Despliegue
 
-Se sube la carpeta `web/` al hosting, por FTP/SFTP o con el workflow de despliegue. Las credenciales viven en los *secrets* de GitHub, nunca en el repositorio. Detalle en `docs/despliegue.md` (fase 7).
+- **GitHub Pages (hoy):** el workflow `.github/workflows/pages.yml` publica `web/` en https://soyangelromero.github.io/municipios-colombia/.
+  - Corre en cada push a `main`, el día 1 de cada mes y a mano.
+  - En cada ejecución corre el pipeline completo y genera los mapas.
+  - Las descargas pesadas (MGN y Excel del DANE) quedan en la caché de Actions. Para renovarlas, sube la versión de la clave `crudos-pesados-vN`.
+  - Las consultas a datos.gov.co se hacen siempre frescas.
+- **Hosting propio con PHP (fase 7):** se sube la carpeta `web/` por FTP/SFTP. Las credenciales viven en los *secrets* de GitHub, nunca en el repositorio.

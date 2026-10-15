@@ -10,6 +10,8 @@ Cada cifra lleva su fuente oficial.
 
 > Estado: **fase 1, base territorial**. El pipeline ya descarga la lista oficial de municipios (DIVIPOLA), la población proyectada por el DANE, los contornos del Marco Geoestadístico Nacional (y con ellos genera los mapas SVG) y las cifras de homicidios y hurtos. El sitio web todavía no tiene contenido.
 
+**Sitio (en construcción):** https://soyangelromero.github.io/municipios-colombia/ · Mapas generados: https://soyangelromero.github.io/municipios-colombia/data/mapas/
+
 ## Cómo está hecho
 
 ```

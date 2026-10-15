@@ -1,0 +1,68 @@
+name: Publicar sitio
+
+# Genera los datos con el pipeline y publica la carpeta web/ en GitHub Pages.
+# Solo las descargas pesadas y estables (MGN ~240 MB, Excel de población del DANE) quedan en la
+# caché de Actions; las consultas a datos.gov.co se hacen frescas en cada ejecución.
+# Para forzar una nueva descarga del MGN o del Excel, sube la versión de la clave de caché.
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 9 1 * *" # el día 1 de cada mes, para refrescar los datos
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  construir:
+    name: Generar sitio
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pipeline/pyproject.toml
+
+      - name: Instalar dependencias
+        run: pip install -e pipeline
+
+      - name: Restaurar descargas pesadas
+        uses: actions/cache@v6
+        with:
+          path: |
+            datos/crudos/mgn
+            datos/crudos/dane
+          key: crudos-pesados-v1
+
+      - name: Correr el pipeline
+        env:
+          SOCRATA_APP_TOKEN: ${{ secrets.SOCRATA_APP_TOKEN }}
+        run: python -m municipios todo
+
+      - uses: actions/configure-pages@v6
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: web
+
+  publicar:
+    name: Publicar en GitHub Pages
+    needs: construir
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.despliegue.outputs.page_url }}
+    steps:
+      - id: despliegue
+        uses: actions/deploy-pages@v5
