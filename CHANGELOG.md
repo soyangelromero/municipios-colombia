@@ -4,6 +4,15 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). S
 
 ## [Sin publicar]
 
+### Agregado (fase 5: relevamiento de transparencia)
+- `python -m municipios relevamiento`: un navegador automático (Scrapling `DynamicFetcher`) abre el menú de transparencia de cada alcaldía y busca 10 criterios de la Ley 1712 por el texto y la dirección de cada enlace. Por defecto revisa las 31 capitales; `--alcance todos`, los 1.104 municipios.
+  - Respeta `robots.txt`, pausa 3 s entre sitios y se identifica con un agente propio.
+  - `datos/manual/sitios.csv`: 18 dominios propios verificados; el resto sigue el patrón `www.<municipio>-<departamento>.gov.co`.
+  - Resultado en `datos/relevamiento/transparencia_automatica.csv`. Si el menú no se puede leer, se registra «menú no legible», nunca «no publica».
+- Cada ficha con relevamiento muestra, en el pilar de transparencia, «Revisión automática del sitio web — sin verificación humana, no puntúa», con el estado de cada criterio, el enlace de evidencia y la fecha.
+- `datos/manual/transparencia.csv` (solo encabezado) para la revisión humana, y el flujo documentado en `datos/manual/README.md` y `docs/metodologia.md`.
+- Pruebas de `clasificar()`, `dominio()`, `candidatos()` y de la lectura del relevamiento, sin red.
+
 ### Agregado (fase 4: sitio web)
 - Generación del sitio completo en `dist/` (`python -m municipios sitio`):
   - portada con buscador, cifras, mapa de departamentos con capas y listas de mejores y peores;

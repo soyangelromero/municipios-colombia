@@ -6,9 +6,10 @@ JSON publicados en dist/data/ (los lee el JavaScript; las páginas HTML ya traen
 - indice.json: configuración del índice, fichas de indicadores y fuentes.
 """
 
+import csv
 import tomllib
 from collections import defaultdict
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from statistics import mean
 from typing import Any
@@ -16,7 +17,7 @@ from typing import Any
 from municipios.comun.modelos import Fuente, Indicador, Municipio
 from municipios.comun.registro import cargar_fuentes, cargar_indicadores
 from municipios.comun.salida import escribir_json, leer_json
-from municipios.config import DIR_CONFIG
+from municipios.config import DIR_CONFIG, RAIZ
 from municipios.fuentes.divipola import DEPARTAMENTOS
 from municipios.indice.calculo import Config, cargar_config
 
@@ -30,6 +31,20 @@ NOMBRES_GRUPOS = {
 }
 
 
+RUTA_TRANSPARENCIA_AUTO = RAIZ / "datos" / "relevamiento" / "transparencia_automatica.csv"
+
+
+def leer_transparencia_auto(ruta: Path) -> dict[str, list[dict[str, str]]]:
+    """Lee el relevamiento automático agrupado por código DIVIPOLA ({} si no existe)."""
+    if not ruta.exists():
+        return {}
+    por_municipio: dict[str, list[dict[str, str]]] = defaultdict(list)
+    with ruta.open(encoding="utf-8", newline="") as f:
+        for fila in csv.DictReader(f):
+            por_municipio[fila["divipola"]].append(fila)
+    return dict(por_municipio)
+
+
 @dataclass
 class DatosSitio:
     sitio: dict[str, Any]
@@ -39,6 +54,8 @@ class DatosSitio:
     municipios: dict[str, Municipio]
     indice: dict[str, dict[str, Any]]
     anios_referencia: dict[str, int | None]
+    # Revisión automática del menú de transparencia: código -> filas (una por criterio).
+    transparencia_auto: dict[str, list[dict[str, str]]] = field(default_factory=dict)
 
     @classmethod
     def cargar(cls, dir_intermedios: Path, generado: str) -> "DatosSitio":
@@ -58,6 +75,7 @@ class DatosSitio:
             municipios=municipios,
             indice=indice["municipios"],
             anios_referencia=indice["anios_referencia"],
+            transparencia_auto=leer_transparencia_auto(RUTA_TRANSPARENCIA_AUTO),
         )
 
     # --- consultas útiles para las páginas -------------------------------------------------

@@ -53,3 +53,17 @@ def test_fragmentos_y_escala():
     assert "width:55.0%" in barra(55)
     assert [tramo(v) for v in (None, 10, 45, 55, 65, 95)] == ["sin", "e1", "e2", "e3", "e4", "e5"]
     assert sigla("cgr_cuipo_gastos") == "Contraloría (CUIPO)"
+
+
+def test_leer_transparencia_auto_agrupa_por_municipio(tmp_path):
+    from municipios.exportar.datos_web import leer_transparencia_auto
+
+    ruta = tmp_path / "t.csv"
+    ruta.write_text(
+        "divipola,criterio,resultado\n05001,pqrsd,enlace_encontrado\n05001,datos_abiertos,no_encontrado\n08001,pqrsd,error\n",
+        encoding="utf-8",
+    )
+    datos = leer_transparencia_auto(ruta)
+    assert len(datos["05001"]) == 2
+    assert datos["08001"][0]["resultado"] == "error"
+    assert leer_transparencia_auto(tmp_path / "no.csv") == {}

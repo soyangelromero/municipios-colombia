@@ -935,3 +935,14 @@
     font-size: 0.85rem;
   }
 }
+
+/* Revisión automática del sitio web de la alcaldía (no puntúa) */
+.revision-auto {
+  margin-top: 1.5rem;
+  padding: 1rem 1.25rem;
+  border: 1px dashed var(--linea);
+  border-radius: var(--radio-chico);
+}
+.revision-auto h3 small { display: block; font-weight: 400; color: var(--texto-suave); }
+.revision { list-style: none; margin: 0.75rem 0; padding: 0; display: grid; gap: 0.35rem; }
+.revision li { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }

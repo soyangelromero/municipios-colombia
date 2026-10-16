@@ -9,6 +9,7 @@ from municipios.exportar import formato
 from municipios.exportar.datos_web import NOMBRES_GRUPOS, DatosSitio
 from municipios.exportar.plantillas import Pagina, barra, miga, semaforo
 from municipios.fuentes.divipola import DEPARTAMENTOS
+from municipios.relevamiento.criterios import CRITERIOS
 
 # Nombre corto de cada organismo, para los enlaces «Fuente».
 SIGLAS = {
@@ -231,6 +232,47 @@ def _resumen(m: Municipio, fila: dict) -> str:
     return escape(texto)
 
 
+def bloque_revision_automatica(datos: DatosSitio, codigo: str) -> str:
+    """Resultado del relevamiento automático del sitio de la alcaldía (no puntúa)."""
+    filas = datos.transparencia_auto.get(codigo)
+    if not filas:
+        return ""
+    nombres = {c.id: c.nombre for c in CRITERIOS}
+    problema = {
+        "sitio_no_encontrado": "No se encontró el sitio web oficial.",
+        "no_permitido": "El sitio no permite la revisión automática (robots.txt).",
+        "error": "No se pudo abrir el menú de transparencia.",
+        "menu_no_legible": "El menú de transparencia no se pudo leer de forma automática: no se sabe qué publica.",
+    }.get(filas[0]["resultado"])
+    items = []
+    for f in filas:
+        if f["resultado"] == "enlace_encontrado":
+            estado = f'<a href="{escape(f["evidencia"])}" rel="noopener">Enlace encontrado</a>'
+        else:
+            estado = "No se encontró un enlace en esa página"
+        items.append(
+            f"<li><span>{escape(nombres.get(f['criterio'], f['criterio']))}</span> <small>{estado}</small></li>"
+        )
+    sitio = filas[0]["sitio"]
+    origen = (
+        f' Sitio revisado: <a href="{escape(sitio)}" rel="noopener">{escape(sitio)}</a>.'
+        if sitio
+        else ""
+    )
+    cuerpo = (
+        f'<p class="nota">{problema}</p>'
+        if problema
+        else f'<ul class="revision">{"".join(items)}</ul>'
+    )
+    return (
+        '<aside class="revision-auto"><h3>Revisión automática del sitio web '
+        "<small>sin verificación humana, no puntúa</small></h3>"
+        f"{cuerpo}"
+        f'<p class="nota">Un robot buscó estos criterios en el menú de transparencia el {escape(filas[0]["fecha"])}. '
+        f"Solo lee la página principal del menú, no sus subpáginas: que falte un enlace no prueba que no se publique, y que haya uno no prueba que el documento esté completo ni al día.{origen}</p></aside>"
+    )
+
+
 def ficha(datos: DatosSitio, codigo: str) -> Pagina:
     m = datos.municipios[codigo]
     fila = datos.indice[codigo]
@@ -271,7 +313,8 @@ def ficha(datos: DatosSitio, codigo: str) -> Pagina:
             f"<p>{escape(p.descripcion)}</p>{aviso}"
             '<div class="tabla-contenedor"><table class="tabla tabla--ficha"><thead><tr><th scope="col">Indicador</th>'
             '<th scope="col">Valor</th><th scope="col">Período</th><th scope="col">Puntaje</th>'
-            f'<th scope="col">Fuente</th></tr></thead><tbody>{"".join(filas_comp)}</tbody></table></div></section>'
+            f'<th scope="col">Fuente</th></tr></thead><tbody>{"".join(filas_comp)}</tbody></table></div>'
+            f"{bloque_revision_automatica(datos, codigo) if p.id == 'T' else ''}</section>"
         )
 
     contexto = []

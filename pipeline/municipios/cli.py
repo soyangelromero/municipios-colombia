@@ -16,6 +16,7 @@ from municipios.comun.socrata import ClienteSocrata
 from municipios.config import DIR_CRUDOS, DIR_INTERMEDIOS, RAIZ, cargar_env
 from municipios.exportar import mapas, sitio
 from municipios.exportar.datos_web import DatosSitio
+from municipios.fotos import commons as fotos
 from municipios.fuentes import (
     cuipo,
     divipola,
@@ -34,11 +35,23 @@ from municipios.indice.almacen import Almacen
 from municipios.indice.calculo import calcular as calcular_indice
 from municipios.indice.calculo import cargar_config
 from municipios.indice.derivados import Calculadora
+from municipios.relevamiento import transparencia as relevamiento
+from municipios.relevamiento.criterios import leer_sitios_manuales
 
 log = logging.getLogger("municipios")
 
 RUTA_MUNICIPIOS = DIR_INTERMEDIOS / "municipios.json"
 RUTA_INDICE = DIR_INTERMEDIOS / "indice.json"
+RUTA_RELEVAMIENTO = RAIZ / "datos" / "relevamiento" / "transparencia_automatica.csv"
+DIR_FOTOS = RAIZ / "datos" / "fotos"
+RUTA_SITIOS = RAIZ / "datos" / "manual" / "sitios.csv"
+# Capitales de departamento (Bogotá incluida): alcance inicial del relevamiento.
+CAPITALES = (
+    "05001", "08001", "11001", "13001", "15001", "17001", "18001", "19001", "20001", "23001",
+    "27001", "41001", "44001", "47001", "50001", "52001", "54001", "63001", "66001", "68001",
+    "70001", "73001", "76001", "81001", "85001", "86001", "91001", "94001", "95001", "97001",
+    "99001",
+)  # fmt: skip
 DIR_WEB = RAIZ / "web"
 DIR_DIST = RAIZ / "dist"
 DIR_MAPAS = DIR_DIST / "data" / "mapas"
@@ -178,6 +191,28 @@ def comando_indice(contexto: Contexto) -> None:
     )
 
 
+def comando_relevamiento(contexto: Contexto) -> None:
+    """Revisión automática del menú de transparencia (necesita `scrapling install`).
+
+    Por defecto revisa las capitales; con --alcance todos, los 1.104 municipios (varias horas).
+    """
+    codigos = (
+        CAPITALES
+        if contexto.alcance == "capitales"
+        else sorted(c for c, m in contexto.municipios.items() if m.tipo == "municipio")
+    )
+    lista = [contexto.municipios[c] for c in codigos]
+    manuales = leer_sitios_manuales(RUTA_SITIOS)
+    total = relevamiento.relevar(lista, manuales, RUTA_RELEVAMIENTO)
+    log.info("Relevamiento: %d municipios → %s", total, RUTA_RELEVAMIENTO)
+
+
+def comando_fotos(contexto: Contexto) -> None:
+    """Descarga la foto con licencia libre de cada municipio (Wikidata y Commons)."""
+    total = fotos.descargar(contexto.codigos, DIR_FOTOS)
+    log.info("Fotos con licencia libre: %d → %s", total, DIR_FOTOS)
+
+
 def comando_sitio(_: Contexto) -> None:
     """Arma dist/: páginas HTML, datos JSON y recursos de web/. Requiere `indice` y `mapas`."""
     if not RUTA_INDICE.exists():
@@ -214,6 +249,14 @@ COMANDOS = {
     **{nombre: (comando_fuente(nombre), ayuda) for nombre, (_, ayuda) in FUENTES.items()},
     "indice": (comando_indice, "Calcula el índice municipal con los datos descargados"),
     "mapas": (comando_mapas, "Descarga el MGN y genera los mapas SVG (≈240 MB la primera vez)"),
+    "relevamiento": (
+        comando_relevamiento,
+        "Revisión automática del menú de transparencia de las alcaldías (no está en `todo`)",
+    ),
+    "fotos": (
+        comando_fotos,
+        "Descarga la foto con licencia libre de cada municipio (no está en `todo`)",
+    ),
     "sitio": (comando_sitio, "Arma el sitio publicable en dist/ (páginas y datos)"),
     "todo": (comando_todo, "Corre todo, en orden"),
 }
@@ -239,6 +282,12 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="municipios", description=__doc__)
     parser.add_argument("--refrescar", action="store_true", help="ignora la caché y descarga")
     parser.add_argument("-v", "--detalle", action="store_true", help="muestra más mensajes")
+    parser.add_argument(
+        "--alcance",
+        choices=("capitales", "todos"),
+        default="capitales",
+        help="en `relevamiento`: qué municipios revisar (por defecto, las capitales)",
+    )
     parser.add_argument(
         "--tolerante",
         action="store_true",
@@ -267,6 +316,7 @@ def main(argv: list[str] | None = None) -> int:
         dir_crudos=DIR_CRUDOS,
         refrescar=args.refrescar,
         tolerante=args.tolerante,
+        alcance=args.alcance,
     )
     funcion, _ = COMANDOS[args.comando]
     funcion(contexto)

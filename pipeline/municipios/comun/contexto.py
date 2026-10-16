@@ -17,6 +17,7 @@ class Contexto:
     dir_crudos: Path
     refrescar: bool = False
     tolerante: bool = False  # en `todo`, seguir aunque una fuente falle
+    alcance: str = "capitales"  # en `relevamiento`: «capitales» o «todos»
 
     @property
     def codigos(self) -> set[str]:

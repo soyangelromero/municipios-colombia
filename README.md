@@ -47,7 +47,7 @@ python -m municipios todo             # corre todas las fuentes (la primera vez 
 pytest pipeline                       # corre las pruebas
 ```
 
-También se puede correr cada paso por separado (`python -m municipios --help` los lista): `divipola`, `poblacion`, `seguridad`, `transparencia`, `gobierno_digital`, `desempeno_institucional`, `finanzas`, `contratacion`, `educacion`, `salud`, `grupos`, `indice`, `mapas` y `sitio`.
+También se puede correr cada paso por separado (`python -m municipios --help` los lista): `divipola`, `poblacion`, `seguridad`, `transparencia`, `gobierno_digital`, `desempeno_institucional`, `finanzas`, `contratacion`, `educacion`, `salud`, `grupos`, `indice`, `mapas`, `relevamiento` (necesita `scrapling install`; no está en `todo`) y `sitio`.
 
 - Los resultados quedan en `datos/intermedios/` y el sitio armado en `dist/`. Ninguna de las dos carpetas se versiona.
 - Las descargas se guardan en caché en `datos/crudos/`; la del MGN pesa unos 240 MB. Para forzar una descarga nueva, usa `--refrescar`.
