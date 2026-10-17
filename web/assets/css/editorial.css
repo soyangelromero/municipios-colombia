@@ -229,6 +229,14 @@
   transform: translateY(-3px);
 }
 
+.card {
+  transition: transform 0.35s var(--ease);
+}
+
+.card:hover {
+  transform: translateY(-4px) rotateX(2deg) rotateY(-2deg);
+}
+
 .tarjeta-foto__fondo {
   position: absolute;
   inset: 0;
