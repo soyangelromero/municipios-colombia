@@ -4,6 +4,18 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). S
 
 ## [Sin publicar]
 
+### Corregido (legibilidad, formularios y créditos)
+- **Datos sobre las fotos.** El velo del héroe y de las tarjetas de la portada es más denso
+  (arriba incluido) y todo el texto que va encima de una foto lleva sombra, así que se lee
+  aunque la imagen sea clara o tenga mucho detalle. El porcentaje del índice, los puestos
+  y el resumen suben de contraste sobre la foto.
+- **Sin foto.** El héroe marca `sin-foto` cuando no hay imagen libre, de modo que en tema claro
+  el texto vuelve a su color normal en lugar de quedar blanco sobre el fondo claro.
+- **Formulario en móvil.** Los campos usan 16 px, lo que evita que iOS amplíe la página al
+  enfocar; en pantallas angostas el botón ocupa todo el ancho. El campo trampa (honeypot) pasó
+  a la utilidad `.visualmente-oculto`, así ya no se cuela ni genera desbordamiento en móvil.
+- **Créditos.** El pie de página ahora acredita «Creado y mantenido por Angel Romero».
+
 ### Agregado (fase 7: despliegue)
 - `docs/despliegue.md`: cómo publicar en GitHub Pages (sin formularios) o en un hosting
   propio con PHP (formularios activos), con la estructura de `privado/` y la tabla de

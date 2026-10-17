@@ -121,6 +121,7 @@ def documento(pagina: Pagina, sitio: dict, activo: str | None = None) -> str:
       <a href="{raiz}acerca/">Acerca y privacidad</a> ·
       <a href="{escape(sitio["repositorio"])}/issues/new/choose">Reportar un error</a></p>
     <p class="pie__fecha">Datos actualizados el {escape(sitio["actualizado"])}.</p>
+    <p class="pie__credito">Creado y mantenido por <a href="mailto:{escape(sitio["correo"])}">Angel Romero</a>.</p>
   </div>
 </footer>
 <script type="module" src="{raiz}assets/js/tema.js"></script>

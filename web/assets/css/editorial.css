@@ -72,12 +72,18 @@
   object-fit: cover;
 }
 
-/* Velo para que el texto siempre se lea sobre la foto. */
+/* Velo para que el texto siempre se lea, por clara o llena que esté la foto. */
 .heroe__fondo::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgb(10 13 18 / 20%) 0%, rgb(10 13 18 / 55%) 55%, rgb(10 13 18 / 88%) 100%);
+  background: linear-gradient(
+    180deg,
+    rgb(6 8 12 / 48%) 0%,
+    rgb(6 8 12 / 68%) 42%,
+    rgb(6 8 12 / 88%) 78%,
+    rgb(6 8 12 / 95%) 100%
+  );
 }
 
 .heroe__fondo--silueta {
@@ -102,17 +108,37 @@
   z-index: 1;
 }
 
-.heroe .etiqueta {
-  color: rgb(255 255 255 / 85%);
+/* Sombra en el texto que va sobre la foto: clave cuando la imagen es clara o está llena de detalle. */
+.heroe:not(.sin-foto) {
+  text-shadow: 0 1px 2px rgb(0 0 0 / 55%), 0 2px 18px rgb(0 0 0 / 45%);
+}
+
+.heroe:not(.sin-foto) .boton,
+.heroe:not(.sin-foto) .semaforo,
+.heroe:not(.sin-foto) .chip-datos {
+  text-shadow: none;
+}
+
+.heroe:not(.sin-foto) .etiqueta {
+  color: rgb(255 255 255 / 90%);
+}
+
+.heroe:not(.sin-foto) .ficha__resumen {
+  color: rgb(255 255 255 / 92%);
+}
+
+.heroe:not(.sin-foto) .indice-grande__de,
+.heroe:not(.sin-foto) .puestos dt,
+.heroe:not(.sin-foto) .puestos small {
+  color: rgb(255 255 255 / 80%);
 }
 
 .heroe h1 {
   margin: 0.15em 0 0.5rem;
-  text-shadow: 0 2px 24px rgb(0 0 0 / 45%);
 }
 
 .heroe .acento {
-  color: color-mix(in srgb, var(--acento) 40%, #fff);
+  color: color-mix(in srgb, var(--acento) 45%, #fff);
 }
 
 .heroe__cuerpo .acciones .boton--secundario {
@@ -219,7 +245,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, transparent 20%, rgb(10 13 18 / 88%) 100%);
+  background: linear-gradient(180deg, rgb(6 8 12 / 20%) 0%, rgb(6 8 12 / 50%) 55%, rgb(6 8 12 / 90%) 100%);
 }
 
 .tarjeta-foto__fondo--silueta {
@@ -242,6 +268,7 @@
   position: relative;
   padding: 1rem;
   color: #fff;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 60%), 0 2px 12px rgb(0 0 0 / 45%);
 }
 
 .tarjeta-foto__titulo {
@@ -255,7 +282,7 @@
 .tarjeta-foto__cuerpo .indice-mini {
   font-family: var(--fuente-mono);
   font-size: 0.78rem;
-  color: rgb(255 255 255 / 80%);
+  color: rgb(255 255 255 / 90%);
 }
 
 .tarjeta-foto .semaforo {

@@ -876,6 +876,15 @@
   font-size: 0.8rem;
 }
 
+.pie__credito {
+  margin-top: 0.6rem;
+  color: var(--texto);
+}
+
+.pie__credito a {
+  font-weight: 600;
+}
+
 /* --- Páginas de texto ------------------------------------------------------------------- */
 .pagina-texto main > section,
 .pagina-texto main > header {
@@ -963,25 +972,43 @@
 
 .formulario label {
   display: grid;
-  gap: 0.3rem;
-  font-size: 0.9rem;
+  gap: 0.35rem;
+  font-size: 0.92rem;
   color: var(--texto-suave);
 }
 
 .formulario input,
 .formulario textarea {
   font: inherit;
+  font-size: 1rem; /* 16 px: evita que iOS amplíe la página al enfocar un campo */
+  line-height: 1.4;
   color: var(--texto);
   background: var(--superficie-2);
   border: 1px solid var(--linea);
   border-radius: var(--radio-chico);
-  padding: 0.55rem 0.7rem;
+  padding: 0.65rem 0.8rem;
   width: 100%;
   resize: vertical;
 }
 
+.formulario input {
+  min-height: 2.75rem;
+}
+
 .formulario button {
   justify-self: start;
+}
+
+/* En pantallas angostas el botón ocupa todo el ancho, más cómodo de tocar. */
+@media (max-width: 560px) {
+  .enviar {
+    padding: 0.4rem 0.85rem;
+  }
+
+  .formulario button {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 .formulario__aviso {
@@ -991,14 +1018,8 @@
   color: var(--verde);
 }
 
-/* Campo trampa: invisible para las personas, tentador para los robots. */
-.formulario__trampa {
-  position: absolute;
-  left: -9999px;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-}
+/* El campo trampa usa la utilidad .visualmente-oculto (base.css): fuera de la vista
+   pero sin desbordar la página en móvil, y tentador para los robots. */
 
 /* Revisión automática del sitio web de la alcaldía (no puntúa) */
 .revision-auto {

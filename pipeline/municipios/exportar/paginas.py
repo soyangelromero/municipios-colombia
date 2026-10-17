@@ -122,7 +122,7 @@ def formulario(
   <summary>{escape(titulo)}</summary>
   <form class="formulario" data-formulario="{tipo}" data-repo="{repo}" data-correo="{correo}">
     <input type="hidden" name="t" data-tiempo value="">
-    <p class="formulario__trampa" aria-hidden="true">
+    <p class="visualmente-oculto" aria-hidden="true">
       <label>No llenar este campo <input type="text" name="web" tabindex="-1" autocomplete="off"></label>
     </p>
     {oculto_municipio}{campo_asunto}
@@ -478,7 +478,7 @@ def ficha(datos: DatosSitio, codigo: str, dir_mapas: Path | None = None) -> Pagi
 {miga(raiz, [("", "Inicio"), (f"d/{m.departamento_slug}/", m.departamento), ("", m.nombre)])}
 <article class="ficha" data-codigo="{codigo}" data-nombre="{escape(m.nombre)}"
   data-reportar="{escape(reportar)}"{f' data-foto="{raiz}assets/fotos/{codigo}-1080.webp"' if foto else ""}>
-<header class="ficha__cabecera heroe" data-capitulo="Portada">
+<header class="ficha__cabecera heroe{" sin-foto" if not foto else ""}" data-capitulo="Portada">
   <div class="heroe__fondo{"" if foto else " heroe__fondo--silueta"}" aria-hidden="true">{fondo or ""}</div>
   <div class="heroe__cuerpo">
   <p class="etiqueta">{escape(m.departamento)} · {escape(grupo)}</p>
