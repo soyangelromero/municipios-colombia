@@ -886,8 +886,21 @@ html.con-intro .intro {
 }
 
 @media (max-width: 1023px) {
-  .hero__mapa { position: relative; height: 64vh; }
-  .hero__texto { padding-top: 104px; }
+  .hero {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .hero__texto {
+    order: 1;
+    padding-top: 104px;
+  }
+
+  .hero__mapa {
+    order: 2;
+    position: relative;
+    height: 64vh;
+  }
 }
 
 /* --- Buscador ------------------------------------------------------------------------------- */
