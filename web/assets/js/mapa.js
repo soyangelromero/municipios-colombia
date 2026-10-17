@@ -21,9 +21,15 @@ export function activarMapa(figura, { texto, enlace }) {
   const mostrar = (camino, x, y) => {
     globo.textContent = texto(camino.dataset.codigo);
     globo.hidden = false;
+    camino.classList.add('is-hover');
     const caja = figura.getBoundingClientRect();
     globo.style.left = `${x - caja.left}px`;
     globo.style.top = `${y - caja.top}px`;
+  };
+
+  const ocultar = (camino) => {
+    globo.hidden = true;
+    if (camino) camino.classList.remove('is-hover');
   };
 
   svg.querySelectorAll('path[data-codigo]').forEach((camino) => {
@@ -32,13 +38,14 @@ export function activarMapa(figura, { texto, enlace }) {
     camino.setAttribute('role', destino ? 'link' : 'img');
     camino.setAttribute('aria-label', texto(camino.dataset.codigo));
     camino.querySelector('title')?.remove(); // el globo reemplaza el título nativo
+    camino.addEventListener('pointerenter', () => camino.classList.add('is-hover'));
     camino.addEventListener('pointermove', (e) => mostrar(camino, e.clientX, e.clientY));
-    camino.addEventListener('pointerleave', () => (globo.hidden = true));
+    camino.addEventListener('pointerleave', () => ocultar(camino));
     camino.addEventListener('focus', () => {
       const r = camino.getBoundingClientRect();
       mostrar(camino, r.left + r.width / 2, r.top);
     });
-    camino.addEventListener('blur', () => (globo.hidden = true));
+    camino.addEventListener('blur', () => ocultar(camino));
     if (destino) {
       camino.style.cursor = 'pointer';
       const ir = () => (window.location.href = destino);
