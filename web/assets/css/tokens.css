@@ -8,7 +8,7 @@
   --ink: #0b0d10; /* fondo de todo el sitio */
   --ink-2: #14171c; /* superficies: inputs, tarjetas, modales */
   --fg: #f4f5f7; /* texto principal */
-  --mute: rgb(244 245 247 / 62%); /* texto secundario */
+  --mute: rgb(244 245 247 / 68%); /* texto secundario */
   --line: rgb(255 255 255 / 14%); /* bordes y separadores */
   --acc: #3d7cff; /* único acento fuerte (azul bandera) */
   --acc-fg: #06101f; /* texto sobre el acento */
@@ -87,7 +87,7 @@
   --ink: #f4f1ea;
   --ink-2: #ffffff;
   --fg: #11151b;
-  --mute: rgb(17 21 27 / 66%);
+  --mute: rgb(17 21 27 / 70%);
   --line: rgb(17 21 27 / 14%);
   --acc: #1c4fd8;
   --acc-fg: #ffffff;
