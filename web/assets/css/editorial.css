@@ -225,8 +225,12 @@
   transition: transform var(--transicion);
 }
 
+.tarjeta-foto {
+  transition: transform 0.35s var(--ease);
+}
+
 .tarjeta-foto:hover {
-  transform: translateY(-3px);
+  transform: translateY(-4px) rotateX(2deg) rotateY(-2deg);
 }
 
 .card {
@@ -1043,7 +1047,18 @@ html.con-intro .intro {
 }
 
 @media (max-width: 767px) {
-  .leyenda-card { display: none; }
+  .leyenda-card {
+    left: 50%;
+    right: auto;
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    width: calc(100% - 2 * var(--gut));
+    max-width: 360px;
+    padding: 10px 12px;
+  }
+
+  .leyenda-card .hist { height: 36px; }
+  .leyenda-card__pie { display: none; }
 }
 
 /* --- Carrusel de tarjetas (.rail) ----------------------------------------------------------- */
@@ -1526,8 +1541,8 @@ html.lock body { overflow: hidden; }
 }
 
 @keyframes intro-mapa {
-  from { opacity: 0; transform: scale(1.08); }
-  to { opacity: 1; transform: none; }
+  from { opacity: 0; transform: scale(1.12); filter: blur(12px) brightness(1.6); }
+  to { opacity: 1; transform: none; filter: blur(0) brightness(1); }
 }
 
 @keyframes intro-trazo {
