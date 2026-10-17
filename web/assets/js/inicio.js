@@ -34,7 +34,14 @@ function intro() {
   };
   capa.querySelector('[data-intro-salto]')?.addEventListener('click', terminar);
   capa.querySelectorAll('[data-contar]').forEach((el) => contar(el, Number(el.dataset.contar), 1000));
-  setTimeout(terminar, 4200);
+  // Cascada de departamentos en el mapa de la intro.
+  const caminos = capa.querySelectorAll('.intro__mapa path[data-codigo]');
+  caminos.forEach((p, i) => {
+    p.style.opacity = '0';
+    p.style.transition = 'opacity 0.6s var(--ease)';
+    setTimeout(() => (p.style.opacity = '1'), 600 + i * 18);
+  });
+  setTimeout(terminar, 4600);
 }
 
 function carrusel() {
