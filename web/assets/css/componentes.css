@@ -1,6 +1,167 @@
 /* Componentes del sitio. Usa solo los tokens de tokens.css. */
 
-/* --- Cabecera ----------------------------------------------------------------------------- */
+/* --- Barra superior fija (.top, ver e2e/04) ------------------------------------------------ */
+.top {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 14px var(--gut);
+  padding-top: calc(14px + env(safe-area-inset-top));
+}
+
+.top::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0;
+  background: linear-gradient(180deg, rgb(11 13 16 / 92%), rgb(11 13 16 / 0%));
+  backdrop-filter: blur(14px);
+  transition: opacity 0.35s linear;
+  -webkit-mask-image: linear-gradient(180deg, #000 60%, transparent);
+  mask-image: linear-gradient(180deg, #000 60%, transparent);
+}
+
+.top.solid::before {
+  opacity: 1;
+}
+
+.top__marca {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--fg);
+  text-decoration: none;
+}
+
+.top__nombre {
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+}
+
+.top__nombre b {
+  font-weight: 650;
+}
+
+.top__nombre span {
+  font-weight: 300;
+  color: var(--mute);
+}
+
+.top__acciones {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  width: 26px;
+  height: 26px;
+}
+
+.logo i {
+  display: block;
+  width: 5px;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--fg);
+}
+
+.logo i:nth-child(2) {
+  height: 60%;
+  background: var(--acc);
+}
+
+.logo i:nth-child(3) {
+  height: 80%;
+}
+
+/* --- Píldoras ----------------------------------------------------------------------------- */
+.pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: var(--r-pill);
+  background: var(--glass);
+  color: var(--fg);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 0.2s var(--ease),
+    transform 0.1s var(--ease);
+}
+
+.pill:hover {
+  background: var(--glass-hover);
+}
+
+.pill:active {
+  transform: scale(0.94);
+}
+
+.pill .ico {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.pill--claro {
+  height: 44px;
+  padding: 0 20px;
+  background: var(--fg);
+  color: var(--ink);
+  font-weight: 650;
+}
+
+.pill--claro:hover {
+  background: color-mix(in srgb, var(--fg) 88%, var(--acc));
+}
+
+.pill--icono {
+  width: 36px;
+  justify-content: center;
+  padding: 0;
+}
+
+@media (pointer: coarse) {
+  .pill::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+  }
+}
+
+@media (max-width: 430px) {
+  .top__acciones .pill {
+    width: 36px;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .top__acciones .pill span {
+    display: none;
+  }
+}
+
+/* --- Cabecera (obsoleta; reemplazada por .top) -------------------------------------------- */
 .cabecera {
   position: sticky;
   top: 0;
@@ -860,25 +1021,49 @@
 
 /* --- Pie ---------------------------------------------------------------------------------- */
 .pie {
+  margin-top: 3rem;
+  padding: clamp(2rem, 5vw, 3.5rem) 0;
   border-top: 1px solid var(--linea);
-  background: var(--superficie);
   font-size: 0.9rem;
-  color: var(--texto-suave);
+  color: var(--mute);
 }
 
-.pie__fila {
-  padding-top: 1.5rem;
-  padding-bottom: 2rem;
+.pie__contacto {
+  display: flex;
+  align-items: center;
+  gap: 1rem 1.25rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.pie__contacto .lede {
+  margin: 0;
+}
+
+.pie__enlaces {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.pie__enlaces a {
+  color: var(--fg);
+  font-size: 0.92rem;
+  text-decoration: none;
+}
+
+.pie__enlaces a:hover {
+  text-decoration: underline;
 }
 
 .pie__fecha {
-  font-family: var(--fuente-mono);
-  font-size: 0.8rem;
+  margin: 0;
 }
 
 .pie__credito {
-  margin-top: 0.6rem;
-  color: var(--texto);
+  margin: 0.4rem 0 0;
+  color: var(--fg);
 }
 
 .pie__credito a {

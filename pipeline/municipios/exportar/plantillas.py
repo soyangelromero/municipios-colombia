@@ -8,15 +8,6 @@ el sitio funciona igual en un dominio propio o en una subcarpeta (GitHub Pages).
 from dataclasses import dataclass
 from html import escape
 
-NAVEGACION = (
-    ("", "Inicio"),
-    ("ranking/", "Ranking"),
-    ("comparar/", "Comparar"),
-    ("metodologia/", "Metodología"),
-    ("fuentes/", "Fuentes"),
-    ("acerca/", "Acerca"),
-)
-
 SEMAFORO_TEXTO = {"verde": "Verde", "amarillo": "Amarillo", "rojo": "Rojo"}
 
 
@@ -37,17 +28,13 @@ class Pagina:
         return "../" * profundidad
 
 
-def documento(pagina: Pagina, sitio: dict, activo: str | None = None) -> str:
+def documento(pagina: Pagina, sitio: dict) -> str:
     raiz = pagina.raiz
     url = sitio["url_base"] + pagina.ruta.removesuffix("index.html")
     titulo = (
         f"{pagina.titulo} · {sitio['nombre']}"
         if pagina.titulo != sitio["nombre"]
         else pagina.titulo
-    )
-    enlaces = "".join(
-        f'<a href="{raiz}{ruta}"{' aria-current="page"' if ruta == activo else ""}>{escape(texto)}</a>'
-        for ruta, texto in NAVEGACION
     )
     imagen = sitio["url_base"] + pagina.imagen if pagina.imagen else ""
     og_imagen = (
@@ -81,7 +68,7 @@ def documento(pagina: Pagina, sitio: dict, activo: str | None = None) -> str:
 <meta property="og:description" content="{escape(pagina.descripcion)}">
 <meta property="og:url" content="{escape(url)}">
 {og_imagen}
-<meta name="theme-color" content="#0a0d12">
+<meta name="theme-color" content="#0b0d10">
 <meta name="raiz" content="{raiz}">
 <link rel="icon" href="{raiz}assets/img/icono.svg" type="image/svg+xml">
 <link rel="preload" href="{raiz}assets/fonts/Geist-Variable.woff2" as="font" type="font/woff2" crossorigin>
@@ -92,38 +79,48 @@ def documento(pagina: Pagina, sitio: dict, activo: str | None = None) -> str:
 <link rel="stylesheet" href="{raiz}assets/css/editorial.css">
 </head>
 <body class="{escape(pagina.clase)}">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-mapa" viewBox="0 0 20 20"><path d="M10 2 3 6v8l7 4 7-4V6z"/><path d="M10 2v14M3 6l7 4 7-4"/></symbol>
+  <symbol id="i-comparar" viewBox="0 0 20 20"><path d="M4 4v12M10 2v16M16 6v8"/></symbol>
+  <symbol id="i-contacto" viewBox="0 0 20 20"><rect x="3" y="5" width="14" height="10" rx="2"/><path d="m3 6 7 5 7-5"/></symbol>
+  <symbol id="i-lupa" viewBox="0 0 20 20"><circle cx="9" cy="9" r="5"/><path d="m13 13 4 4"/></symbol>
+  <symbol id="i-cerrar" viewBox="0 0 20 20"><path d="m5 5 10 10M15 5 5 15"/></symbol>
+</svg>
 <a class="saltar" href="#contenido">Saltar al contenido</a>
-<header class="cabecera">
-  <div class="cabecera__fila contenedor">
-    <a class="marca" href="{raiz}" aria-label="{escape(sitio["nombre"])}, inicio">
-      <img src="{raiz}assets/img/icono.svg" alt="" width="28" height="28">
-      <span>Municipios <strong>Colombia</strong></span>
-    </a>
-    <nav class="nav" aria-label="Principal">{enlaces}</nav>
-    <button type="button" class="tema" data-tema-boton hidden aria-label="Cambiar entre modo oscuro y claro">
-      <span aria-hidden="true">◐</span></button>
-    <div class="busqueda" data-busqueda>
-      <label class="visualmente-oculto" for="buscar-global">Buscar municipio</label>
-      <input id="buscar-global" type="search" placeholder="Busca tu municipio" autocomplete="off"
-        role="combobox" aria-expanded="false" aria-controls="buscar-global-lista">
-      <ul id="buscar-global-lista" class="busqueda__lista" role="listbox" hidden></ul>
-    </div>
+<header class="top" data-top>
+  <a class="top__marca" href="{raiz}" aria-label="{escape(sitio["nombre"])}, inicio">
+    <span class="logo" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="top__nombre"><b>Municipios</b> <span>Colombia</span></span>
+  </a>
+  <div class="top__acciones">
+    <a class="pill" href="{raiz}"><svg class="ico"><use href="#i-mapa"/></svg><span>Mapa</span></a>
+    <a class="pill" href="{raiz}comparar/"><svg class="ico"><use href="#i-comparar"/></svg><span>Comparar</span></a>
+    <a class="pill" href="{raiz}acerca/#contacto"><svg class="ico"><use href="#i-contacto"/></svg><span>Contacto</span></a>
+    <button type="button" class="pill pill--icono" data-tema-boton hidden
+      aria-label="Cambiar entre modo oscuro y claro"><span aria-hidden="true">◐</span></button>
   </div>
 </header>
 <main id="contenido" class="contenedor">
 {pagina.contenido}
 </main>
 <footer class="pie">
-  <div class="contenedor pie__fila">
-    <p><strong>{escape(sitio["nombre"])}</strong> · Datos oficiales con su fuente.
-      Código <a href="{escape(sitio["repositorio"])}">abierto (MIT)</a> y datos propios CC BY 4.0.</p>
-    <p><a href="{raiz}metodologia/">Metodología</a> · <a href="{raiz}fuentes/">Fuentes</a> ·
-      <a href="{raiz}acerca/">Acerca y privacidad</a> ·
-      <a href="{escape(sitio["repositorio"])}/issues/new/choose">Reportar un error</a></p>
-    <p class="pie__fecha">Datos actualizados el {escape(sitio["actualizado"])}.</p>
+  <div class="pie__fila contenedor">
+    <div class="pie__contacto">
+      <p class="lede sm">¿Trabajas en una alcaldía o encuentras un dato equivocado? Escríbenos y lo corregimos con su fuente.</p>
+      <a class="pill pill--claro" href="{raiz}acerca/#contacto">Contacto</a>
+    </div>
+    <nav class="pie__enlaces" aria-label="Pie de página">
+      <a href="{raiz}metodologia/">Metodología</a>
+      <a href="{raiz}fuentes/">Fuentes</a>
+      <a href="{raiz}acerca/">Acerca y privacidad</a>
+      <a href="{escape(sitio["repositorio"])}">Código abierto (MIT)</a>
+      <a href="{escape(sitio["repositorio"])}/issues/new/choose">Reportar un error</a>
+    </nav>
+    <p class="mono pie__fecha">Datos actualizados el {escape(sitio["actualizado"])}.</p>
     <p class="pie__credito">Creado y mantenido por <a href="mailto:{escape(sitio["correo"])}">Angel Romero</a>.</p>
   </div>
 </footer>
+<script>addEventListener('scroll',function(){{var t=document.querySelector('[data-top]');if(t)t.classList.toggle('solid',scrollY>40)}},{{passive:true}})</script>
 <script type="module" src="{raiz}assets/js/tema.js"></script>
 <script type="module" src="{raiz}assets/js/busqueda.js"></script>
 {scripts}

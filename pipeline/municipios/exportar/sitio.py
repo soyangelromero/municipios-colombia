@@ -14,18 +14,14 @@ from municipios.exportar.plantillas import Pagina, documento
 
 log = logging.getLogger(__name__)
 
+
 # Página activa en la navegación, según la primera parte de la ruta.
-SECCIONES = ("ranking", "comparar", "metodologia", "fuentes", "acerca")
-ACTIVA = {"": "", **{s: f"{s}/" for s in SECCIONES}}
-
-
 def _escribir(destino: Path, pagina: Pagina, sitio: dict) -> None:
     ruta = destino / (
         pagina.ruta + "index.html" if pagina.ruta.endswith("/") or not pagina.ruta else pagina.ruta
     )
     ruta.parent.mkdir(parents=True, exist_ok=True)
-    activa = ACTIVA.get(pagina.ruta.split("/", 1)[0])  # None: ninguna (fichas, departamentos)
-    ruta.write_text(documento(pagina, sitio, activa), encoding="utf-8")
+    ruta.write_text(documento(pagina, sitio), encoding="utf-8")
 
 
 def construir(datos: DatosSitio, dir_web: Path, destino: Path) -> int:

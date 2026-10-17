@@ -1,78 +1,110 @@
-/* Tokens de diseño: todo color, tipografía y espacio del sitio sale de aquí.
-   El tema editorial oscuro es el de por defecto; el claro se activa con data-tema="claro". */
+/* Tokens de diseño (ver e2e/02-sistema-de-diseno.md y e2e/11-adaptacion-colombia.md).
+   Modo oscuro por defecto; el claro se activa con data-tema="claro".
+   Al final quedan alias con los nombres anteriores para migrar el resto del CSS sin romperlo. */
 :root {
   color-scheme: dark;
 
-  --fondo: #0a0d12;
-  --fondo-2: #0f141c;
-  --superficie: #121826;
-  --superficie-2: #1a2231;
-  --texto: #f3f6fb;
-  --texto-suave: #97a3b8;
-  --linea: #232c3d;
-  --acento: #3b76ff;
-  --acento-fuerte: #2a5ce0;
-  --acento-suave: #101d3d;
-  --acento-texto: #ffffff;
-  --enfoque: #7ba0ff;
+  /* Color */
+  --ink: #0b0d10; /* fondo de todo el sitio */
+  --ink-2: #14171c; /* superficies: inputs, tarjetas, modales */
+  --fg: #f4f5f7; /* texto principal */
+  --mute: rgb(244 245 247 / 62%); /* texto secundario */
+  --line: rgb(255 255 255 / 14%); /* bordes y separadores */
+  --acc: #3d7cff; /* único acento fuerte (azul bandera) */
+  --acc-fg: #06101f; /* texto sobre el acento */
+  --ok: #22c55e; /* semáforo verde */
+  --warn: #eab308; /* semáforo amarillo */
+  --bad: #ef4444; /* semáforo rojo */
+  --q-grad: linear-gradient(90deg, #ef4444, #eab308 50%, #22c55e); /* escala continua */
+  --q-info: #b58cf0; /* datos informativos que no puntúan (violeta) */
+  --q-info-grad: linear-gradient(90deg, #5a4a9e, #b58cf0 55%, #d9c7fb);
 
-  /* Semáforo del índice: color + texto, nunca solo color. */
-  --verde: #4ade80;
-  --verde-suave: #10301d;
-  --amarillo: #fbbf24;
-  --amarillo-suave: #33270b;
-  --rojo: #f87171;
-  --rojo-suave: #3a1414;
+  /* Fondos translúcidos y vidrio */
+  --glass: rgb(255 255 255 / 8%);
+  --glass-hover: rgb(255 255 255 / 16%);
+  --glass-card: rgb(255 255 255 / 7.5%);
+  --panel: rgb(15 18 23 / 92%);
 
-  /* Escala de los mapas y barras: cinco tramos, de rojo a verde. */
-  --escala-e1: #e05b5b;
-  --escala-e2: #f0954a;
-  --escala-e3: #e8bd4f;
-  --escala-e4: #92bf55;
-  --escala-e5: #3fae63;
-  --escala-sin: #3a4350;
+  /* Espaciado, radios y sombras */
+  --gut: clamp(16px, 4vw, 48px);
+  --ancho: 1400px;
+  --ancho-texto: 880px;
+  --r-card: 22px;
+  --r-modal: 22px;
+  --r-panel: 26px;
+  --r-sheet: 24px;
+  --r-pill: 99px;
+  --r-input: 16px;
+  --r-chip: 99px;
+  --r-kpi: 13px;
+  --sh-sug: 0 18px 40px rgb(0 0 0 / 50%);
+  --sh-panel: 0 30px 80px rgb(0 0 0 / 50%);
 
+  /* Movimiento (ver e2e/10-movimiento-y-accesibilidad.md) */
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Tipografías autoalojadas (OFL) */
   --fuente: "Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --fuente-mono: "Geist Mono", ui-monospace, "Cascadia Mono", "SFMono-Regular", Menlo, monospace;
 
-  --margen: clamp(16px, 4vw, 40px);
-  --radio: 16px;
-  --radio-chico: 10px;
+  /* --- Alias de compatibilidad (migración gradual del CSS existente) --- */
+  --fondo: var(--ink);
+  --fondo-2: var(--ink-2);
+  --superficie: var(--ink-2);
+  --superficie-2: #1b2029;
+  --texto: var(--fg);
+  --texto-suave: var(--mute);
+  --linea: var(--line);
+  --acento: var(--acc);
+  --acento-fuerte: #2a5fe0;
+  --acento-suave: #0e1a38;
+  --acento-texto: var(--acc-fg);
+  --enfoque: var(--acc);
+  --verde: var(--ok);
+  --verde-suave: #0c2a18;
+  --amarillo: var(--warn);
+  --amarillo-suave: #2e2406;
+  --rojo: var(--bad);
+  --rojo-suave: #331111;
+  --escala-e1: var(--bad);
+  --escala-e2: #f0954a;
+  --escala-e3: var(--warn);
+  --escala-e4: #92bf55;
+  --escala-e5: var(--ok);
+  --escala-sin: #3a4350;
+  --margen: var(--gut);
+  --radio: var(--r-card);
+  --radio-chico: var(--r-kpi);
   --sombra: 0 1px 2px rgb(0 0 0 / 40%), 0 4px 18px rgb(0 0 0 / 30%);
-  --sombra-fuerte: 0 10px 40px rgb(0 0 0 / 45%);
-  --transicion: 160ms ease;
+  --sombra-fuerte: var(--sh-panel);
+  --transicion: 160ms var(--ease);
 }
 
 :root[data-tema="claro"] {
   color-scheme: light;
 
-  --fondo: #f6f6f4;
-  --fondo-2: #ffffff;
-  --superficie: #ffffff;
+  --ink: #f4f1ea;
+  --ink-2: #ffffff;
+  --fg: #11151b;
+  --mute: rgb(17 21 27 / 66%);
+  --line: rgb(17 21 27 / 14%);
+  --acc: #1c4fd8;
+  --acc-fg: #ffffff;
+  --ok: #15803d;
+  --warn: #a16207;
+  --bad: #b91c1c;
+  --q-info: #7c4fd6;
+  --glass: rgb(17 21 27 / 6%);
+  --glass-hover: rgb(17 21 27 / 12%);
+  --glass-card: rgb(17 21 27 / 5%);
+  --panel: rgb(255 255 255 / 94%);
+
   --superficie-2: #eef0f3;
-  --texto: #0f141c;
-  --texto-suave: #525c6c;
-  --linea: #e1e4e9;
-  --acento: #1d4ed8;
+  --linea: var(--line);
   --acento-fuerte: #13328f;
   --acento-suave: #e6edff;
-  --acento-texto: #ffffff;
-  --enfoque: #2563eb;
-
-  --verde: #15803d;
-  --verde-suave: #e2f3e7;
-  --amarillo: #a16207;
-  --amarillo-suave: #fbf0d4;
-  --rojo: #b91c1c;
-  --rojo-suave: #fbe3e3;
-
-  --escala-e1: #d64545;
-  --escala-e2: #ee8a3c;
-  --escala-e3: #f2c14e;
-  --escala-e4: #9cc65a;
-  --escala-e5: #2f9e55;
+  --texto-suave: var(--mute);
   --escala-sin: #c9cfd7;
-
   --sombra: 0 1px 2px rgb(15 23 42 / 6%), 0 4px 16px rgb(15 23 42 / 6%);
-  --sombra-fuerte: 0 10px 40px rgb(15 23 42 / 12%);
 }
