@@ -7,7 +7,19 @@ from urllib.parse import urlencode
 from municipios.comun.modelos import Municipio
 from municipios.exportar import formato
 from municipios.exportar.datos_web import NOMBRES_GRUPOS, DatosSitio
-from municipios.exportar.plantillas import Pagina, barra, miga, semaforo
+from municipios.exportar.plantillas import (
+    Pagina,
+    anillo,
+    bar2,
+    barra,
+    chip,
+    color_puntaje,
+    kpi,
+    medidor,
+    miga,
+    semaforo,
+    sin_dato,
+)
 from municipios.exportar.silueta import Siluetas
 from municipios.fuentes.divipola import DEPARTAMENTOS
 from municipios.relevamiento.criterios import CRITERIOS
@@ -190,19 +202,105 @@ def tabla_ranking(datos: DatosSitio, codigos: list[str], raiz: str, con_departam
 
 
 # --- inicio ---------------------------------------------------------------------------------
-def tarjeta_carrusel(datos: DatosSitio, codigo: str, siluetas: Siluetas) -> str:
-    """Tarjeta con foto (o silueta) para el carrusel de la portada."""
-    m, f = datos.municipios[codigo], datos.indice[codigo]
-    foto = foto_img(datos, codigo, "", primera=False, tamanos="320px")
-    fondo = foto or (siluetas.de(m.departamento_slug, codigo) or "")
-    clase = "" if foto else " tarjeta-foto__fondo--silueta"
-    return (
-        f'<a class="tarjeta-foto revela" href="m/{m.slug}/">'
-        f'<span class="tarjeta-foto__fondo{clase}" aria-hidden="true">{fondo}</span>'
-        f'<span class="tarjeta-foto__cuerpo"><span class="tarjeta-foto__titulo">{escape(m.nombre)}</span>'
-        f'<span class="indice-mini">{escape(m.departamento)} · índice {_num(f.get("indice"))}</span><br>'
-        f"{semaforo(f.get('semaforo'), f.get('indice'))}</span></a>"
+def _dato(fila: dict, clave: str) -> dict | None:
+    return fila.get("datos", {}).get(clave)
+
+
+def _valor_dato(datos: DatosSitio, fila: dict, clave: str, unidad: str | None = None) -> str:
+    """Valor formateado de un indicador de contexto (o «—»)."""
+    dato = _dato(fila, clave)
+    if dato is None:
+        return "—"
+    u = (
+        unidad
+        if unidad is not None
+        else (datos.indicadores[clave].unidad if clave in datos.indicadores else "")
     )
+    return formato.segun_unidad(dato["valor"], u)
+
+
+def tarjeta_carrusel(datos: DatosSitio, codigo: str, siluetas: Siluetas, puesto: int) -> str:
+    """Tarjeta 9:15 de foto (o silueta) para el carrusel de la portada."""
+    m, f = datos.municipios[codigo], datos.indice[codigo]
+    foto = foto_img(datos, codigo, "", primera=puesto <= 3, tamanos="(max-width:620px) 72vw, 300px")
+    fondo = foto or (siluetas.de(m.departamento_slug, codigo) or "")
+    clase = "" if foto else " card__fondo--silueta"
+    indice = f.get("indice")
+    chip_txt = f"Índice {_num(indice, 0)}" if indice is not None else "Sin índice"
+    poblacion = _dato(f, "poblacion")
+    t, s = datos.valor(codigo, "T"), datos.valor(codigo, "S")
+    meta = (
+        f"{escape(m.departamento)} · {formato.numero(poblacion['valor'] if poblacion else None)} hab"
+        f" · trans {_num(t, 0)} · seg {_num(s, 0)}"
+    )
+    gasto = _dato(f, "gasto_por_habitante")
+    if gasto is not None:
+        info = (
+            '<span class="card__info-etq">Gasto por habitante</span>'
+            f'<span class="card__info-val">{formato.segun_unidad(gasto["valor"], "pesos")}</span>'
+            f'<span class="f">{enlaces_fuente(datos, gasto["fuentes"])}</span>'
+        )
+    else:
+        info = '<span class="card__info-etq">Dato informativo</span><span class="card__info-val">—</span>'
+    return (
+        f'<a class="card" href="m/{m.slug}/" data-foto="{puesto}" data-dep="{m.departamento_codigo}"'
+        f' data-grupo="{escape(f.get("grupo") or "")}">'
+        f'<span class="card__fondo{clase}" aria-hidden="true">{fondo}</span>'
+        f'<span class="card__chip">{chip(chip_txt, f.get("semaforo"))}</span>'
+        f'<span class="card__puesto mono">{puesto:02d}</span>'
+        '<span class="card__cuerpo">'
+        f'<span class="card__nombre">{escape(m.nombre)}</span>'
+        f'<span class="card__meta">{meta}</span>'
+        f'<span class="card__info">{info}</span>'
+        "</span></a>"
+    )
+
+
+def _fila_ranking(datos: DatosSitio, codigo: str, raiz: str) -> str:
+    """Una fila de la lista de ranking (.rk)."""
+    m, f = datos.municipios[codigo], datos.indice[codigo]
+    iniciales = "".join(p[0] for p in m.nombre.split()[:2]).upper()
+    valor = f.get("indice")
+    return (
+        '<li class="rk__fila">'
+        f'<a class="rk__enlace" href="{raiz}m/{m.slug}/" data-historia="{codigo}">'
+        f'<span class="rk__puesto mono">{f["puesto"]["nacional"]:02d}</span>'
+        f'<span class="rk__cara" aria-hidden="true">{escape(iniciales)}</span>'
+        f'<span class="rk__texto"><b>{escape(m.nombre)}</b>'
+        f"<small>{escape(m.departamento)} · {escape(NOMBRES_GRUPOS.get(f.get('grupo') or '', 'sin grupo'))}</small></span>"
+        f'<span class="rk__valor">{_num(valor, 0)}</span>'
+        "</a>"
+        f'<span class="rk__barra">{bar2(valor)}</span></li>'
+    )
+
+
+def _señales(datos: DatosSitio, codigo: str) -> list[tuple[str, str, str]]:
+    """(color, texto, valor) de las señales del resumen, ordenadas por gravedad."""
+    f = datos.indice[codigo]
+    señales: list[tuple[str, str, str]] = []
+    for pid, nombre in (
+        ("T", "Transparencia"),
+        ("S", "Servicios y seguridad"),
+        ("G", "Gestión"),
+        ("C", "Control"),
+    ):
+        v = datos.valor(codigo, pid)
+        if v is None:
+            señales.append(("rojo", f"{nombre} sin datos suficientes", "sin dato"))
+            continue
+        señales.append((color_puntaje(v), nombre, _num(v, 0)))
+    if f.get("tope"):
+        señales.insert(0, ("rojo", "No publica su ejecución presupuestal (índice topado)", "39,9"))
+    gasto = _dato(f, "gasto_por_habitante")
+    if gasto is not None:
+        señales.append(
+            (
+                "info",
+                "Gasto por habitante (contexto, no puntúa)",
+                formato.segun_unidad(gasto["valor"], "pesos"),
+            )
+        )
+    return señales
 
 
 def inicio(datos: DatosSitio, dir_mapas: Path) -> Pagina:
@@ -213,15 +311,8 @@ def inicio(datos: DatosSitio, dir_mapas: Path) -> Pagina:
         cod: tramo(datos.promedio([m.divipola for m in por_dep.get(cod, [])]))
         for cod in DEPARTAMENTOS
     }
-
-    def lista(codigos: list[str]) -> str:
-        items = "".join(
-            f'<li><a href="m/{datos.municipios[c].slug}/"><span>{escape(datos.municipios[c].nombre)}'
-            f"<small>{escape(datos.municipios[c].departamento)}</small></span>"
-            f"{semaforo(datos.indice[c]['semaforo'], datos.indice[c]['indice'])}</a></li>"
-            for c in codigos
-        )
-        return f'<ol class="lista-municipios">{items}</ol>'
+    siluetas = Siluetas(dir_mapas)
+    total = len(datos.municipios)
 
     pilares = "".join(
         f'<li class="tarjeta"><h3>{escape(p.nombre)} <small>{p.peso:g} %</small></h3>'
@@ -232,86 +323,115 @@ def inicio(datos: DatosSitio, dir_mapas: Path) -> Pagina:
         f'<button type="button" data-capa="{c}" aria-pressed="{"true" if c == "indice" else "false"}">{t}</button>'
         for c, t in CAPAS
     )
-    siluetas = Siluetas(dir_mapas)
+    # Histograma de la leyenda: una barra por departamento, según el índice promedio.
+    histograma = "".join(
+        f'<i class="hist__b hist__b--{colores[cod]}" style="height:{max(6, min(100, datos.promedio([m.divipola for m in por_dep.get(cod, [])]) or 0)):.0f}%"></i>'
+        for cod in DEPARTAMENTOS
+    )
+    promedios = [
+        datos.promedio([m.divipola for m in por_dep.get(cod, [])]) for cod in DEPARTAMENTOS
+    ]
+    promedios = [v for v in promedios if v is not None]
+
+    def opciones_dep() -> str:
+        return "".join(
+            f'<option value="{cod}">{escape(nombre)}</option>'
+            for cod, (nombre, _) in sorted(DEPARTAMENTOS.items(), key=lambda kv: kv[1][0])
+        )
+
+    grupos = "".join(f'<option value="{g}">{escape(n)}</option>' for g, n in NOMBRES_GRUPOS.items())
+
     intro = f"""
-<div class="intro" data-intro role="dialog" aria-label="Presentación del proyecto">
-  <button type="button" class="boton boton--secundario intro__salto" data-intro-salto>Saltar</button>
+<div class="intro" id="intro" data-intro role="dialog" aria-modal="true" aria-label="Presentación del proyecto">
+  <div class="intro__fondo" aria-hidden="true"></div>
+  <button type="button" class="pill intro__salto" data-intro-salto>Saltar</button>
   <div class="intro__contenido">
-    <p class="intro__marca">Municipios <span class="acento">Colombia</span></p>
+    <p class="intro__marca"><span class="logo logo--grande" aria-hidden="true"><i></i><i></i><i></i><i></i></span></p>
+    <h1 class="intro__h1"><span class="o">Municipios</span> <span class="lt">Colombia</span></h1>
+    <p class="lede">Transparencia, servicios, seguridad, gestión y control de cada alcaldía, con la fuente oficial de cada dato.</p>
     <div class="intro__cifras">
+      <div><strong data-contar="{total}">{formato.numero(total)}</strong>municipios</div>
       <div><strong data-contar="{len(ranking)}">{formato.numero(len(ranking))}</strong>con índice</div>
-      <div><strong data-contar="{conteo["verde"]}">{conteo["verde"]}</strong>en verde</div>
-      <div><strong data-contar="{len(datos.municipios)}">{formato.numero(len(datos.municipios))}</strong>en total</div>
+      <div><strong data-contar="{conteo["verde"]}">{formato.numero(conteo["verde"])}</strong>en verde</div>
     </div>
+    <button type="button" class="pill pill--claro intro__explorar" data-intro-salto>Explorar el mapa</button>
   </div>
 </div>
 """
-    carrusel = "".join(tarjeta_carrusel(datos, c, siluetas) for c in ranking[:10])
+    carrusel = "".join(
+        tarjeta_carrusel(datos, c, siluetas, i + 1) for i, c in enumerate(ranking[:40])
+    )
+    filas_rank = "".join(_fila_ranking(datos, c, "") for c in ranking[:20])
     contenido = f"""
 {intro}
-<section class="portada">
-  <div class="portada__texto">
-    <p class="chip-datos">Datos oficiales · actualizado el {escape(datos.sitio["actualizado"])}</p>
-    <p class="etiqueta">Observatorio ciudadano</p>
-    <h1>¿Tu municipio muestra sus <span class="acento">cuentas</span>?</h1>
-    <p class="entradilla">{escape(datos.sitio["descripcion"])}</p>
-    <form class="busqueda busqueda--grande" data-busqueda action="ranking/" role="search">
+<section class="hero" data-mapa-pais>
+  <div class="hero__mapa" data-mapa>
+    <div class="mseg" role="group" aria-label="Qué mostrar en el mapa">
+      <span class="mseg__th" aria-hidden="true"></span>{botones_capa}
+    </div>
+    {mapa_en_linea(dir_mapas / "colombia.svg", colores, "Mapa de Colombia por departamento, coloreado según el índice promedio")}
+    <div class="leyenda-card" aria-hidden="true">
+      <p class="leyenda-card__tit">Índice municipal · promedio por departamento</p>
+      <div class="hist">{histograma}</div>
+      <div class="leyenda-card__extremos mono"><span>{_num(min(promedios), 0)}</span><span>peor — mejor</span><span>{_num(max(promedios), 0)}</span></div>
+      {leyenda_escala()}
+      <p class="leyenda-card__pie f">Fuente: cálculo propio a partir de fuentes oficiales.</p>
+    </div>
+    <div class="mapa__velo" aria-hidden="true"></div>
+  </div>
+  <div class="hero__texto">
+    <h1 class="hero__h1"><span class="lt">¿Tu municipio</span> <span class="o">muestra</span> <span class="lt">sus</span> <span class="acc">cuentas</span><span class="o">?</span></h1>
+    <p class="lede">{escape(datos.sitio["descripcion"])}</p>
+    <form class="buscador" data-busqueda action="ranking/" role="search">
+      <svg class="buscador__ico" aria-hidden="true"><use href="#i-lupa"/></svg>
       <label class="visualmente-oculto" for="buscar-portada">Busca tu municipio</label>
-      <input id="buscar-portada" name="q" type="search" placeholder="Escribe el nombre de tu municipio"
+      <input id="buscar-portada" name="q" type="search" placeholder="Busca tu municipio"
         autocomplete="off" role="combobox" aria-expanded="false" aria-controls="buscar-portada-lista">
       <ul id="buscar-portada-lista" class="busqueda__lista" role="listbox" hidden></ul>
     </form>
-    <ul class="cifras">
-      <li><strong>{formato.numero(len(ranking))}</strong> municipios con índice</li>
-      <li class="cifras--verde"><strong>{conteo["verde"]}</strong> en verde</li>
-      <li class="cifras--amarillo"><strong>{conteo["amarillo"]}</strong> en amarillo</li>
-      <li class="cifras--rojo"><strong>{conteo["rojo"]}</strong> en rojo</li>
-    </ul>
-  </div>
-  <div class="portada__mapa" data-mapa-pais>
-    <div class="capas" role="group" aria-label="Qué mostrar en el mapa">{botones_capa}</div>
-    {mapa_en_linea(dir_mapas / "colombia.svg", colores, "Mapa de Colombia por departamento, coloreado según el índice promedio")}
-    {leyenda_escala()}
-    <p class="nota">Promedio de los municipios de cada departamento. Toca un departamento para ver sus municipios.</p>
   </div>
 </section>
 
-<section class="carrusel">
-  <div class="tarjeta__cabecera">
-    <h2>Municipios con mejor índice</h2>
-    <div class="carrusel__nav">
-      <button type="button" data-carrusel-nav="ant" aria-label="Anterior">←</button>
-      <button type="button" data-carrusel-nav="sig" aria-label="Siguiente">→</button>
-    </div>
+<section class="rail revela">
+  <div class="rail-h">
+    <h2>Elige un municipio</h2>
+    <p class="mono">{formato.numero(total)} municipios · los 40 primeros</p>
   </div>
-  <div class="carrusel__pista" data-carrusel>{carrusel}</div>
-</section>
-
-<section class="dos-columnas revela">
-  <div>
-    <h2>Mejor índice</h2>
-    {lista(ranking[:10])}
+  <div class="rail__filtros">
+    <label class="sel">
+      <span class="visualmente-oculto">Departamento</span>
+      <select data-filtro-dep><option value="">Todos los departamentos</option>{opciones_dep()}</select>
+    </label>
+    <label class="sel">
+      <span class="visualmente-oculto">Grupo de capacidades</span>
+      <select data-filtro-grupo><option value="">Todos los grupos</option>{grupos}</select>
+    </label>
   </div>
-  <div>
-    <h2>Más por mejorar</h2>
-    {lista(list(reversed(ranking[-10:])))}
+  <div class="rail__track" data-carrusel>
+    {carrusel}
   </div>
 </section>
-<p class="centrado"><a class="boton" href="ranking/">Ver el ranking completo</a></p>
 
-<section class="revela">
-  <h2>Qué mide el índice</h2>
-  <p>Un número de 0 a 100 con cuatro pilares. Cada municipio se compara con los de su <a href="metodologia/#pares">grupo de capacidades</a> del DNP: un municipio pequeño no se mide contra Medellín.</p>
+<section class="rank-sec revela">
+  <h2 class="rank-h"><span class="lt">Quién muestra sus cuentas</span> <span class="o">y da mejores servicios</span></h2>
+  <ol class="rk" data-rk>{filas_rank}</ol>
+  <p><a class="pill" href="ranking/">Ver el ranking completo <span class="mono">+{max(0, len(ranking) - 20)}</span></a></p>
+</section>
+
+<section class="revela bloque-pilares">
+  <h2><span class="lt">Qué mide</span> <span class="o">el índice</span></h2>
+  <p class="lede">Un número de 0 a 100 con cuatro pilares. Cada municipio se compara con los de su <a href="metodologia/#pares">grupo de capacidades</a> del DNP: un municipio pequeño no se mide contra Medellín.</p>
   <ul class="rejilla">{pilares}</ul>
-  <p><a href="metodologia/">Cómo se calcula, paso a paso</a></p>
+  <p><a class="pill pill--claro" href="metodologia/">Cómo se calcula, paso a paso</a> <a class="pill" href="ranking/">Ver el ranking completo</a></p>
 </section>
+<a class="chip-datos chip-datos--fijo mono" href="fuentes/">Datos oficiales · actualizado el {escape(datos.sitio["actualizado"])}</a>
 """
     return Pagina(
         "",
         datos.sitio["nombre"],
         datos.sitio["descripcion"],
         contenido,
-        ("inicio.js",),
+        ("inicio.js", "carrusel.js"),
         "pagina-inicio",
     )
 
@@ -393,6 +513,106 @@ def bloque_revision_automatica(datos: DatosSitio, codigo: str) -> str:
     )
 
 
+TITULOS_CAP = {
+    "T": ('<span class="lt">¿Muestra</span> <span class="o">sus cuentas?</span>', "01"),
+    "S": ('<span class="lt">De cada 100 hogares,</span> <span class="o">qué llega</span>', "02"),
+    "G": ('<span class="lt">Cómo gestiona</span> <span class="o">su presupuesto</span>', "03"),
+    "C": ('<span class="o">Qué dice</span> <span class="lt">el control</span>', "04"),
+}
+# Etiqueta corta de cada pilar, para los anillos de la portada de la ficha.
+CORTOS_PILAR = {"T": "Transp.", "S": "Servicios", "G": "Gestión", "C": "Control"}
+
+
+def _cap_pilar(datos: DatosSitio, codigo: str, p) -> str:
+    """Un capítulo de la historia por pilar: medidor, descripción y componentes."""
+    fila = datos.indice[codigo]
+    info = fila.get("pilares", {}).get(p.id, {})
+    titulo, numero = TITULOS_CAP.get(p.id, (escape(p.nombre), "00"))
+    filas = []
+    for c in p.componentes:
+        valor, periodo, fuentes = _valor_componente(datos, fila, c.id, c.si_falta)
+        comp = fila.get("componentes", {}).get(c.id, {}).get("puntaje")
+        filas.append(
+            '<li class="comp">'
+            f'<p class="comp__nombre">{escape(c.nombre)}</p>'
+            f'<p class="comp__valor">{valor}</p>'
+            f'<p class="comp__pie mono">{periodo} · {fuentes}</p>'
+            f"{bar2(comp, etiqueta=c.nombre)}</li>"
+        )
+    extra = bloque_revision_automatica(datos, codigo) if p.id == "T" else ""
+    return (
+        f'<section class="cap cap--pilar" data-capitulo="{escape(p.nombre)}">'
+        f'<p class="ojo mono"><span class="acc">{numero}</span> {escape(p.nombre)}</p>'
+        f'<h2 class="h">{titulo}</h2>'
+        '<div class="cap__fila">'
+        f"{medidor(info.get('puntaje'), p.nombre)}"
+        f'<p class="lede">{escape(p.descripcion)}</p></div>'
+        f'<ul class="comp-grid">{"".join(filas)}</ul>{extra}</section>'
+    )
+
+
+def _cap_contexto(datos: DatosSitio, codigo: str) -> str:
+    fila = datos.indice[codigo]
+    gasto = _dato(fila, "gasto_por_habitante")
+    if gasto is not None:
+        cifra = f'<p class="big money">{formato.segun_unidad(gasto["valor"], "pesos")}</p>'
+        pie = (
+            f'<p class="mono">{escape(formato.periodo(gasto["periodo"]))} · '
+            f"{enlaces_fuente(datos, gasto['fuentes'])}</p>"
+        )
+    else:
+        cifra = sin_dato("gasto por habitante", "se buscó en CUIPO (Contraloría)")
+        pie = ""
+    kpis = []
+    for ind in datos.config.contexto:
+        if ind == "gasto_por_habitante":
+            continue
+        dato, ficha_ind = _dato(fila, ind), datos.indicadores.get(ind)
+        if dato is None or ficha_ind is None:
+            continue
+        kpis.append(
+            kpi(
+                ficha_ind.etiqueta,
+                escape(formato.segun_unidad(dato["valor"], ficha_ind.unidad)),
+                f'<span class="mono">{escape(formato.periodo(dato["periodo"]))}</span> · '
+                f"{enlaces_fuente(datos, dato['fuentes'])}",
+            )
+        )
+    return (
+        '<section class="cap cap--contexto" data-capitulo="Contexto">'
+        '<p class="ojo mono"><span class="acc">05</span> Contexto · no puntúa</p>'
+        '<h2 class="h"><span class="lt">Gastó por vecino</span> <span class="q-info">(contexto)</span></h2>'
+        f"{cifra}{pie}"
+        f'<div class="kpi-grid">{"".join(kpis) or "<p>Sin datos de contexto.</p>"}</div></section>'
+    )
+
+
+def _cap_resumen(datos: DatosSitio, codigo: str) -> str:
+    señales = _señales(datos, codigo)
+    rojos = sum(1 for c, _, _ in señales if c == "rojo")
+    amarillos = sum(1 for c, _, _ in señales if c == "amarillo")
+    if rojos:
+        titulo = f'Hay <span class="o">{rojos} señal{"es" if rojos > 1 else ""}</span> para mirar de cerca'
+    elif amarillos:
+        titulo = f'Hay <span class="o">{amarillos} aspecto{"s" if amarillos > 1 else ""}</span> para mejorar'
+    else:
+        titulo = '<span class="o">Buenos resultados</span> frente a sus pares'
+    filas = "".join(
+        f'<li class="veredicto__fila"><span class="chip__punto chip__punto--{("info" if c == "info" else c)}"></span>'
+        f'<span class="veredicto__texto">{escape(t)}</span>'
+        f'<span class="veredicto__valor">{escape(v)}</span></li>'
+        for c, t, v in señales
+    )
+    return (
+        '<section class="cap cap--resumen" data-capitulo="Resumen">'
+        '<p class="ojo mono"><span class="acc">06</span> En resumen</p>'
+        f'<h2 class="h">{titulo}</h2>'
+        f'<ul class="veredicto">{filas}</ul>'
+        '<p class="lede sm">Lo que pesa es la transparencia y los servicios; el gasto por habitante es '
+        "contexto: no es bueno ni malo por sí solo.</p></section>"
+    )
+
+
 def ficha(datos: DatosSitio, codigo: str, dir_mapas: Path | None = None) -> Pagina:
     m = datos.municipios[codigo]
     fila = datos.indice[codigo]
@@ -427,7 +647,7 @@ def ficha(datos: DatosSitio, codigo: str, dir_mapas: Path | None = None) -> Pagi
             else ""
         )
         secciones.append(
-            f'<section class="tarjeta" id="pilar-{p.id}" data-capitulo="{escape(p.nombre)}">'
+            f'<section class="tarjeta" id="pilar-{p.id}">'
             f'<header class="tarjeta__cabecera"><h2>{escape(p.nombre)} <small>{p.peso:g} % del índice</small></h2>'
             f"{barra(datos.valor(codigo, p.id), p.nombre)}</header>"
             f"<p>{escape(p.descripcion)}</p>{aviso}"
@@ -474,63 +694,76 @@ def ficha(datos: DatosSitio, codigo: str, dir_mapas: Path | None = None) -> Pagi
     fondo = foto or (
         Siluetas(dir_mapas).de(m.departamento_slug, codigo) if dir_mapas is not None else None
     )
+    capitulos = "".join(_cap_pilar(datos, codigo, p) for p in datos.config.pilares)
+    capitulos += _cap_contexto(datos, codigo) + _cap_resumen(datos, codigo)
+    anillos = "".join(
+        anillo(
+            datos.valor(codigo, p.id),
+            color_puntaje(datos.valor(codigo, p.id)),
+            CORTOS_PILAR.get(p.id, p.nombre),
+        )
+        for p in datos.config.pilares
+    )
+    largo = "corto" if len(m.nombre) <= 12 else "medio" if len(m.nombre) <= 18 else "largo"
+    poblacion = _valor_dato(datos, fila, "poblacion")
+    superficie = _valor_dato(datos, fila, "superficie_km2")
+    densidad = _valor_dato(datos, fila, "densidad")
+    anexo = (
+        f'<h3>Los cuatro pilares</h3><ul class="pilares">{resumen_pilares}</ul>'
+        f"{''.join(secciones)}"
+        "<h3>Contexto <small>no puntúa</small></h3>"
+        f'<dl class="contexto">{"".join(contexto) or "<p>Sin datos de contexto.</p>"}</dl>'
+    )
     contenido = f"""
 {miga(raiz, [("", "Inicio"), (f"d/{m.departamento_slug}/", m.departamento), ("", m.nombre)])}
 <article class="ficha" data-codigo="{codigo}" data-nombre="{escape(m.nombre)}"
+  data-indice="{"" if fila.get("indice") is None else fila["indice"]}" data-semaforo="{fila.get("semaforo") or ""}"
   data-reportar="{escape(reportar)}"{f' data-foto="{raiz}assets/fotos/{codigo}-1080.webp"' if foto else ""}>
-<header class="ficha__cabecera heroe{" sin-foto" if not foto else ""}" data-capitulo="Portada">
+<header class="ficha__heroe heroe{" sin-foto" if not foto else ""}" data-capitulo="Portada">
   <div class="heroe__fondo{"" if foto else " heroe__fondo--silueta"}" aria-hidden="true">{fondo or ""}</div>
+  <div class="st-shade" aria-hidden="true"></div>
   <div class="heroe__cuerpo">
-  <p class="etiqueta">{escape(m.departamento)} · {escape(grupo)}</p>
-  <h1>{titular(m.nombre)}</h1>
-  <div class="ficha__indice">
-    <p class="indice-grande indice-grande--{fila.get("semaforo") or "sin"}">
-      <span class="indice-grande__valor">{_num(fila.get("indice"))}</span>
-      <span class="indice-grande__de">de 100</span></p>
-    {semaforo(fila.get("semaforo"))}
+    <p class="etiqueta mono">{escape(m.departamento)} · {escape(grupo)}</p>
+    <h1 class="big ficha__nombre ficha__nombre--{largo}">{escape(m.nombre)}</h1>
+    <p class="lede">{poblacion} habitantes · {superficie} km² · {densidad} hab/km²</p>
+    {medidor(fila.get("indice"), "Índice municipal", fila.get("semaforo"))}
+    <div class="anillos">{anillos}</div>
     {puesto_html}
+    <p class="ficha__resumen">{_resumen(m, fila)}</p>
+    {credito_foto(datos, codigo)}
+    <div class="acciones">
+      <button type="button" class="pill pill--claro" data-historia hidden>Empezar →</button>
+      <a class="pill" href="{raiz}comparar/?a={codigo}">Comparar</a>
+      <button type="button" class="pill" data-compartir hidden>Compartir</button>
+      <a class="pill" href="{raiz}d/{m.departamento_slug}/">Ver en el mapa</a>
+      <a class="pill" href="{escape(reportar)}" rel="noopener">Reportar</a>
+    </div>
   </div>
-  <p class="ficha__resumen">{_resumen(m, fila)}</p>
-  <div class="acciones">
-    <button type="button" class="boton boton--grande" data-historia hidden>Ver como historia</button>
-    <a class="boton boton--secundario" href="{raiz}comparar/?a={codigo}">Comparar</a>
-    <button type="button" class="boton boton--secundario" data-compartir hidden>Compartir</button>
-    <a class="boton boton--secundario" href="{escape(reportar)}" rel="noopener">Reportar un error</a>
-  </div>
-  </div>
-  {credito_foto(datos, codigo)}
 </header>
 
-<section class="tarjeta" data-capitulo="Resumen">
-  <h2>Los cuatro pilares</h2>
-  <ul class="pilares">{resumen_pilares}</ul>
-</section>
+{capitulos}
 
-{"".join(secciones)}
-
-<section class="tarjeta" data-capitulo="Contexto">
-  <h2>Contexto <small>no puntúa</small></h2>
-  <dl class="contexto">{"".join(contexto) or "<p>Sin datos de contexto.</p>"}</dl>
-</section>
-
-<section class="tarjeta">
+<section class="tarjeta mapa-seccion">
   <h2>{escape(m.nombre)} en el mapa de {escape(m.departamento)}</h2>
   <div class="mapa mapa--ficha" data-mapa="{m.departamento_slug}" data-resaltar="{codigo}">
     <p class="nota"><a href="{raiz}d/{m.departamento_slug}/">Ver el mapa y el ranking de {escape(m.departamento)}</a></p>
   </div>
 </section>
 
-<section class="nota-final">
-  <p>Cada cifra tiene su fuente oficial. Los puntajes «entre pares» son el percentil del municipio dentro de su grupo de capacidades del DNP (0 = el peor del grupo, 100 = el mejor). <a href="{raiz}metodologia/">Ver la metodología</a>.</p>
+<section class="anexo">
+  <details><summary class="pill">Ver los datos técnicos y las fuentes</summary>{anexo}</details>
 </section>
 
-<section class="tarjeta">
+<section class="tarjeta reportes" id="reportar">
   <h2>¿Ves algo mal o falta un dato?</h2>
   <p class="nota">Tu aviso se publica con su fecha en el registro de correcciones. Si una alcaldía quiere responder, este es su derecho de réplica.</p>
   {formulario("reporte", datos, titulo="Reportar un error en un dato", ayuda="Si el sitio no tiene servidor, se abre un issue en GitHub con tu mensaje.", municipio=f"{m.nombre}, {m.departamento} ({codigo})")}
   {formulario("pedido", datos, titulo="Pedir un dato que la alcaldía no publica", ayuda="Nos ayuda a completar la ficha y a ejercer el derecho de petición.", municipio=f"{m.nombre}, {m.departamento} ({codigo})", asunto=True)}
 </section>
 </article>
+<footer class="nota-final contenedor">
+  <p>Cada cifra tiene su fuente oficial. Los puntajes «entre pares» son el percentil del municipio dentro de su grupo de capacidades del DNP (0 = el peor del grupo, 100 = el mejor). <a href="{raiz}metodologia/">Ver la metodología</a>.</p>
+</footer>
 """
     descripcion = (
         f"{m.nombre} ({m.departamento}): índice municipal {_num(fila.get('indice'))}/100. "

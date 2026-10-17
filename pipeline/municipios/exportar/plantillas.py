@@ -5,6 +5,7 @@ página conoce su `raiz` (la ruta relativa hasta la carpeta del sitio, por ejemp
 el sitio funciona igual en un dominio propio o en una subcarpeta (GitHub Pages).
 """
 
+import math
 from dataclasses import dataclass
 from html import escape
 
@@ -89,7 +90,7 @@ def documento(pagina: Pagina, sitio: dict) -> str:
 <a class="saltar" href="#contenido">Saltar al contenido</a>
 <header class="top" data-top>
   <a class="top__marca" href="{raiz}" aria-label="{escape(sitio["nombre"])}, inicio">
-    <span class="logo" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
     <span class="top__nombre"><b>Municipios</b> <span>Colombia</span></span>
   </a>
   <div class="top__acciones">
@@ -147,6 +148,98 @@ def barra(puntaje: float | None, etiqueta: str = "") -> str:
         f'<span class="barra__relleno barra__relleno--{color}" style="width:{max(puntaje, 1):.1f}%"></span>'
         f'<span class="barra__valor">{texto}</span></span>'
     )
+
+
+def color_puntaje(valor: float | None) -> str | None:
+    """Color del semáforo para un puntaje 0-100 (mismos cortes que el índice)."""
+    if valor is None:
+        return None
+    return "rojo" if valor < 40 else "verde" if valor >= 70 else "amarillo"
+
+
+def _dec(valor: float, decimales: int = 1) -> str:
+    return f"{valor:.{decimales}f}".replace(".", ",")
+
+
+def medidor(
+    valor: float | None, etiqueta: str = "Índice municipal", color: str | None = None
+) -> str:
+    """Medidor semicircular (gauge) con aguja. Sin dato: aviso plano."""
+    color = color or color_puntaje(valor)
+    if valor is None:
+        return '<figure class="gauge gauge--vacio"><p class="gauge__sin">Sin dato</p></figure>'
+    fraccion = max(0.0, min(1.0, valor / 100))
+    angulo = math.pi - fraccion * math.pi
+    aguja_x = 100 + 76 * math.cos(angulo)
+    aguja_y = 100 - 76 * math.sin(angulo)
+    return (
+        f'<figure class="gauge" role="img" aria-label="{escape(etiqueta)}: {_dec(valor)} de 100, '
+        f'estado {SEMAFORO_TEXTO.get(color or "", "sin dato")}">'
+        '<svg viewBox="0 0 200 108" aria-hidden="true">'
+        '<path class="gauge__pista" d="M20 100 A80 80 0 0 1 180 100" pathLength="100"></path>'
+        f'<path class="gauge__arco gauge__arco--{color}" d="M20 100 A80 80 0 0 1 180 100" '
+        f'pathLength="100" style="stroke-dasharray:{fraccion * 100:.2f} 100"></path>'
+        f'<circle class="gauge__aguja" cx="{aguja_x:.1f}" cy="{aguja_y:.1f}" r="7"></circle>'
+        "</svg>"
+        f'<figcaption><span class="gauge__valor">{_dec(valor)}</span>'
+        f'<span class="gauge__de">de 100</span>{semaforo(color)}</figcaption>'
+        "</figure>"
+    )
+
+
+def anillo(valor: float | None, color: str | None, etiqueta: str, *, unidad: str = "%") -> str:
+    """Anillo de progreso 0-100 con la etiqueta debajo."""
+    if valor is None:
+        return (
+            '<div class="ring ring--vacio"><span class="ring__sin">s/d</span>'
+            f'<span class="ring__etiq">{escape(etiqueta)}</span></div>'
+        )
+    circ = 2 * math.pi * 34
+    offset = circ * (1 - max(0.0, min(100.0, valor)) / 100)
+    return (
+        f'<div class="ring ring--{color or color_puntaje(valor)}">'
+        f'<svg viewBox="0 0 80 80" role="img" aria-label="{escape(etiqueta)}: {_dec(valor)}{unidad}">'
+        '<circle class="ring__pista" cx="40" cy="40" r="34"></circle>'
+        f'<circle class="ring__arco" cx="40" cy="40" r="34" '
+        f'stroke-dasharray="{circ:.1f}" stroke-dashoffset="{offset:.1f}"></circle>'
+        "</svg>"
+        f'<span class="ring__valor">{_dec(valor)}<small>{unidad}</small></span>'
+        f'<span class="ring__etiq">{escape(etiqueta)}</span>'
+        "</div>"
+    )
+
+
+def bar2(puntaje: float | None, color: str | None = None, etiqueta: str = "") -> str:
+    """Barra fina (10 px) que crece de izquierda a derecha según el puntaje."""
+    if puntaje is None:
+        return '<span class="bar2 bar2--vacio" title="Sin dato"></span>'
+    color = color or color_puntaje(puntaje)
+    return (
+        f'<span class="bar2" role="img" aria-label="{escape(etiqueta)} {_dec(puntaje)} de 100">'
+        f'<i class="bar2__f bar2__f--{color}" style="width:{max(puntaje, 1):.1f}%"></i></span>'
+    )
+
+
+def chip(texto: str, color: str | None = None, *, activo: bool = False) -> str:
+    punto = f'<span class="chip__punto chip__punto--{color}"></span>' if color else ""
+    clase = "chip chip--on" if activo else "chip"
+    return f'<span class="{clase}">{punto}{escape(texto)}</span>'
+
+
+def kpi(etiqueta: str, valor: str, detalle: str = "", color: str | None = None) -> str:
+    """Tarjeta de dato: etiqueta, valor grande y una línea de contexto con su fuente."""
+    clase = f" kpi__valor--{color}" if color else ""
+    detalle_html = f'<p class="kpi__detalle">{detalle}</p>' if detalle else ""
+    return (
+        f'<div class="kpi"><p class="kpi__etiqueta">{escape(etiqueta)}</p>'
+        f'<p class="kpi__valor{clase}">{valor}</p>{detalle_html}</div>'
+    )
+
+
+def sin_dato(texto: str, buscado: str = "") -> str:
+    """Aviso rojo de dato faltante (con dónde se buscó, si se indica)."""
+    extra = f' <span class="nd-red__donde">{escape(buscado)}</span>' if buscado else ""
+    return f'<p class="nd-red"><span class="nd-red__ico" aria-hidden="true">!</span>Sin dato de {escape(texto)}.{extra}</p>'
 
 
 def miga(raiz: str, pasos: list[tuple[str, str]]) -> str:

@@ -68,19 +68,27 @@
 
 .logo i {
   display: block;
-  width: 5px;
+  width: 4px;
   height: 100%;
   border-radius: 2px;
   background: var(--fg);
 }
 
+.logo i:nth-child(1) {
+  height: 52%;
+}
+
 .logo i:nth-child(2) {
-  height: 60%;
-  background: var(--acc);
+  height: 70%;
 }
 
 .logo i:nth-child(3) {
-  height: 80%;
+  height: 86%;
+  background: var(--acc);
+}
+
+.logo i:nth-child(4) {
+  height: 100%;
 }
 
 /* --- Píldoras ----------------------------------------------------------------------------- */

@@ -7,14 +7,13 @@ const ficha = document.querySelector('.ficha');
 
 /** Datos de la ficha para la tarjeta de compartir, leídos del propio HTML. */
 function infoFicha() {
-  const color = document.querySelector('.indice-grande')?.className.match(/indice-grande--(\w+)/);
-  const valor = document.querySelector('.indice-grande__valor')?.textContent.trim() ?? '';
+  const indice = ficha?.dataset.indice ?? '';
   return {
     nombre: ficha?.dataset.nombre ?? document.title,
     slug: ficha?.dataset.codigo ?? '',
-    valor: valor === '—' ? null : Number(valor.replace(',', '.')),
-    semaforo: color ? color[1] : null,
-    puesto: document.querySelector('.puestos dd')?.textContent.trim() ?? '',
+    valor: indice === '' ? null : Number(indice.replace(',', '.')),
+    semaforo: ficha?.dataset.semaforo || null,
+    puesto: document.querySelector('.puestos dd')?.childNodes[0]?.textContent.trim() ?? '',
     foto: ficha?.dataset.foto ?? null,
     url: window.location.href,
   };
