@@ -964,10 +964,6 @@ html.con-intro .intro {
   transition: color 0.3s var(--ease), background 0.3s var(--ease);
 }
 
-.mseg {
-  position: relative;
-}
-
 .mseg button {
   position: relative;
   z-index: 1;
