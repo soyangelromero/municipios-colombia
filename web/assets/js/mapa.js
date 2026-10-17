@@ -18,6 +18,16 @@ export function activarMapa(figura, { texto, enlace }) {
   globo.setAttribute('role', 'status');
   figura.append(globo);
 
+  const mostrarPanel = (figura, textoPanel, destino) => {
+    figura.querySelector('.mapa__panel')?.remove();
+    const panel = document.createElement('div');
+    panel.className = 'mapa__panel';
+    panel.innerHTML = `<p class="mapa__panel__texto">${textoPanel}</p><a class="pill pill--claro" href="${destino}">Abrir ficha</a>`;
+    figura.append(panel);
+    setTimeout(() => panel.classList.add('is-visible'), 10);
+    setTimeout(() => panel.remove(), 900);
+  };
+
   const mostrar = (camino, x, y) => {
     globo.textContent = texto(camino.dataset.codigo);
     globo.hidden = false;
@@ -49,14 +59,12 @@ export function activarMapa(figura, { texto, enlace }) {
     if (destino) {
       camino.style.cursor = 'pointer';
       const ir = () => (window.location.href = destino);
-      camino.addEventListener('click', () => {
+      camino.addEventListener('click', (e) => {
+        e.preventDefault();
         const hero = document.querySelector('.hero__texto');
-        if (hero) {
-          hero.classList.add('is-saliendo');
-          setTimeout(ir, 520);
-        } else {
-          ir();
-        }
+        if (hero) hero.classList.add('is-saliendo');
+        mostrarPanel(figura, texto(camino.dataset.codigo), destino);
+        setTimeout(ir, 900);
       });
       camino.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') ir();
