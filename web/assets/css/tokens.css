@@ -1,19 +1,64 @@
-/* Tokens de diseño: todo color, tipografía y espacio del sitio sale de aquí. */
+/* Tokens de diseño: todo color, tipografía y espacio del sitio sale de aquí.
+   El tema editorial oscuro es el de por defecto; el claro se activa con data-tema="claro". */
 :root {
-  color-scheme: light dark;
+  color-scheme: dark;
 
-  --fondo: #f5f6f8;
+  --fondo: #0a0d12;
+  --fondo-2: #0f141c;
+  --superficie: #121826;
+  --superficie-2: #1a2231;
+  --texto: #f3f6fb;
+  --texto-suave: #97a3b8;
+  --linea: #232c3d;
+  --acento: #3b76ff;
+  --acento-fuerte: #2a5ce0;
+  --acento-suave: #101d3d;
+  --acento-texto: #ffffff;
+  --enfoque: #7ba0ff;
+
+  /* Semáforo del índice: color + texto, nunca solo color. */
+  --verde: #4ade80;
+  --verde-suave: #10301d;
+  --amarillo: #fbbf24;
+  --amarillo-suave: #33270b;
+  --rojo: #f87171;
+  --rojo-suave: #3a1414;
+
+  /* Escala de los mapas y barras: cinco tramos, de rojo a verde. */
+  --escala-e1: #e05b5b;
+  --escala-e2: #f0954a;
+  --escala-e3: #e8bd4f;
+  --escala-e4: #92bf55;
+  --escala-e5: #3fae63;
+  --escala-sin: #3a4350;
+
+  --fuente: "Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --fuente-mono: "Geist Mono", ui-monospace, "Cascadia Mono", "SFMono-Regular", Menlo, monospace;
+
+  --margen: clamp(16px, 4vw, 40px);
+  --radio: 16px;
+  --radio-chico: 10px;
+  --sombra: 0 1px 2px rgb(0 0 0 / 40%), 0 4px 18px rgb(0 0 0 / 30%);
+  --sombra-fuerte: 0 10px 40px rgb(0 0 0 / 45%);
+  --transicion: 160ms ease;
+}
+
+:root[data-tema="claro"] {
+  color-scheme: light;
+
+  --fondo: #f6f6f4;
+  --fondo-2: #ffffff;
   --superficie: #ffffff;
-  --superficie-2: #eef1f5;
-  --texto: #141922;
-  --texto-suave: #4a5363;
-  --linea: #dce1e8;
+  --superficie-2: #eef0f3;
+  --texto: #0f141c;
+  --texto-suave: #525c6c;
+  --linea: #e1e4e9;
   --acento: #1d4ed8;
-  --acento-fuerte: #0f2a5c;
+  --acento-fuerte: #13328f;
+  --acento-suave: #e6edff;
   --acento-texto: #ffffff;
   --enfoque: #2563eb;
 
-  /* Semáforo del índice: color + texto, nunca solo color. */
   --verde: #15803d;
   --verde-suave: #e2f3e7;
   --amarillo: #a16207;
@@ -21,7 +66,6 @@
   --rojo: #b91c1c;
   --rojo-suave: #fbe3e3;
 
-  /* Escala de los mapas y barras: cinco tramos, de rojo a verde. */
   --escala-e1: #d64545;
   --escala-e2: #ee8a3c;
   --escala-e3: #f2c14e;
@@ -29,43 +73,6 @@
   --escala-e5: #2f9e55;
   --escala-sin: #c9cfd7;
 
-  --fuente: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
-  --fuente-mono: ui-monospace, "Cascadia Mono", "SFMono-Regular", Menlo, monospace;
-
-  --margen: clamp(16px, 4vw, 40px);
-  --radio: 14px;
-  --radio-chico: 8px;
   --sombra: 0 1px 2px rgb(15 23 42 / 6%), 0 4px 16px rgb(15 23 42 / 6%);
-  --transicion: 160ms ease;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --fondo: #0d1117;
-    --superficie: #151b23;
-    --superficie-2: #1c2430;
-    --texto: #e7ebf0;
-    --texto-suave: #a2acba;
-    --linea: #2a3340;
-    --acento: #7aa2ff;
-    --acento-fuerte: #0f2a5c;
-    --acento-texto: #0d1117;
-    --enfoque: #93b4ff;
-
-    --verde: #4ade80;
-    --verde-suave: #12301e;
-    --amarillo: #fbbf24;
-    --amarillo-suave: #33270b;
-    --rojo: #f87171;
-    --rojo-suave: #3a1414;
-
-    --escala-e1: #e05b5b;
-    --escala-e2: #f0954a;
-    --escala-e3: #e8bd4f;
-    --escala-e4: #92bf55;
-    --escala-e5: #3fae63;
-    --escala-sin: #3a4350;
-
-    --sombra: 0 1px 2px rgb(0 0 0 / 40%), 0 4px 16px rgb(0 0 0 / 30%);
-  }
+  --sombra-fuerte: 0 10px 40px rgb(15 23 42 / 12%);
 }

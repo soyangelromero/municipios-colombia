@@ -8,6 +8,7 @@ from municipios.comun.modelos import Municipio
 from municipios.exportar import formato
 from municipios.exportar.datos_web import NOMBRES_GRUPOS, DatosSitio
 from municipios.exportar.plantillas import Pagina, barra, miga, semaforo
+from municipios.exportar.silueta import Siluetas
 from municipios.fuentes.divipola import DEPARTAMENTOS
 from municipios.relevamiento.criterios import CRITERIOS
 
@@ -56,6 +57,44 @@ def enlaces_fuente(datos: DatosSitio, claves: list[str] | tuple[str, ...]) -> st
         for s, fuentes in por_sigla.items()
     ]
     return " · ".join(enlaces) or "—"
+
+
+def titular(nombre: str) -> str:
+    """Nombre con pesos mezclados: las primeras palabras livianas, la última negra y de acento."""
+    palabras = nombre.split()
+    if len(palabras) == 1:
+        return f'<span class="t-negro acento">{escape(nombre)}</span>'
+    return (
+        f'<span class="t-liviano">{escape(" ".join(palabras[:-1]))}</span> '
+        f'<span class="t-negro acento">{escape(palabras[-1])}</span>'
+    )
+
+
+def foto_img(datos: DatosSitio, codigo: str, raiz: str, *, primera: bool, tamanos: str) -> str:
+    """<img> de la foto del municipio con srcset, o cadena vacía si no hay foto libre."""
+    if codigo not in datos.fotos:
+        return ""
+    base = f"{raiz}assets/fotos/{codigo}"
+    carga = 'fetchpriority="high"' if primera else 'loading="lazy" decoding="async"'
+    return (
+        f'<img class="foto" src="{base}-1080.webp" '
+        f'srcset="{base}-480.webp 480w, {base}-1080.webp 1080w" sizes="{tamanos}" alt="" {carga}>'
+    )
+
+
+def credito_foto(datos: DatosSitio, codigo: str) -> str:
+    """Crédito y licencia de la foto (siempre visibles junto a ella)."""
+    f = datos.fotos.get(codigo)
+    if not f:
+        return ""
+    autor = f["autor"] if len(f["autor"]) <= 70 else f["autor"][:67] + "…"
+    licencia = escape(f["licencia"])
+    if f["url_licencia"]:
+        licencia = f'<a href="{escape(f["url_licencia"])}" rel="noopener">{licencia}</a>'
+    return (
+        f'<p class="credito">Foto: {escape(autor)} · {licencia} · '
+        f'<a href="{escape(f["url_pagina"])}" rel="noopener">Wikimedia Commons</a></p>'
+    )
 
 
 def leyenda_escala() -> str:
@@ -113,6 +152,21 @@ def tabla_ranking(datos: DatosSitio, codigos: list[str], raiz: str, con_departam
 
 
 # --- inicio ---------------------------------------------------------------------------------
+def tarjeta_carrusel(datos: DatosSitio, codigo: str, siluetas: Siluetas) -> str:
+    """Tarjeta con foto (o silueta) para el carrusel de la portada."""
+    m, f = datos.municipios[codigo], datos.indice[codigo]
+    foto = foto_img(datos, codigo, "", primera=False, tamanos="320px")
+    fondo = foto or (siluetas.de(m.departamento_slug, codigo) or "")
+    clase = "" if foto else " tarjeta-foto__fondo--silueta"
+    return (
+        f'<a class="tarjeta-foto revela" href="m/{m.slug}/">'
+        f'<span class="tarjeta-foto__fondo{clase}" aria-hidden="true">{fondo}</span>'
+        f'<span class="tarjeta-foto__cuerpo"><span class="tarjeta-foto__titulo">{escape(m.nombre)}</span>'
+        f'<span class="indice-mini">{escape(m.departamento)} · índice {_num(f.get("indice"))}</span><br>'
+        f"{semaforo(f.get('semaforo'), f.get('indice'))}</span></a>"
+    )
+
+
 def inicio(datos: DatosSitio, dir_mapas: Path) -> Pagina:
     ranking = datos.ranking()
     conteo = {s: sum(1 for c in ranking if datos.indice[c]["semaforo"] == s) for s in ("verde", "amarillo", "rojo")}  # fmt: skip
@@ -140,10 +194,27 @@ def inicio(datos: DatosSitio, dir_mapas: Path) -> Pagina:
         f'<button type="button" data-capa="{c}" aria-pressed="{"true" if c == "indice" else "false"}">{t}</button>'
         for c, t in CAPAS
     )
+    siluetas = Siluetas(dir_mapas)
+    intro = f"""
+<div class="intro" data-intro role="dialog" aria-label="Presentación del proyecto">
+  <button type="button" class="boton boton--secundario intro__salto" data-intro-salto>Saltar</button>
+  <div class="intro__contenido">
+    <p class="intro__marca">Municipios <span class="acento">Colombia</span></p>
+    <div class="intro__cifras">
+      <div><strong data-contar="{len(ranking)}">{formato.numero(len(ranking))}</strong>con índice</div>
+      <div><strong data-contar="{conteo["verde"]}">{conteo["verde"]}</strong>en verde</div>
+      <div><strong data-contar="{len(datos.municipios)}">{formato.numero(len(datos.municipios))}</strong>en total</div>
+    </div>
+  </div>
+</div>
+"""
+    carrusel = "".join(tarjeta_carrusel(datos, c, siluetas) for c in ranking[:10])
     contenido = f"""
+{intro}
 <section class="portada">
   <div class="portada__texto">
-    <p class="etiqueta">Observatorio ciudadano · datos oficiales</p>
+    <p class="chip-datos">Datos oficiales · actualizado el {escape(datos.sitio["actualizado"])}</p>
+    <p class="etiqueta">Observatorio ciudadano</p>
     <h1>¿Tu municipio muestra sus <span class="acento">cuentas</span>?</h1>
     <p class="entradilla">{escape(datos.sitio["descripcion"])}</p>
     <form class="busqueda busqueda--grande" data-busqueda action="ranking/" role="search">
@@ -167,7 +238,18 @@ def inicio(datos: DatosSitio, dir_mapas: Path) -> Pagina:
   </div>
 </section>
 
-<section class="dos-columnas">
+<section class="carrusel">
+  <div class="tarjeta__cabecera">
+    <h2>Municipios con mejor índice</h2>
+    <div class="carrusel__nav">
+      <button type="button" data-carrusel-nav="ant" aria-label="Anterior">←</button>
+      <button type="button" data-carrusel-nav="sig" aria-label="Siguiente">→</button>
+    </div>
+  </div>
+  <div class="carrusel__pista" data-carrusel>{carrusel}</div>
+</section>
+
+<section class="dos-columnas revela">
   <div>
     <h2>Mejor índice</h2>
     {lista(ranking[:10])}
@@ -179,7 +261,7 @@ def inicio(datos: DatosSitio, dir_mapas: Path) -> Pagina:
 </section>
 <p class="centrado"><a class="boton" href="ranking/">Ver el ranking completo</a></p>
 
-<section>
+<section class="revela">
   <h2>Qué mide el índice</h2>
   <p>Un número de 0 a 100 con cuatro pilares. Cada municipio se compara con los de su <a href="metodologia/#pares">grupo de capacidades</a> del DNP: un municipio pequeño no se mide contra Medellín.</p>
   <ul class="rejilla">{pilares}</ul>
@@ -273,7 +355,7 @@ def bloque_revision_automatica(datos: DatosSitio, codigo: str) -> str:
     )
 
 
-def ficha(datos: DatosSitio, codigo: str) -> Pagina:
+def ficha(datos: DatosSitio, codigo: str, dir_mapas: Path | None = None) -> Pagina:
     m = datos.municipios[codigo]
     fila = datos.indice[codigo]
     ruta = f"m/{m.slug}/"
@@ -350,12 +432,19 @@ def ficha(datos: DatosSitio, codigo: str) -> Pagina:
             f"<div><dt>En su grupo</dt><dd>{p['grupo']}<small> de {p['grupo_de']}</small></dd></div>"
             "</dl>"
         )
+    foto = foto_img(datos, codigo, raiz, primera=True, tamanos="100vw")
+    fondo = foto or (
+        Siluetas(dir_mapas).de(m.departamento_slug, codigo) if dir_mapas is not None else None
+    )
     contenido = f"""
 {miga(raiz, [("", "Inicio"), (f"d/{m.departamento_slug}/", m.departamento), ("", m.nombre)])}
-<article class="ficha" data-codigo="{codigo}" data-nombre="{escape(m.nombre)}">
-<header class="ficha__cabecera" data-capitulo="Portada">
+<article class="ficha" data-codigo="{codigo}" data-nombre="{escape(m.nombre)}"
+  data-reportar="{escape(reportar)}"{f' data-foto="{raiz}assets/fotos/{codigo}-1080.webp"' if foto else ""}>
+<header class="ficha__cabecera heroe" data-capitulo="Portada">
+  <div class="heroe__fondo{"" if foto else " heroe__fondo--silueta"}" aria-hidden="true">{fondo or ""}</div>
+  <div class="heroe__cuerpo">
   <p class="etiqueta">{escape(m.departamento)} · {escape(grupo)}</p>
-  <h1>{escape(m.nombre)}</h1>
+  <h1>{titular(m.nombre)}</h1>
   <div class="ficha__indice">
     <p class="indice-grande indice-grande--{fila.get("semaforo") or "sin"}">
       <span class="indice-grande__valor">{_num(fila.get("indice"))}</span>
@@ -365,11 +454,13 @@ def ficha(datos: DatosSitio, codigo: str) -> Pagina:
   </div>
   <p class="ficha__resumen">{_resumen(m, fila)}</p>
   <div class="acciones">
-    <button type="button" class="boton" data-historia hidden>Ver como historia</button>
+    <button type="button" class="boton boton--grande" data-historia hidden>Ver como historia</button>
     <a class="boton boton--secundario" href="{raiz}comparar/?a={codigo}">Comparar</a>
     <button type="button" class="boton boton--secundario" data-compartir hidden>Compartir</button>
     <a class="boton boton--secundario" href="{escape(reportar)}" rel="noopener">Reportar un error</a>
   </div>
+  </div>
+  {credito_foto(datos, codigo)}
 </header>
 
 <section class="tarjeta" data-capitulo="Resumen">
@@ -401,7 +492,13 @@ def ficha(datos: DatosSitio, codigo: str) -> Pagina:
         "Transparencia, servicios, seguridad, gestión y control, con fuentes oficiales."
     )
     return Pagina(
-        ruta, f"{m.nombre}, {m.departamento}", descripcion, contenido, ("ficha.js",), "pagina-ficha"
+        ruta,
+        f"{m.nombre}, {m.departamento}",
+        descripcion,
+        contenido,
+        ("ficha.js",),
+        "pagina-ficha",
+        f"assets/fotos/{codigo}-1080.webp" if codigo in datos.fotos else "",
     )
 
 

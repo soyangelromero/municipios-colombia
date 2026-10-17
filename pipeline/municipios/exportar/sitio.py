@@ -9,7 +9,7 @@ from html import escape
 from pathlib import Path
 
 from municipios.exportar import paginas
-from municipios.exportar.datos_web import DatosSitio, exportar
+from municipios.exportar.datos_web import DIR_FOTOS, DatosSitio, exportar
 from municipios.exportar.plantillas import Pagina, documento
 
 log = logging.getLogger(__name__)
@@ -35,6 +35,7 @@ def construir(datos: DatosSitio, dir_web: Path, destino: Path) -> int:
         shutil.rmtree(destino / viejo, ignore_errors=True)
     shutil.copytree(dir_web, destino, dirs_exist_ok=True)
     exportar(datos, destino / "data")
+    _copiar_fotos(datos, destino / "assets" / "fotos")
 
     dir_mapas = destino / "data" / "mapas"
     lista = [
@@ -46,7 +47,7 @@ def construir(datos: DatosSitio, dir_web: Path, destino: Path) -> int:
         paginas.acerca(datos),
         paginas.no_encontrada(datos),
         *(paginas.departamento(datos, cod, dir_mapas) for cod in datos.por_departamento()),
-        *(paginas.ficha(datos, codigo) for codigo in datos.municipios),
+        *(paginas.ficha(datos, codigo, dir_mapas) for codigo in datos.municipios),
     ]
     for pagina in lista:
         _escribir(destino, pagina, datos.sitio)
@@ -55,6 +56,14 @@ def construir(datos: DatosSitio, dir_web: Path, destino: Path) -> int:
     (destino / ".nojekyll").write_text("", encoding="utf-8")  # GitHub Pages: servir tal cual
     log.info("Sitio: %d páginas → %s", len(lista), destino)
     return len(lista)
+
+
+def _copiar_fotos(datos: DatosSitio, destino: Path) -> None:
+    shutil.rmtree(destino, ignore_errors=True)
+    destino.mkdir(parents=True)
+    for codigo in datos.fotos:
+        for archivo in DIR_FOTOS.glob(f"{codigo}-*.webp"):
+            shutil.copy2(archivo, destino / archivo.name)
 
 
 def _sitemap(destino: Path, rutas: list[str], sitio: dict) -> None:

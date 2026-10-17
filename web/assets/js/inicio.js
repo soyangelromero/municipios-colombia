@@ -1,10 +1,75 @@
-// Portada: mapa de departamentos con capas (índice y cada pilar).
+// Portada: intro, mapa de departamentos con capas, carrusel y apariciones al desplazar.
 import { cargarJSON, formatoNumero, raiz } from './comun.js';
 import { activarMapa, colorear } from './mapa.js';
 
 const NOMBRES = { indice: 'Índice', T: 'Transparencia', S: 'Servicios', G: 'Gestión', C: 'Control' };
 
-async function iniciar() {
+function contar(elemento, hasta, ms) {
+  const arranque = performance.now();
+  const paso = (t) => {
+    const p = Math.min(1, (t - arranque) / ms);
+    elemento.textContent = formatoNumero(Math.round(hasta * (1 - (1 - p) ** 3)), 0);
+    if (p < 1) requestAnimationFrame(paso);
+  };
+  requestAnimationFrame(paso);
+}
+
+/** Intro de la portada: se muestra solo la primera vez y con «Saltar» siempre visible. */
+function intro() {
+  const capa = document.querySelector('[data-intro]');
+  if (!capa) return;
+  if (!document.documentElement.classList.contains('con-intro')) {
+    capa.remove();
+    return;
+  }
+  const terminar = () => {
+    if (!capa.isConnected) return;
+    capa.remove();
+    document.documentElement.classList.remove('con-intro');
+    try {
+      localStorage.setItem('intro-vista', '1');
+    } catch {
+      /* sin almacenamiento: la intro se verá de nuevo */
+    }
+  };
+  capa.querySelector('[data-intro-salto]')?.addEventListener('click', terminar);
+  capa.querySelectorAll('[data-contar]').forEach((el) => contar(el, Number(el.dataset.contar), 1000));
+  setTimeout(terminar, 4200);
+}
+
+function carrusel() {
+  const pista = document.querySelector('[data-carrusel]');
+  if (!pista) return;
+  document.querySelectorAll('[data-carrusel-nav]').forEach((boton) => {
+    boton.addEventListener('click', () => {
+      const paso = pista.clientWidth * 0.8 * (boton.dataset.carruselNav === 'sig' ? 1 : -1);
+      pista.scrollBy({ left: paso, behavior: 'smooth' });
+    });
+  });
+}
+
+/** Aparición suave de los elementos con la clase «revela» (desactivada con reduced motion). */
+function apariciones() {
+  const elementos = document.querySelectorAll('.revela');
+  if (!('IntersectionObserver' in window)) {
+    elementos.forEach((el) => el.classList.add('visible'));
+    return;
+  }
+  const observador = new IntersectionObserver(
+    (entradas) => {
+      entradas.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observador.unobserve(e.target);
+        }
+      });
+    },
+    { rootMargin: '0px 0px -8% 0px' },
+  );
+  elementos.forEach((el) => observador.observe(el));
+}
+
+async function mapa() {
   const bloque = document.querySelector('[data-mapa-pais]');
   const figura = bloque?.querySelector('.mapa');
   if (!figura) return;
@@ -31,4 +96,7 @@ async function iniciar() {
   );
 }
 
-iniciar().catch(() => {});
+intro();
+carrusel();
+apariciones();
+mapa().catch(() => {});

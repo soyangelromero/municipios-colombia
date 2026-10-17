@@ -1,8 +1,24 @@
 // Ficha de municipio: mapa del departamento, compartir y modo historia.
 import { formatoNumero, municipios, raiz } from './comun.js';
 import { activarMapa, colorear, insertarMapa } from './mapa.js';
+import { compartir } from './compartir.js';
 
 const ficha = document.querySelector('.ficha');
+
+/** Datos de la ficha para la tarjeta de compartir, leídos del propio HTML. */
+function infoFicha() {
+  const color = document.querySelector('.indice-grande')?.className.match(/indice-grande--(\w+)/);
+  const valor = document.querySelector('.indice-grande__valor')?.textContent.trim() ?? '';
+  return {
+    nombre: ficha?.dataset.nombre ?? document.title,
+    slug: ficha?.dataset.codigo ?? '',
+    valor: valor === '—' ? null : Number(valor.replace(',', '.')),
+    semaforo: color ? color[1] : null,
+    puesto: document.querySelector('.puestos dd')?.textContent.trim() ?? '',
+    foto: ficha?.dataset.foto ?? null,
+    url: window.location.href,
+  };
+}
 
 async function mapaDelDepartamento() {
   const contenedor = document.querySelector('[data-mapa]');
@@ -21,28 +37,11 @@ async function mapaDelDepartamento() {
   });
 }
 
-function compartir() {
+function compartirBoton() {
   const boton = document.querySelector('[data-compartir]');
   if (!boton) return;
   boton.hidden = false;
-  boton.addEventListener('click', async () => {
-    const datos = { title: document.title, url: window.location.href };
-    if (navigator.share) {
-      try {
-        await navigator.share(datos);
-      } catch {
-        /* la persona canceló */
-      }
-      return;
-    }
-    try {
-      await navigator.clipboard.writeText(datos.url);
-      boton.textContent = 'Enlace copiado';
-      setTimeout(() => (boton.textContent = 'Compartir'), 2500);
-    } catch {
-      window.prompt('Copia este enlace:', datos.url);
-    }
-  });
+  boton.addEventListener('click', () => compartir(infoFicha(), boton));
 }
 
 /** Modo historia: recorre los capítulos de la ficha a pantalla completa, uno por uno. */
@@ -59,11 +58,18 @@ function historia() {
     capa.setAttribute('role', 'dialog');
     capa.setAttribute('aria-modal', 'true');
     capa.setAttribute('aria-label', `Historia de ${ficha?.dataset.nombre ?? 'municipio'}`);
+    const fondo = ficha?.dataset.foto
+      ? `<div class="historia__fondo" style="background-image:url('${ficha.dataset.foto}')"></div>`
+      : '';
     capa.innerHTML = `
+      ${fondo}
       <div>
         <div class="historia__progreso">${capitulos.map(() => '<span></span>').join('')}</div>
         <div class="historia__barra"><strong data-titulo></strong>
-          <button type="button" class="boton boton--secundario" data-cerrar>Cerrar</button></div>
+          <span>
+            <button type="button" class="boton boton--secundario" data-compartir-historia>Compartir</button>
+            <button type="button" class="boton boton--secundario" data-cerrar>Cerrar</button>
+          </span></div>
       </div>
       <div class="historia__contenido" data-contenido tabindex="-1"></div>
       <div class="historia__nav">
@@ -98,11 +104,18 @@ function historia() {
       if (e.key === 'ArrowLeft') mostrar(actual - 1);
     };
 
+    barras.forEach((b, j) => b.addEventListener('click', () => mostrar(j)));
     capa.querySelector('[data-cerrar]').addEventListener('click', cerrar);
     capa.querySelector('[data-anterior]').addEventListener('click', () => mostrar(actual - 1));
     capa.querySelector('[data-siguiente]').addEventListener('click', () =>
       actual === capitulos.length - 1 ? cerrar() : mostrar(actual + 1),
     );
+    capa.querySelector('[data-compartir-historia]').addEventListener('click', (e) => compartir(infoFicha(), e.target));
+    // Un toque en el contenido (fuera de enlaces y botones) avanza de capítulo.
+    contenido.addEventListener('click', (e) => {
+      if (e.target.closest('a, button')) return;
+      if (actual < capitulos.length - 1) mostrar(actual + 1);
+    });
     document.addEventListener('keydown', teclas);
     document.body.style.overflow = 'hidden';
     document.body.append(capa);
@@ -110,6 +123,6 @@ function historia() {
   });
 }
 
-compartir();
+compartirBoton();
 historia();
 mapaDelDepartamento().catch(() => {});

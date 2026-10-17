@@ -4,6 +4,26 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). S
 
 ## [Sin publicar]
 
+### Cambiado (rediseño editorial)
+- Lenguaje visual propio, inspirado en el tono editorial de municipiosargentinos.net pero
+  reimplementado desde cero y con identidad colombiana:
+  - tipografía libre Geist y Geist Mono (OFL), autoalojadas, para titular, texto y etiquetas
+    monoespaciadas en mayúsculas;
+  - **modo oscuro por defecto**, claro opcional con un botón que guarda la preferencia;
+  - un acento fuerte único (azul cobalto), distinto del semáforo.
+- **Ficha con foto**: cada municipio busca una imagen con licencia libre en Wikimedia Commons
+  (`python -m municipios fotos`); se guarda en WebP (480 y 1080 px) con su crédito y licencia,
+  siempre visibles. Sin foto, se dibuja la **silueta del municipio** a partir de su trazado en
+  el mapa del departamento (`exportar/silueta.py`).
+- **Portada**: intro animada de unos 4 segundos la primera vez, con «Saltar» siempre visible;
+  carrusel de tarjetas con foto o silueta; chip «Datos oficiales · actualizado el …»;
+  apariciones suaves con IntersectionObserver.
+- **Modo historia a pantalla completa**: capítulos con la foto de fondo, avance por toque,
+  teclas y barra de progreso, y botón para compartir.
+- **Tarjeta para compartir** en `<canvas>` (feed 1080×1350): nombre, índice, semáforo, puesto y
+  URL; se comparte como archivo o se descarga.
+- `og:image` por ficha con su foto; el movimiento se desactiva con `prefers-reduced-motion`.
+
 ### Agregado (fase 5: relevamiento de transparencia)
 - `python -m municipios relevamiento`: un navegador automático (Scrapling `DynamicFetcher`) abre el menú de transparencia de cada alcaldía y busca 10 criterios de la Ley 1712 por el texto y la dirección de cada enlace. Por defecto revisa las 31 capitales; `--alcance todos`, los 1.104 municipios.
   - Respeta `robots.txt`, pausa 3 s entre sitios y se identifica con un agente propio.

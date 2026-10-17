@@ -32,6 +32,7 @@ NOMBRES_GRUPOS = {
 
 
 RUTA_TRANSPARENCIA_AUTO = RAIZ / "datos" / "relevamiento" / "transparencia_automatica.csv"
+DIR_FOTOS = RAIZ / "datos" / "fotos"
 
 
 def leer_transparencia_auto(ruta: Path) -> dict[str, list[dict[str, str]]]:
@@ -45,6 +46,19 @@ def leer_transparencia_auto(ruta: Path) -> dict[str, list[dict[str, str]]]:
     return dict(por_municipio)
 
 
+def leer_fotos(dir_fotos: Path) -> dict[str, dict[str, str]]:
+    """Crédito de las fotos con licencia libre, por código DIVIPOLA ({} si no hay)."""
+    ruta = dir_fotos / "fotos.csv"
+    if not ruta.exists():
+        return {}
+    with ruta.open(encoding="utf-8", newline="") as f:
+        return {
+            fila["divipola"]: fila
+            for fila in csv.DictReader(f)
+            if (dir_fotos / f"{fila['divipola']}-1080.webp").exists()
+        }
+
+
 @dataclass
 class DatosSitio:
     sitio: dict[str, Any]
@@ -56,6 +70,8 @@ class DatosSitio:
     anios_referencia: dict[str, int | None]
     # Revisión automática del menú de transparencia: código -> filas (una por criterio).
     transparencia_auto: dict[str, list[dict[str, str]]] = field(default_factory=dict)
+    # Fotos con licencia libre: código -> {autor, licencia, url_licencia, url_pagina, …}.
+    fotos: dict[str, dict[str, str]] = field(default_factory=dict)
 
     @classmethod
     def cargar(cls, dir_intermedios: Path, generado: str) -> "DatosSitio":
@@ -76,6 +92,7 @@ class DatosSitio:
             indice=indice["municipios"],
             anios_referencia=indice["anios_referencia"],
             transparencia_auto=leer_transparencia_auto(RUTA_TRANSPARENCIA_AUTO),
+            fotos=leer_fotos(DIR_FOTOS),
         )
 
     # --- consultas útiles para las páginas -------------------------------------------------

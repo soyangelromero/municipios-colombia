@@ -1,4 +1,21 @@
-/* Base: tipografía, enlaces, estructura y utilidades. */
+/* Base: tipografía, enlaces, estructura y utilidades.
+   Tipografías libres Geist y Geist Mono (licencia OFL), autoalojadas por privacidad. */
+@font-face {
+  font-family: "Geist";
+  src: url("../fonts/Geist-Variable.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist Mono";
+  src: url("../fonts/GeistMono-Variable.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 *,
 *::before,
 *::after {
@@ -28,16 +45,34 @@ h3 {
 }
 
 h1 {
-  font-size: clamp(2rem, 5.5vw, 3.4rem);
+  font-size: clamp(2.3rem, 7vw, 4.4rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
   margin-top: 0.3em;
 }
 
 h2 {
-  font-size: clamp(1.35rem, 3vw, 1.75rem);
+  font-size: clamp(1.4rem, 3.4vw, 2rem);
+  font-weight: 750;
+  letter-spacing: -0.02em;
 }
 
 h3 {
-  font-size: 1.1rem;
+  font-size: 1.12rem;
+  font-weight: 650;
+}
+
+/* Titulares con pesos mezclados: una palabra liviana, otra negra y de acento. */
+.t-liviano {
+  font-weight: 300;
+}
+
+.t-negro {
+  font-weight: 900;
+}
+
+.t-mono {
+  font-family: var(--fuente-mono);
 }
 
 h1 small,

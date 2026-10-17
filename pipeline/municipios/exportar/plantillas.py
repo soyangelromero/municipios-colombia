@@ -28,6 +28,7 @@ class Pagina:
     contenido: str
     scripts: tuple[str, ...] = ()
     clase: str = ""
+    imagen: str = ""  # ruta (desde la raíz del sitio) de la imagen para redes sociales
 
     @property
     def raiz(self) -> str:
@@ -48,6 +49,19 @@ def documento(pagina: Pagina, sitio: dict, activo: str | None = None) -> str:
         f'<a href="{raiz}{ruta}"{' aria-current="page"' if ruta == activo else ""}>{escape(texto)}</a>'
         for ruta, texto in NAVEGACION
     )
+    imagen = sitio["url_base"] + pagina.imagen if pagina.imagen else ""
+    og_imagen = (
+        f'<meta property="og:image" content="{escape(imagen)}">\n'
+        '<meta name="twitter:card" content="summary_large_image">'
+        if imagen
+        else '<meta name="twitter:card" content="summary">'
+    )
+    intro = (
+        "if(!localStorage.getItem('intro-vista')&&!matchMedia('(prefers-reduced-motion: reduce)')."
+        "matches){d.classList.add('con-intro');setTimeout(function(){d.classList.remove('con-intro')},9000)}"
+        if "pagina-inicio" in pagina.clase
+        else ""
+    )
     scripts = "".join(
         f'<script type="module" src="{raiz}assets/js/{escape(s)}"></script>' for s in pagina.scripts
     )
@@ -66,13 +80,16 @@ def documento(pagina: Pagina, sitio: dict, activo: str | None = None) -> str:
 <meta property="og:title" content="{escape(titulo)}">
 <meta property="og:description" content="{escape(pagina.descripcion)}">
 <meta property="og:url" content="{escape(url)}">
-<meta name="twitter:card" content="summary">
-<meta name="theme-color" content="#0f2a5c">
+{og_imagen}
+<meta name="theme-color" content="#0a0d12">
 <meta name="raiz" content="{raiz}">
 <link rel="icon" href="{raiz}assets/img/icono.svg" type="image/svg+xml">
+<link rel="preload" href="{raiz}assets/fonts/Geist-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<script>var d=document.documentElement;d.classList.add('js');try{{var t=localStorage.getItem('tema');if(t==='claro'||t==='oscuro')d.dataset.tema=t;{intro}}}catch(e){{}}</script>
 <link rel="stylesheet" href="{raiz}assets/css/tokens.css">
 <link rel="stylesheet" href="{raiz}assets/css/base.css">
 <link rel="stylesheet" href="{raiz}assets/css/componentes.css">
+<link rel="stylesheet" href="{raiz}assets/css/editorial.css">
 </head>
 <body class="{escape(pagina.clase)}">
 <a class="saltar" href="#contenido">Saltar al contenido</a>
@@ -83,6 +100,8 @@ def documento(pagina: Pagina, sitio: dict, activo: str | None = None) -> str:
       <span>Municipios <strong>Colombia</strong></span>
     </a>
     <nav class="nav" aria-label="Principal">{enlaces}</nav>
+    <button type="button" class="tema" data-tema-boton hidden aria-label="Cambiar entre modo oscuro y claro">
+      <span aria-hidden="true">◐</span></button>
     <div class="busqueda" data-busqueda>
       <label class="visualmente-oculto" for="buscar-global">Buscar municipio</label>
       <input id="buscar-global" type="search" placeholder="Busca tu municipio" autocomplete="off"
@@ -104,6 +123,7 @@ def documento(pagina: Pagina, sitio: dict, activo: str | None = None) -> str:
     <p class="pie__fecha">Datos actualizados el {escape(sitio["actualizado"])}.</p>
   </div>
 </footer>
+<script type="module" src="{raiz}assets/js/tema.js"></script>
 <script type="module" src="{raiz}assets/js/busqueda.js"></script>
 {scripts}
 </body>
