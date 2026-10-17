@@ -3,6 +3,7 @@ import { compartir } from './compartir.js';
 
 const DURACION = 9000;
 const SENSIBILIDAD = 40;
+const SIN_MOVIMIENTO = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function recogerCapas() {
   const ficha = document.querySelector('.ficha');
@@ -56,7 +57,7 @@ export function activarHistoria() {
 
   function reiniciarReloj() {
     clearTimeout(reloj);
-    if (pausado || indice >= defs.length - 1) return;
+    if (SIN_MOVIMIENTO || pausado || indice >= defs.length - 1) return;
     reloj = setTimeout(() => mostrar(indice + 1), DURACION);
   }
 
