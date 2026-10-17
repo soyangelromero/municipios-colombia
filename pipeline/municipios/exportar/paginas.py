@@ -875,25 +875,39 @@ def comparar(datos: DatosSitio) -> Pagina:
     raiz = "../"
     contenido = f"""
 {miga(raiz, [("", "Inicio"), ("", "Comparar")])}
-<header class="encabezado">
-  <h1>Comparar dos municipios</h1>
-  <p class="entradilla">Elige dos municipios para verlos lado a lado, pilar por pilar y dato por dato.</p>
-</header>
-<form class="comparar__elegir" data-comparar>
-  <div class="busqueda" data-busqueda data-busqueda-campo="a">
-    <label for="comparar-a">Municipio A</label>
-    <input id="comparar-a" type="search" placeholder="Escribe un municipio" autocomplete="off"
-      role="combobox" aria-expanded="false" aria-controls="comparar-a-lista">
-    <ul id="comparar-a-lista" class="busqueda__lista" role="listbox" hidden></ul>
+<div id="cmp">
+  <a class="cmp-cerrar pill pill--icono" href="{raiz}" aria-label="Cerrar y volver al inicio">&times;</a>
+  <div class="cmp-top">
+    <div class="cmp-lado" data-lado="a">
+      <div class="cmp-fondo" data-fondo="a" aria-hidden="true"></div>
+      <div class="cmp-info">
+        <div class="busqueda cmp-buscar" data-busqueda data-busqueda-campo="a">
+          <label class="visualmente-oculto" for="cmp-a">Municipio A</label>
+          <input id="cmp-a" type="search" placeholder="Elige un municipio" autocomplete="off"
+            role="combobox" aria-expanded="false" aria-controls="cmp-a-lista">
+          <ul id="cmp-a-lista" class="busqueda__lista" role="listbox" hidden></ul>
+        </div>
+        <p class="cmp-dep mono" data-dep="a"></p>
+      </div>
+    </div>
+    <div class="cmp-vs" aria-hidden="true">VS</div>
+    <div class="cmp-lado" data-lado="b">
+      <div class="cmp-fondo" data-fondo="b" aria-hidden="true"></div>
+      <div class="cmp-info">
+        <div class="busqueda cmp-buscar" data-busqueda data-busqueda-campo="b">
+          <label class="visualmente-oculto" for="cmp-b">Municipio B</label>
+          <input id="cmp-b" type="search" placeholder="Elige otro municipio" autocomplete="off"
+            role="combobox" aria-expanded="false" aria-controls="cmp-b-lista">
+          <ul id="cmp-b-lista" class="busqueda__lista" role="listbox" hidden></ul>
+        </div>
+        <p class="cmp-dep mono" data-dep="b"></p>
+      </div>
+    </div>
   </div>
-  <div class="busqueda" data-busqueda data-busqueda-campo="b">
-    <label for="comparar-b">Municipio B</label>
-    <input id="comparar-b" type="search" placeholder="Escribe otro municipio" autocomplete="off"
-      role="combobox" aria-expanded="false" aria-controls="comparar-b-lista">
-    <ul id="comparar-b-lista" class="busqueda__lista" role="listbox" hidden></ul>
+  <div class="cmp-body" data-cmp-resultado aria-live="polite">
+    <p class="nota">Elige los dos municipios para ver el duelo, rubro por rubro.</p>
   </div>
-</form>
-<div class="comparar__resultado" data-comparar-resultado aria-live="polite"></div>
+</div>
 <noscript><p class="nota">El comparador necesita JavaScript. Puedes ver cada municipio en su ficha desde el <a href="{raiz}ranking/">ranking</a>.</p></noscript>
 """
     return Pagina(
