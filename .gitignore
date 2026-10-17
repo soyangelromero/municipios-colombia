@@ -2,7 +2,9 @@
 .venv/
 venv/
 .env
-privado/
+# privado/: secretos y la base SQLite, fuera de la carpeta pública. Solo el ejemplo se versiona.
+privado/*
+!privado/config.example.php
 *.sqlite
 *.sqlite3
 

@@ -4,6 +4,19 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). S
 
 ## [Sin publicar]
 
+### Agregado (fase 6: formularios en PHP, opcionales)
+- `web/api/`: `reportes.php`, `contacto.php` y `pedidos.php` con una librería compartida
+  (`web/api/lib/comun.php`). Sin Composer, con PDO SQLite.
+  - La base y la sal viven en `privado/`, **fuera** de la carpeta pública; nunca se versiona.
+  - Límite de envíos por IP guardando solo `hash_hmac('sha256', ip, sal)` (nunca la IP),
+    borrado de envíos a los 30 días, campo trampa (honeypot), control de tiempo mínimo y
+    comprobación de origen; salida siempre en JSON y escapada.
+- `privado/config.example.php` (versionado, sin valores) documenta qué hace falta.
+- Formulario en cada ficha («Reportar un error» y «Pedir un dato») y en «Acerca» (contacto).
+  Sin endpoint —como en GitHub Pages— caen al issue de GitHub prellenado o al correo; con PHP,
+  envían a la API. `web/assets/js/formularios.js` decide según `config.js`.
+- `.gitignore`: se versiona solo `privado/config.example.php`, nunca el resto de `privado/`.
+
 ### Cambiado (rediseño editorial)
 - Lenguaje visual propio, inspirado en el tono editorial de municipiosargentinos.net pero
   reimplementado desde cero y con identidad colombiana:

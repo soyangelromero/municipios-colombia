@@ -97,6 +97,44 @@ def credito_foto(datos: DatosSitio, codigo: str) -> str:
     )
 
 
+def formulario(
+    tipo: str,
+    datos: DatosSitio,
+    *,
+    titulo: str,
+    ayuda: str,
+    municipio: str = "",
+    asunto: bool = False,
+) -> str:
+    """Formulario opcional: con PHP envía a la API; sin PHP cae a GitHub o al correo."""
+    repo = escape(datos.sitio["repositorio"])
+    correo = escape(datos.sitio["correo"])
+    campo_asunto = (
+        '<label>Asunto <input type="text" name="asunto" maxlength="160" required></label>'
+        if asunto
+        else ""
+    )
+    oculto_municipio = (
+        f'<input type="hidden" name="municipio" value="{escape(municipio)}">' if municipio else ""
+    )
+    return f"""
+<details class="enviar">
+  <summary>{escape(titulo)}</summary>
+  <form class="formulario" data-formulario="{tipo}" data-repo="{repo}" data-correo="{correo}">
+    <input type="hidden" name="t" data-tiempo value="">
+    <p class="formulario__trampa" aria-hidden="true">
+      <label>No llenar este campo <input type="text" name="web" tabindex="-1" autocomplete="off"></label>
+    </p>
+    {oculto_municipio}{campo_asunto}
+    <label>Mensaje <textarea name="mensaje" rows="4" minlength="5" required></textarea></label>
+    <label>Tu correo (opcional) <input type="email" name="contacto" maxlength="120"></label>
+    <button type="submit" class="boton">Enviar</button>
+    <p class="formulario__aviso" role="status" data-aviso></p>
+    <p class="nota">{escape(ayuda)}</p>
+  </form>
+</details>"""
+
+
 def leyenda_escala() -> str:
     pasos = [("e1", "menos de 40"), ("e2", "40 a 49"), ("e3", "50 a 59"), ("e4", "60 a 69"), ("e5", "70 o más"), ("sin", "sin dato")]  # fmt: skip
     items = "".join(f'<li><span class="muestra muestra--{c}"></span>{t}</li>' for c, t in pasos)
@@ -485,6 +523,13 @@ def ficha(datos: DatosSitio, codigo: str, dir_mapas: Path | None = None) -> Pagi
 <section class="nota-final">
   <p>Cada cifra tiene su fuente oficial. Los puntajes «entre pares» son el percentil del municipio dentro de su grupo de capacidades del DNP (0 = el peor del grupo, 100 = el mejor). <a href="{raiz}metodologia/">Ver la metodología</a>.</p>
 </section>
+
+<section class="tarjeta">
+  <h2>¿Ves algo mal o falta un dato?</h2>
+  <p class="nota">Tu aviso se publica con su fecha en el registro de correcciones. Si una alcaldía quiere responder, este es su derecho de réplica.</p>
+  {formulario("reporte", datos, titulo="Reportar un error en un dato", ayuda="Si el sitio no tiene servidor, se abre un issue en GitHub con tu mensaje.", municipio=f"{m.nombre}, {m.departamento} ({codigo})")}
+  {formulario("pedido", datos, titulo="Pedir un dato que la alcaldía no publica", ayuda="Nos ayuda a completar la ficha y a ejercer el derecho de petición.", municipio=f"{m.nombre}, {m.departamento} ({codigo})", asunto=True)}
+</section>
 </article>
 """
     descripcion = (
@@ -496,7 +541,7 @@ def ficha(datos: DatosSitio, codigo: str, dir_mapas: Path | None = None) -> Pagi
         f"{m.nombre}, {m.departamento}",
         descripcion,
         contenido,
-        ("ficha.js",),
+        ("ficha.js", "formularios.js"),
         "pagina-ficha",
         f"assets/fotos/{codigo}-1080.webp" if codigo in datos.fotos else "",
     )
@@ -779,13 +824,18 @@ def acerca(datos: DatosSitio) -> Pagina:
   <p>El código está en <a href="{escape(s["repositorio"])}">GitHub</a> bajo licencia MIT. Los datos propios (relevamientos, cálculos e índice) se publican bajo CC BY 4.0. Los datos de terceros conservan la licencia de su fuente.</p>
   <p>¿Quieres ayudar? Lee la <a href="{escape(s["repositorio"])}/blob/main/CONTRIBUTING.md">guía para contribuir</a>.</p>
 </section>
+<section id="contacto">
+  <h2>Escríbenos</h2>
+  {formulario("contacto", datos, titulo="Enviar un mensaje", ayuda="Si el sitio no tiene servidor, se abre tu correo con el mensaje listo.", asunto=True)}
+</section>
 """
     return Pagina(
         "acerca/",
         "Acerca y privacidad",
         "Qué es el proyecto, cómo corregir un dato, privacidad y licencias.",
         contenido,
-        clase="pagina-texto",
+        ("formularios.js",),
+        "pagina-texto",
     )
 
 

@@ -936,6 +936,70 @@
   }
 }
 
+/* --- Formularios opcionales (reportar, pedir el dato, contacto) --------------------------- */
+.enviar {
+  border: 1px solid var(--linea);
+  border-radius: var(--radio-chico);
+  padding: 0.4rem 0.9rem;
+  margin: 0.75rem 0;
+  background: var(--superficie);
+}
+
+.enviar[open] {
+  padding-bottom: 0.9rem;
+}
+
+.enviar > summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 0.5rem 0;
+}
+
+.formulario {
+  display: grid;
+  gap: 0.75rem;
+  max-width: 40rem;
+}
+
+.formulario label {
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.9rem;
+  color: var(--texto-suave);
+}
+
+.formulario input,
+.formulario textarea {
+  font: inherit;
+  color: var(--texto);
+  background: var(--superficie-2);
+  border: 1px solid var(--linea);
+  border-radius: var(--radio-chico);
+  padding: 0.55rem 0.7rem;
+  width: 100%;
+  resize: vertical;
+}
+
+.formulario button {
+  justify-self: start;
+}
+
+.formulario__aviso {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--verde);
+}
+
+/* Campo trampa: invisible para las personas, tentador para los robots. */
+.formulario__trampa {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
 /* Revisión automática del sitio web de la alcaldía (no puntúa) */
 .revision-auto {
   margin-top: 1.5rem;
