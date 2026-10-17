@@ -1,0 +1,53 @@
+name: Desplegar por SFTP
+
+# Solo a mano (workflow_dispatch). Construye el sitio y lo sube a un hosting con PHP por SFTP.
+# Necesita estos secrets: SFTP_SERVIDOR, SFTP_USUARIO, SFTP_PUERTO (opcional),
+# SFTP_CLAVE y SFTP_RUTA. Explicación en docs/despliegue.md.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: despliegue-sftp
+  cancel-in-progress: false
+
+jobs:
+  desplegar:
+    name: Construir y subir por SFTP
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pipeline/pyproject.toml
+
+      - name: Instalar dependencias
+        run: pip install -e pipeline
+
+      - name: Restaurar descargas pesadas
+        uses: actions/cache@v6
+        with:
+          path: |
+            datos/crudos/mgn
+            datos/crudos/dane
+          key: crudos-pesados-v1
+
+      - name: Correr el pipeline
+        env:
+          SOCRATA_APP_TOKEN: ${{ secrets.SOCRATA_APP_TOKEN }}
+        run: python -m municipios --tolerante todo
+
+      - name: Enviar por SFTP
+        env:
+          SFTP_SERVIDOR: ${{ secrets.SFTP_SERVIDOR }}
+          SFTP_USUARIO: ${{ secrets.SFTP_USUARIO }}
+          SFTP_PUERTO: ${{ secrets.SFTP_PUERTO }}
+          SFTP_CLAVE: ${{ secrets.SFTP_CLAVE }}
+          SFTP_RUTA: ${{ secrets.SFTP_RUTA }}
+        run: |
+          sudo apt-get update && sudo apt-get install -y lftp
+          lftp -u "$SFTP_USUARIO","$SFTP_CLAVE" "sftp://$SFTP_SERVIDOR:${SFTP_PUERTO:-22}" \
+            -e "set sftp:auto-confirm yes; set net:max-retries 2; mirror -R --delete --verbose dist/ $SFTP_RUTA; bye"

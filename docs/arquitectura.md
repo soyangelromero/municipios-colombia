@@ -48,12 +48,16 @@ Fases siguientes: `indice/` (pares, puntajes, sensibilidad), más exportaciones 
 
 - **`web/`:** lo escrito a mano.
   - `assets/css/`: `tokens.css` (colores y tipografía, modo claro y oscuro), `base.css` y `componentes.css`.
+  - `assets/css/`: `editorial.css` (portada, héroes, siluetas, carrusel y modo historia) además de los anteriores.
   - `assets/js/`: módulos ES sin dependencias.
     - `comun.js`: carga de datos y formato.
     - `busqueda.js`: buscador accesible.
     - `mapa.js`: interacción de los mapas.
+    - `tema.js`: cambio entre modo oscuro y claro.
+    - `compartir.js`: tarjeta de imagen (canvas) para compartir una ficha.
+    - `formularios.js`: envío opcional de los formularios (a PHP, GitHub o correo).
     - `inicio.js`, `departamento.js`, `ficha.js` (mapa, compartir y modo historia), `tablas.js` (orden y filtros) y `comparar.js`.
-  - `assets/img/`.
+  - `assets/img/` y `assets/fonts/` (Geist y Geist Mono).
   - `api/` (fase 6): PHP 8.1+ con PDO SQLite. La configuración y la base viven en `privado/`, fuera de la carpeta pública.
 - **`dist/`:** lo genera `python -m municipios sitio` y no se versiona.
   - Copia `web/`.
@@ -73,4 +77,4 @@ Fases siguientes: `indice/` (pares, puntajes, sensibilidad), más exportaciones 
   - En cada ejecución corre el pipeline completo y genera los mapas.
   - Las descargas pesadas (MGN y Excel del DANE) quedan en la caché de Actions. Para renovarlas, sube la versión de la clave `crudos-pesados-vN`.
   - Las consultas a datos.gov.co se hacen siempre frescas.
-- **Hosting propio con PHP (fase 7):** se sube la carpeta `web/` por FTP/SFTP. Las credenciales viven en los *secrets* de GitHub, nunca en el repositorio.
+- **Hosting propio con PHP (fase 7):** se sube el contenido de `dist/` por SFTP con `.github/workflows/deploy.yml` (manual). La configuración y la base viven en `privado/`, fuera de la carpeta pública, y las credenciales en los *secrets* de GitHub, nunca en el repositorio. Paso a paso en [despliegue.md](despliegue.md).

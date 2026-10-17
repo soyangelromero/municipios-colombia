@@ -4,6 +4,12 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). S
 
 ## [Sin publicar]
 
+### Agregado (fase 7: despliegue)
+- `docs/despliegue.md`: cómo publicar en GitHub Pages (sin formularios) o en un hosting
+  propio con PHP (formularios activos), con la estructura de `privado/` y la tabla de
+  configuración.
+- `.github/workflows/deploy.yml`: despliegue manual por SFTP (opcional).
+
 ### Agregado (fase 6: formularios en PHP, opcionales)
 - `web/api/`: `reportes.php`, `contacto.php` y `pedidos.php` con una librería compartida
   (`web/api/lib/comun.php`). Sin Composer, con PDO SQLite.

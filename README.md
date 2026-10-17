@@ -8,13 +8,15 @@ Observatorio cívico, abierto y neutral sobre los **1.104 municipios de Colombia
 
 Cada cifra lleva su fuente oficial.
 
-> Estado: **fase 4, sitio web**. El pipeline descarga y cruza con DIVIPOLA 12 fuentes oficiales, calcula el índice municipal (ver [docs/metodologia.md](docs/metodologia.md)) y genera el sitio completo:
-> - portada con mapa;
-> - una ficha por municipio;
+> Estado: **fases 5 y 6, sitio web y formularios**. El pipeline descarga y cruza con DIVIPOLA 12 fuentes oficiales, calcula el índice municipal (ver [docs/metodologia.md](docs/metodologia.md)) y genera el sitio completo, con un rediseño editorial (modo oscuro por defecto, héroe con foto, carrusel y tarjetas para compartir):
+> - portada con mapa, carrusel e introducción;
+> - una ficha por municipio, con mapa, fotos y modo historia;
 > - una página por departamento;
 > - ranking con filtros, comparador, metodología y fuentes.
 
 **Sitio (en construcción):** https://soyangelromero.github.io/municipios-colombia/ · Mapas generados: https://soyangelromero.github.io/municipios-colombia/data/mapas/
+
+Los formularios para reportar un error, pedir un dato o escribir al proyecto son **opcionales**: sin servidor caen al issue de GitHub o al correo; en un hosting con PHP envían a la API (ver [docs/despliegue.md](docs/despliegue.md)).
 
 ## Cómo está hecho
 
