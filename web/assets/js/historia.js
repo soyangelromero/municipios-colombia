@@ -33,7 +33,7 @@ function infoFicha(ficha) {
 function limpiar(nodo) {
   nodo.querySelectorAll('[id]').forEach((el) => el.removeAttribute('id'));
   nodo.querySelectorAll('.acciones').forEach((el) => el.remove());
-  nodo.classList.add('cap');
+  nodo.classList.add('cap', 'activo');
 }
 
 export function activarHistoria() {
