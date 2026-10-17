@@ -843,6 +843,13 @@ html.con-intro .intro {
   z-index: 20;
   max-width: none;
   padding: 112px var(--gut) 48px;
+  transition: opacity 0.52s var(--ease), transform 0.52s var(--ease);
+}
+
+.hero__texto.is-saliendo {
+  opacity: 0;
+  transform: translateX(-36px);
+  pointer-events: none;
 }
 
 .hero__h1 {
@@ -945,12 +952,30 @@ html.con-intro .intro {
   transition: color 0.3s var(--ease), background 0.3s var(--ease);
 }
 
+.mseg {
+  position: relative;
+}
+
+.mseg button {
+  position: relative;
+  z-index: 1;
+}
+
 .mseg button[aria-pressed="true"] {
-  background: var(--fg);
+  background: transparent;
   color: var(--ink);
 }
 
-.mseg__th { display: none; }
+.mseg__th {
+  position: absolute;
+  top: 4px;
+  left: 0;
+  height: 34px;
+  border-radius: var(--r-pill);
+  background: var(--fg);
+  transition: left 0.5s var(--ease), width 0.5s var(--ease), transform 0.5s var(--ease);
+  z-index: 0;
+}
 
 /* --- Leyenda del mapa ----------------------------------------------------------------------- */
 .leyenda-card {
@@ -1451,6 +1476,71 @@ html.lock body { overflow: hidden; }
 @keyframes intro-fondo {
   from { opacity: 0; transform: scale(1.1); }
   to { opacity: 1; transform: none; }
+}
+
+.intro__mapa {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  animation: intro-mapa 5s 0.4s var(--expo) both;
+  pointer-events: none;
+}
+
+.intro__mapa .mapa {
+  width: min(72vw, 520px);
+  height: auto;
+  margin: 0;
+}
+
+.intro__mapa .mapa__svg {
+  width: 100%;
+  height: auto;
+  opacity: 0.55;
+  filter: drop-shadow(0 0 24px rgb(61 124 255 / 35%));
+}
+
+.intro__mapa .mapa__svg path {
+  fill: transparent;
+  stroke: color-mix(in srgb, var(--acc) 70%, #fff);
+  stroke-width: 0.9;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 1 1;
+  animation: intro-trazo 3.6s 0.6s var(--ease) both;
+}
+
+.intro__mapa .mapa__ayuda,
+.intro__mapa figcaption {
+  display: none;
+}
+
+@keyframes intro-mapa {
+  from { opacity: 0; transform: scale(1.08); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes intro-trazo {
+  from { stroke-dashoffset: 4; opacity: 0.2; }
+  to { stroke-dashoffset: 0; opacity: 1; }
+}
+
+/* Ensamblado del logo */
+.logo--grande i {
+  transform-origin: bottom center;
+  animation: logo-barra 0.9s var(--expo) both;
+}
+
+.logo--grande i:nth-child(1) { animation-delay: 0.1s; }
+.logo--grande i:nth-child(2) { animation-delay: 0.22s; }
+.logo--grande i:nth-child(3) { animation-delay: 0.34s; }
+.logo--grande i:nth-child(4) { animation-delay: 0.46s; }
+
+@keyframes logo-barra {
+  from { transform: scaleY(0); opacity: 0; }
+  to { transform: none; opacity: 1; }
 }
 
 .intro__contenido {

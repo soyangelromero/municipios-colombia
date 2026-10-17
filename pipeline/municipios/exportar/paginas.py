@@ -344,6 +344,7 @@ def inicio(datos: DatosSitio, dir_mapas: Path) -> Pagina:
     intro = f"""
 <div class="intro" id="intro" data-intro role="dialog" aria-modal="true" aria-label="Presentación del proyecto">
   <div class="intro__fondo" aria-hidden="true"></div>
+  <div class="intro__mapa" aria-hidden="true">{mapa_en_linea(dir_mapas / "colombia.svg", {}, "Mapa de Colombia")}</div>
   <button type="button" class="pill intro__salto" data-intro-salto>Saltar</button>
   <div class="intro__contenido">
     <p class="intro__marca"><span class="logo logo--grande" aria-hidden="true"><i></i><i></i><i></i><i></i></span></p>

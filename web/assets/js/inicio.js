@@ -87,10 +87,18 @@ async function mapa() {
   });
 
   const botones = bloque.querySelectorAll('[data-capa]');
+  const th = bloque.querySelector('.mseg__th');
+  const moverTh = (boton) => {
+    if (!th || !boton) return;
+    th.style.left = `${boton.offsetLeft}px`;
+    th.style.width = `${boton.offsetWidth}px`;
+  };
+  moverTh(bloque.querySelector('[aria-pressed="true"]'));
   botones.forEach((boton) =>
     boton.addEventListener('click', () => {
       capa = boton.dataset.capa;
       botones.forEach((b) => b.setAttribute('aria-pressed', String(b === boton)));
+      moverTh(boton);
       colorear(figura, Object.fromEntries(Object.entries(deps).map(([cod, d]) => [cod, d[capa]])));
     }),
   );

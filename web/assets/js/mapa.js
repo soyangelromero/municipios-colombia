@@ -41,9 +41,18 @@ export function activarMapa(figura, { texto, enlace }) {
     camino.addEventListener('blur', () => (globo.hidden = true));
     if (destino) {
       camino.style.cursor = 'pointer';
-      camino.addEventListener('click', () => (window.location.href = destino));
+      const ir = () => (window.location.href = destino);
+      camino.addEventListener('click', () => {
+        const hero = document.querySelector('.hero__texto');
+        if (hero) {
+          hero.classList.add('is-saliendo');
+          setTimeout(ir, 520);
+        } else {
+          ir();
+        }
+      });
       camino.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') window.location.href = destino;
+        if (e.key === 'Enter') ir();
       });
     }
   });
