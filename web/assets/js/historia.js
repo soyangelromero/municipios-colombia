@@ -45,6 +45,20 @@ const CONTEXTO_KPI = [
   'mdm_puntaje',
 ];
 
+let estilos = null;
+
+/** La hoja de estilos de las historias se descarga la primera vez que hace falta. */
+export function cargarEstilos() {
+  estilos ??= new Promise((resolver) => {
+    const enlace = document.createElement('link');
+    enlace.rel = 'stylesheet';
+    enlace.href = new URL('../css/historia.css', import.meta.url).href;
+    enlace.onload = enlace.onerror = () => resolver();
+    document.head.append(enlace);
+  });
+  return estilos;
+}
+
 let datosGlobales = null; // { idx, pais, orden }
 let abierta = null; // estado de la historia abierta
 
@@ -503,7 +517,7 @@ function gestos(capa) {
 
 export async function abrirHistoria(clave, capitulo = 0, origen = null) {
   if (abierta) cerrar(true);
-  const ctx = await base();
+  const [ctx] = await Promise.all([base(), cargarEstilos()]);
   const codigo = ctx.porSlug[clave] ?? clave;
   let m;
   try {
@@ -563,18 +577,9 @@ export async function abrirHistoria(clave, capitulo = 0, origen = null) {
   capa.querySelector('[data-pausa]').focus({ preventScroll: true });
 }
 
-/** Enlaza tarjetas y filas de la portada: abren la historia en su sitio (sin recargar). */
-export function enlazarHistorias(selector = 'a.card, [data-historia]') {
-  document.addEventListener('click', (e) => {
-    if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
-    const a = e.target.closest(selector);
-    if (!a) return;
-    const href = a.getAttribute('href') ?? '';
-    const slug = a.dataset.historia ?? href.replace(/\/$/, '').split('/').pop();
-    if (!slug) return;
-    e.preventDefault();
-    abrirHistoria(slug, 0, a);
-  });
+/** Abre la historia indicada por el hash de la URL (`#departamento--municipio`), si existe. */
+export async function abrirDesdeHash() {
   const hash = location.hash.slice(1);
-  if (hash) base().then(({ porSlug }) => porSlug[hash] && abrirHistoria(hash));
+  const { porSlug } = await base();
+  if (hash && porSlug[hash]) abrirHistoria(hash);
 }

@@ -231,6 +231,15 @@ def exportar(datos: DatosSitio, destino: Path) -> None:
         compacto=True,
     )
     escribir_json(
+        destino / "departamentos.json",
+        {
+            "generado": datos.sitio["actualizado"],
+            "departamentos": departamentos,
+            "grupos": NOMBRES_GRUPOS,
+        },
+        compacto=True,
+    )
+    escribir_json(
         destino / "indice.json",
         {
             "version": datos.config.version,

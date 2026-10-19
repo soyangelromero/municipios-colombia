@@ -93,17 +93,35 @@ function activar(contenedor, lista, departamentos) {
   entrada.addEventListener('blur', () => setTimeout(cerrar, 120));
 }
 
-async function iniciar() {
+let cargando = null;
+
+/** Descarga el listado de municipios solo cuando alguien usa un buscador. */
+function cargar(contenedores) {
+  cargando ??= (async () => {
+    try {
+      const [lista, pais] = await Promise.all([municipios(), cargarJSON('data/pais.json')]);
+      for (const m of lista) m._clave = normalizar(m.nombre);
+      lista.sort((a, b) => (b.poblacion ?? 0) - (a.poblacion ?? 0)); // los más poblados primero
+      contenedores.forEach((c) => activar(c, lista, pais.departamentos));
+    } catch {
+      // Sin datos (por ejemplo, abierto sin servidor): el buscador simplemente no sugiere.
+    }
+  })();
+  return cargando;
+}
+
+function iniciar() {
   const contenedores = document.querySelectorAll('[data-busqueda]');
-  if (!contenedores.length) return;
-  try {
-    const [lista, pais] = await Promise.all([municipios(), cargarJSON('data/pais.json')]);
-    for (const m of lista) m._clave = normalizar(m.nombre);
-    lista.sort((a, b) => (b.poblacion ?? 0) - (a.poblacion ?? 0)); // los más poblados primero
-    contenedores.forEach((c) => activar(c, lista, pais.departamentos));
-  } catch {
-    // Sin datos (por ejemplo, abierto sin servidor): el buscador simplemente no sugiere.
-  }
+  contenedores.forEach((c) => {
+    const entrada = c.querySelector('input');
+    const activarAhora = () =>
+      cargar(contenedores).then(() => {
+        // Lo que se alcanzó a escribir mientras cargaba también debe sugerir.
+        if (entrada.value && document.activeElement === entrada) entrada.dispatchEvent(new Event('input'));
+      });
+    entrada.addEventListener('focus', activarAhora, { once: true });
+    entrada.addEventListener('pointerenter', activarAhora, { once: true });
+  });
 }
 
 iniciar();

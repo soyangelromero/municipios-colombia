@@ -78,7 +78,6 @@ def documento(pagina: Pagina, sitio: dict) -> str:
 <link rel="stylesheet" href="{raiz}assets/css/base.css">
 <link rel="stylesheet" href="{raiz}assets/css/componentes.css">
 <link rel="stylesheet" href="{raiz}assets/css/editorial.css">
-<link rel="stylesheet" href="{raiz}assets/css/historia.css">
 </head>
 <body class="{escape(pagina.clase)}">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">

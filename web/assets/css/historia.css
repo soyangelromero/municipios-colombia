@@ -1,18 +1,5 @@
 /* Ficha en formato historias (e2e/06). Capa a pantalla completa construida por js/historia.js. */
 
-/* Velo del héroe de la ficha estática (la capa de historias usa .hi-velo). */
-.st-shade {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background: linear-gradient(180deg, rgb(6 8 10 / 55%), rgb(6 8 10 / 12%) 45%, rgb(6 8 10 / 92%));
-}
-
-html.lock,
-html.lock body {
-  overflow: hidden;
-}
-
 .hi {
   /* La historia es siempre oscura (va sobre foto), aunque el sitio esté en modo claro. */
   --ink: #0b0d10;

@@ -2,7 +2,7 @@
 import { formatoNumero, municipios, raiz } from './comun.js';
 import { activarMapa, colorear, insertarMapa } from './mapa.js';
 import { compartir } from './compartir.js';
-import { abrirHistoria } from './historia.js';
+const abrirHistoria = (codigo, cap, origen) => import('./historia.js').then((m) => m.abrirHistoria(codigo, cap, origen));
 
 const ficha = document.querySelector('.ficha');
 

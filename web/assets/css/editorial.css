@@ -2207,3 +2207,17 @@ body.pagina-comparar {
 
 /* El halo del mapa solo se ve bien sobre fondo oscuro. */
 :root[data-tema="claro"] .hero__mapa .mapa::before { display: none; }
+
+/* Velo del héroe de la ficha estática (la capa de historias usa .hi-velo). */
+.st-shade {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(180deg, rgb(6 8 10 / 55%), rgb(6 8 10 / 12%) 45%, rgb(6 8 10 / 92%));
+}
+
+html.lock,
+html.lock body {
+  overflow: hidden;
+}
+

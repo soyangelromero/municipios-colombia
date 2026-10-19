@@ -228,7 +228,7 @@ def _valor_dato(datos: DatosSitio, fila: dict, clave: str, unidad: str | None = 
 def tarjeta_carrusel(datos: DatosSitio, codigo: str, siluetas: Siluetas, puesto: int) -> str:
     """Tarjeta 9:15 de foto (o silueta) para el carrusel de la portada."""
     m, f = datos.municipios[codigo], datos.indice[codigo]
-    foto = foto_img(datos, codigo, "", primera=puesto <= 3, tamanos="(max-width:620px) 72vw, 300px")
+    foto = foto_img(datos, codigo, "", primera=puesto <= 3, tamanos="(max-width:620px) 56vw, 240px")
     fondo = foto or (siluetas.de(m.departamento_slug, codigo) or "")
     clase = "" if foto else " card__fondo--silueta"
     indice = f.get("indice")

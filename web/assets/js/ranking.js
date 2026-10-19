@@ -1,6 +1,6 @@
 // Ranking completo (e2e/09): pestañas por indicador, filtros, «Ver más» y apertura de la historia en su sitio.
 import { formatoNumero, normalizar } from './comun.js';
-import { enlazarHistorias } from './historia.js';
+import { enlazarHistorias } from './historia-enlaces.js';
 
 const lista = document.querySelector('[data-rk]');
 const controles = document.querySelector('[data-rk-controles]');

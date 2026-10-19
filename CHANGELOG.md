@@ -4,6 +4,12 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). S
 
 ## [Sin publicar]
 
+### Rendimiento de la portada
+- La portada ya no descarga `pais.json` (118 KB) al abrir: el buscador lo pide la primera vez que se usa y el mapa lee un `departamentos.json` pequeño.
+- `historia.js` (26 KB) y su CSS se cargan bajo demanda (al tocar, al apuntar o cuando el navegador está ocioso); `historia-enlaces.js` pesa 1 KB.
+- Las fotos de las tarjetas piden la variante de 480 px (≈ 22 KB) en vez de la de 1080 px (≈ 95 KB) en pantallas habituales.
+- Medido en local: DOMContentLoaded de ≈ 990 ms a ≈ 320 ms, sin tareas largas; HTML 125 KB (29 KB comprimido).
+
 ### Agregado y corregido (fase 6: formularios, rendimiento e íconos)
 - **Formularios PHP**: el frontend pedía `reporte.php` y `pedido.php`, pero los archivos son `reportes.php` y `pedidos.php`; corregido. Nuevas pruebas de la API con el servidor integrado de PHP (`test_api_php.py`): origen, método, campo trampa, tiempo mínimo, límite por IP y hora, hash en lugar de la IP y borrado de lo viejo.
 - **Portada más liviana**: el mapa ya no es 3D (sin `perspective`, sin cadena de `drop-shadow`); es un SVG plano con resalte al apuntar. Los trazados se re-simplifican al incrustarlos (`aligerar.py`) y la intro copia el mapa en vez de traerlo dos veces: el HTML de la portada baja de 246 KB a 125 KB. Las tarjetas ya no crean una capa 3D cada una.
