@@ -8,3 +8,5 @@ url_base = "https://soyangelromero.github.io/municipios-colombia/"
 repositorio = "https://github.com/soyangelromero/municipios-colombia"
 correo = "iangelromero@outlook.com"
 idioma = "es-CO"
+# Verificación de propiedad en Google Search Console (etiqueta meta; no es un secreto).
+google_verificacion = "23dx7pWXsNOkfsxv6z4DU9sKJM8EzkNOHYFCqG0QW4M"

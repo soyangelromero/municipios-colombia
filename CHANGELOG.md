@@ -4,6 +4,9 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). S
 
 ## [Sin publicar]
 
+### Agregado
+- Etiqueta de verificación de Google Search Console en todas las páginas (`google_verificacion` en `pipeline/config/sitio.toml`; quien haga un fork pone la suya).
+
 ### Agregado: SEO
 - **Datos estructurados** (JSON-LD): `WebSite` y `Dataset` en la portada (para Google Dataset Search); `BreadcrumbList` en fichas y departamentos y `AdministrativeArea` en cada ficha.
 - **Títulos** de ficha con índice y puesto («Sogamoso (Boyacá): índice 86,5/100, puesto 1 de 1.103 | …»), acortados cuando pasan de ~72 caracteres; título propio para la portada y los departamentos.

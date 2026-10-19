@@ -58,6 +58,11 @@ def documento(pagina: Pagina, sitio: dict) -> str:
         f'<meta name="twitter:title" content="{escape(titulo)}">\n'
         f'<meta name="twitter:image" content="{escape(imagen)}">'
     )
+    verificacion = (
+        f'<meta name="google-site-verification" content="{escape(sitio["google_verificacion"])}">\n'
+        if sitio.get("google_verificacion")
+        else ""
+    )
     robots = "" if pagina.indexar else '<meta name="robots" content="noindex, follow">\n'
     datos_estructurados = "".join(
         '<script type="application/ld+json">'
@@ -84,7 +89,7 @@ def documento(pagina: Pagina, sitio: dict) -> str:
 {base}<title>{escape(titulo)}</title>
 <meta name="description" content="{escape(pagina.descripcion)}">
 <link rel="canonical" href="{escape(url)}">
-{robots}<meta property="og:type" content="website">
+{verificacion}{robots}<meta property="og:type" content="website">
 <meta property="og:locale" content="es_CO">
 <meta property="og:site_name" content="{escape(sitio["nombre"])}">
 <meta property="og:title" content="{escape(titulo)}">
