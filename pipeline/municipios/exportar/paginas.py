@@ -1228,7 +1228,7 @@ def acerca(datos: DatosSitio) -> Pagina:
 </section>
 <section id="privacidad">
   <h2>Privacidad</h2>
-  <p>Este sitio no usa cookies, no usa herramientas de analítica ni publicidad y no carga recursos de terceros. No recopila datos personales. Si usas «Súmate al pedido» (solo cuando el sitio tiene servidor), se guarda el municipio, el dato y una huella cifrada de tu conexión (no la IP) para que cuentes una sola vez; se borra al año. Si escribes por correo o abres un issue, esos datos los gestiona tu proveedor de correo o GitHub.</p>
+  <p>Este sitio no usa cookies, no usa herramientas de analítica ni publicidad y no carga recursos de terceros, salvo el servicio que cuenta los pedidos de datos cuando está activo (corre en Cloudflare Workers: al ver «Lo que más le piden los vecinos» o usar «Súmate al pedido», tu navegador lo consulta y Cloudflare ve tu IP). No recopila datos personales. Si usas «Súmate al pedido» (solo cuando el sitio tiene servidor), se guarda el municipio, el dato y una huella cifrada de tu conexión (no la IP) para que cuentes una sola vez; se borra al año. Si escribes por correo o abres un issue, esos datos los gestiona tu proveedor de correo o GitHub.</p>
 </section>
 <section>
   <h2>Código y datos abiertos</h2>

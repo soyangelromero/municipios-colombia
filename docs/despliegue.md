@@ -69,7 +69,7 @@ El archivo `privado/config.php` **no** se versiona (`.gitignore` solo deja pasar
 - Guarda: tipo, municipio, asunto, mensaje, contacto (si lo dan) y `hash_hmac('sha256', ip, sal)`.
 - **Nunca** guarda la IP ni datos personales sin pedirlo.
 - Los envíos se borran solos al pasar `dias_retencion`.
-- **«Súmate al pedido»** (`apoyos.php`, lectura en `pedidos-ranking.php`): guarda solo municipio, dato y el hash de la IP; una fila por persona, municipio y dato. Se borra al pasar `dias_apoyos`. Alimenta «Lo que más le piden los vecinos» de la portada y el botón de la historia de transparencia. Se activa al poner `endpoint: '/api'` en `web/assets/js/config.js`; sin servidor, esos bloques muestran el buscador y el formulario de la ficha.
+- **«Súmate al pedido»** (`apoyos.php`, lectura en `pedidos-ranking.php`): guarda solo municipio, dato y el hash de la IP; una fila por persona, municipio y dato. Se borra al pasar `dias_apoyos`. Alimenta «Lo que más le piden los vecinos» de la portada y el botón de la historia de transparencia. Si no tienes hosting con PHP, usa el Worker gratuito de `docs/cloudflare.md`. Se activa al poner `endpoint: '/api'` en `web/assets/js/config.js`; sin servidor, esos bloques muestran el buscador y el formulario de la ficha.
 - Protección contra abuso: campo trampa (honeypot), tiempo mínimo de llenado, límite por IP,
   comprobación de origen y validación de longitud. Todas las respuestas son JSON.
 

@@ -1,0 +1,16 @@
+# Configuración del Worker de «Súmate al pedido» (ver docs/cloudflare.md).
+name = "municipios-pedidos"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+
+[vars]
+# Origen del sitio que puede usar el servicio (sin barra final). Si usas dominio propio, cámbialo.
+ORIGEN = "https://soyangelromero.github.io"
+DIAS_APOYOS = "365"
+MAX_APOYOS_HORA = "30"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "municipios-pedidos"
+# Lo escribe «wrangler d1 create»: reemplaza este valor por el database_id que te devuelve.
+database_id = "REEMPLAZA-CON-EL-ID-DE-D1"
