@@ -134,3 +134,63 @@ def test_borra_lo_viejo(api):
     assert _enviar(url, "contacto", _valido())[0] == 200
     mensajes = [r[0] for r in sqlite3.connect(base).execute("SELECT mensaje FROM envios")]
     assert "viejo" not in mensajes
+
+
+def _apoyo(url, municipio="05001", dato="ejecucion_presupuestal", **extra):
+    cuerpo = {"t": int(time.time() * 1000) - 5000, "municipio": municipio, "dato": dato, **extra}
+    return _enviar(url, "apoyos", cuerpo)
+
+
+def _ranking(url, consulta=""):
+    with urllib.request.urlopen(f"{url}/api/pedidos-ranking.php{consulta}", timeout=10) as r:
+        return json.loads(r.read())
+
+
+def test_apoyo_cuenta_una_sola_vez_por_persona(api):
+    url, base = api
+    assert _apoyo(url) == (200, {"ok": True, "yaPedido": False, "total": 1})
+    assert _apoyo(url) == (200, {"ok": True, "yaPedido": True, "total": 1})
+    fila = sqlite3.connect(base).execute("SELECT ip_hash FROM apoyos").fetchone()
+    assert len(fila[0]) == 64 and "127.0.0.1" not in fila[0]
+
+
+def test_apoyo_valida_municipio_dato_y_robots(api):
+    url, _ = api
+    assert _apoyo(url, municipio="abc")[0] == 422
+    assert _apoyo(url, dato="Dato Raro!")[0] == 422
+    assert _apoyo(url, web="robot")[0] == 400
+    assert _enviar(url, "apoyos", {"municipio": "05001", "dato": "x"})[0] == 400
+
+
+def test_ranking_ordena_y_detalla_por_municipio(api):
+    url, base = api
+    _apoyo(url, "05001", "sueldos")
+    _apoyo(url, "05001", "compras")
+    _apoyo(url, "15759", "sueldos")
+    con = sqlite3.connect(base)
+    con.execute(
+        "INSERT INTO apoyos VALUES ('05001', 'sueldos', 'otra-persona', ?)",
+        (datetime.now(UTC).isoformat(),),
+    )
+    con.commit()
+    con.close()
+    ranking = _ranking(url)
+    assert [m["codigo"] for m in ranking["municipios"]] == ["05001", "15759"]
+    primero = ranking["municipios"][0]
+    assert primero["total"] == 3 and primero["porDato"]["sueldos"] == 2
+    detalle = _ranking(url, "?municipio=05001")
+    assert detalle["porDato"] == {"sueldos": 2, "compras": 1}
+    assert sorted(detalle["mios"]) == ["compras", "sueldos"]
+
+
+def test_apoyos_viejos_se_borran_y_hay_limite_por_hora(api):
+    url, base = api
+    _apoyo(url, "05001", "a")
+    viejo = (datetime.now(UTC) - timedelta(days=400)).isoformat()
+    con = sqlite3.connect(base)
+    con.execute("INSERT INTO apoyos VALUES ('05001', 'viejo', 'x', ?)", (viejo,))
+    con.commit()
+    _apoyo(url, "05001", "b")
+    assert con.execute("SELECT COUNT(*) FROM apoyos WHERE dato = 'viejo'").fetchone()[0] == 0
+    estados = [_apoyo(url, "05001", f"d{i}")[0] for i in range(40)]
+    assert 429 in estados

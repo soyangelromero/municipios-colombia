@@ -480,6 +480,15 @@ def inicio(datos: DatosSitio, dir_mapas: Path) -> Pagina:
   <p><a class="pill" href="ranking/">Ver el ranking completo <span class="mono">+{max(0, len(ranking) - 20)}</span></a></p>
 </section>
 
+<section class="vp revela" id="vecinos-piden" data-vecinos aria-labelledby="vp-t">
+  <p class="vp-k"><span class="vp-vivo" aria-hidden="true"></span>En vivo</p>
+  <h2 id="vp-t"><span class="lt">Lo que más le piden</span> <span class="o">los vecinos</span></h2>
+  <p class="vp-sub">Municipios con más pedidos de datos que hoy no publican. Cada vecino cuenta una vez. No mide calidad ni acusa a nadie: muestra qué información quiere ver la gente.</p>
+  <label class="vp-filtro"><span>Departamento</span><select data-vp-dep><option value="">Todo el país</option></select></label>
+  <div class="vp-tk" data-vp-cinta aria-live="polite" hidden></div>
+  <div data-vp-cuerpo><p class="nota">Elige un municipio, mira qué datos no publica y súmate al pedido. <a href="ranking/">Ver el ranking completo</a>.</p></div>
+</section>
+
 <section class="revela bloque-pilares">
   <h2><span class="lt">Qué mide</span> <span class="o">el índice</span></h2>
   <p class="lede">Un número de 0 a 100 con cuatro pilares. Cada municipio se compara con los de su <a href="metodologia/#pares">grupo de capacidades</a> del DNP: un municipio pequeño no se mide contra Medellín.</p>
@@ -1219,7 +1228,7 @@ def acerca(datos: DatosSitio) -> Pagina:
 </section>
 <section id="privacidad">
   <h2>Privacidad</h2>
-  <p>Este sitio no usa cookies, no usa herramientas de analítica ni publicidad y no carga recursos de terceros. No recopila datos personales. Si escribes por correo o abres un issue, esos datos los gestiona tu proveedor de correo o GitHub.</p>
+  <p>Este sitio no usa cookies, no usa herramientas de analítica ni publicidad y no carga recursos de terceros. No recopila datos personales. Si usas «Súmate al pedido» (solo cuando el sitio tiene servidor), se guarda el municipio, el dato y una huella cifrada de tu conexión (no la IP) para que cuentes una sola vez; se borra al año. Si escribes por correo o abres un issue, esos datos los gestiona tu proveedor de correo o GitHub.</p>
 </section>
 <section>
   <h2>Código y datos abiertos</h2>

@@ -2,6 +2,7 @@
 // Cada capítulo se arma con los JSON del sitio (data/m/<código>.json, indice.json, pais.json).
 import { cargarJSON, dibujarSilueta, escapar as esc, formatoNumero as num, formatoSegunUnidad as fmt, raiz } from './comun.js';
 import { compartir } from './compartir.js';
+import { CRITERIOS, ICONO_ALTAVOZ, abrirHojaPedido, cargarEstilos as estilosPedidos, detalle as detallePedidos } from './pedidos.js';
 
 const DURACION = 9000; // ms por capítulo
 const SIN_MOVIMIENTO = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -21,18 +22,6 @@ const TITULARES = {
   S: '<span class="lt">Servicios</span> <span class="neg">y seguridad</span>',
   G: '<span class="lt">Cómo gestiona</span> <span class="neg">sus recursos</span>',
   C: '<span class="lt">Qué dice</span> <span class="neg">el control</span>',
-};
-const CRITERIOS = {
-  presupuesto: 'Presupuesto vigente',
-  ejecucion: 'Ejecución presupuestal',
-  plan_desarrollo: 'Plan de desarrollo',
-  plan_adquisiciones: 'Plan de adquisiciones',
-  contratacion: 'Contratación (SECOP)',
-  directorio: 'Directorio y salarios',
-  control: 'Informes de control',
-  pqrsd: 'Peticiones (PQRSD)',
-  datos_abiertos: 'Datos abiertos',
-  declaraciones: 'Declaración de bienes',
 };
 const CONTEXTO_KPI = [
   'poblacion',
@@ -177,6 +166,36 @@ function bloqueAuto(m) {
     <p class="hi-nota mono">Revisado el ${esc(a.fecha)}. Solo lee la página principal del menú.</p></section>`;
 }
 
+function botonPedir() {
+  return `<div class="hi-pedir"><button type="button" class="pill pill--claro" data-pedir>${ICONO_ALTAVOZ}<b>Súmate al pedido</b><span class="mono" data-pedir-n hidden></span></button></div>`;
+}
+
+/** Datos de transparencia que el municipio no publica: criterios no hallados y cifras sin dato. */
+function datosPendientes(m, idx) {
+  const faltan = new Set((m.auto?.criterios ?? []).filter(([, r]) => r === 'no_encontrado').map(([c]) => c));
+  const criterios = Object.keys(CRITERIOS).filter((c) => (m.auto ? faltan.has(c) : true)).map((c) => ({ id: c, nombre: CRITERIOS[c] }));
+  const cifras = (idx.pilares.find((p) => p.id === 'T')?.componentes ?? []).filter((c) => !m.datos[c.id]).map((c) => ({ id: c.id, nombre: c.nombre }));
+  return [...criterios, ...cifras];
+}
+
+async function mostrarPedidos() {
+  const boton = abierta?.capa.querySelector('[data-pedir-n]');
+  const d = await detallePedidos(abierta?.m.codigo);
+  const destino = abierta?.capa.querySelector('[data-pedir-n]') ?? boton;
+  if (!destino || !d) return;
+  destino.textContent = `${num(d.total, 0)} ${d.total === 1 ? 'pedido' : 'pedidos'}`;
+  destino.hidden = d.total === 0;
+}
+
+async function pedirActual(boton) {
+  const { m, ctx } = abierta;
+  const hayPausa = abierta.pausado;
+  if (!hayPausa) pausa(true, true);
+  boton.addEventListener('pedido', mostrarPedidos, { once: true });
+  await abrirHojaPedido({ codigo: m.codigo, nombre: m.nombre, slug: m.slug }, datosPendientes(m, ctx.idx), boton);
+  if (abierta && !hayPausa) pausa(false, true);
+}
+
 function pilar(id, n, m, { idx }) {
   const p = idx.pilares.find((x) => x.id === id);
   const info = m.pilares[id] ?? {};
@@ -211,7 +230,7 @@ function pilar(id, n, m, { idx }) {
       <div class="hi-pilar__txt"><p class="mono">${num(p.peso, 0)} % del índice</p><p>${esc(p.descripcion)}</p></div></div>
     ${aviso}${tope}
     <ul class="hi-filas">${filas}</ul>
-    ${id === 'T' ? bloqueAuto(m) : ''}`;
+    ${id === 'T' ? bloqueAuto(m) + botonPedir() : ''}`;
 }
 
 function contexto(m, { idx }) {
@@ -363,6 +382,10 @@ function mostrar(i, dir = 1) {
   fondo.style.animation = '';
   fondo.dataset.k = String(n % 4);
   cuerpo.querySelectorAll('[data-cuenta]').forEach(contar);
+  if (cuerpo.querySelector('[data-pedir]')) {
+    estilosPedidos();
+    mostrarPedidos();
+  }
   cuerpo.querySelectorAll('.hi-cap > *').forEach((el, k) => el.style.setProperty('--k', k));
 }
 
@@ -576,6 +599,7 @@ export async function abrirHistoria(clave, capitulo = 0, origen = null) {
     else if (b.dataset.ir) mostrar(Number(b.dataset.ir));
     else if (b.matches('[data-siguiente-muni]')) vecino(1);
     else if (b.matches('[data-compartir-cap]')) compartirActual(b);
+    else if (b.matches('[data-pedir]')) pedirActual(b);
     else if (b.matches('[data-reportar]')) window.open(m.reportar, '_blank', 'noopener');
     else if (b.dataset.metodo) abrirHoja(`Cómo se calcula: ${b.closest('li').textContent.split('·')[0].trim()}`, metodo(b.dataset.metodo, m, ctx));
   });

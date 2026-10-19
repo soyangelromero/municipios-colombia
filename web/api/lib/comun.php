@@ -62,6 +62,16 @@ function municipios_db(array $config): PDO
             creado TEXT NOT NULL
         )'
     );
+    // Un apoyo = una persona (hash de IP) que pide un dato de un municipio. No guarda texto ni contacto.
+    $pdo->exec(
+        'CREATE TABLE IF NOT EXISTS apoyos (
+            municipio TEXT NOT NULL,
+            dato TEXT NOT NULL,
+            ip_hash TEXT NOT NULL,
+            creado TEXT NOT NULL,
+            PRIMARY KEY (municipio, dato, ip_hash)
+        )'
+    );
     return $pdo;
 }
 
@@ -89,6 +99,23 @@ function municipios_limpiar(PDO $pdo, int $dias): void
 {
     $limite = gmdate('c', time() - $dias * 86400);
     $pdo->prepare('DELETE FROM envios WHERE creado < ?')->execute([$limite]);
+}
+
+/** Corta si la IP superó el máximo de apoyos por hora (responde 429). */
+function municipios_limitar_apoyos(PDO $pdo, string $ipHash, int $maximo): void
+{
+    $sentencia = $pdo->prepare('SELECT COUNT(*) FROM apoyos WHERE ip_hash = ? AND creado >= ?');
+    $sentencia->execute([$ipHash, gmdate('c', time() - 3600)]);
+    if ((int) $sentencia->fetchColumn() >= $maximo) {
+        municipios_json(429, ['error' => 'Hiciste muchos pedidos seguidos. Inténtalo en un rato.']);
+        exit;
+    }
+}
+
+/** Borra los apoyos más viejos que el número de días indicado. */
+function municipios_limpiar_apoyos(PDO $pdo, int $dias): void
+{
+    $pdo->prepare('DELETE FROM apoyos WHERE creado < ?')->execute([gmdate('c', time() - $dias * 86400)]);
 }
 
 /** Exige POST, JSON y un origen permitido; devuelve el cuerpo como arreglo. */

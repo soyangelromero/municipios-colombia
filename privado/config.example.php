@@ -22,4 +22,9 @@ return [
     // Cuántos días se conservan los envíos y cuántos se aceptan por IP y hora.
     'dias_retencion' => 30,
     'max_por_hora' => 10,
+
+    // «Súmate al pedido»: días que se conserva cada apoyo (hash de IP + municipio + dato)
+    // y cuántos se aceptan por IP y hora.
+    'dias_apoyos' => 365,
+    'max_apoyos_hora' => 30,
 ];

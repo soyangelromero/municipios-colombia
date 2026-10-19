@@ -548,3 +548,9 @@
 html.lock body > :not(.hi):not(script):not(.sheet):not(.fondo-hoja) {
   visibility: hidden;
 }
+
+/* Botón «Súmate al pedido» al pie del capítulo de transparencia */
+.hi-pedir { margin-top: 18px; }
+.hi-pedir .pill { gap: 10px; }
+.hi-pedir .ico { width: 18px; height: 18px; fill: none; stroke: currentcolor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.hi-pedir [data-pedir-n] { padding-left: 10px; border-left: 1px solid rgb(0 0 0 / 22%); font-weight: 400; }

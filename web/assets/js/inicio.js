@@ -121,7 +121,25 @@ async function mapa() {
 }
 
 enlazarHistorias();
+/** «Lo que más le piden los vecinos» se descarga (JS, CSS y datos) solo al acercarse a esa sección. */
+function vecinos() {
+  const seccion = document.querySelector('[data-vecinos]');
+  if (!seccion) return;
+  const cargar = () => import('./vecinos.js').then((m) => m.iniciar(seccion));
+  if (!('IntersectionObserver' in window)) return void cargar();
+  const observador = new IntersectionObserver(
+    (entradas) => {
+      if (!entradas.some((e) => e.isIntersecting)) return;
+      observador.disconnect();
+      cargar();
+    },
+    { rootMargin: '600px 0px' },
+  );
+  observador.observe(seccion);
+}
+
 intro();
 carrusel();
 apariciones();
+vecinos();
 mapa().catch(() => {});
