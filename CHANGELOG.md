@@ -4,6 +4,15 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). S
 
 ## [Sin publicar]
 
+### Corregido (rediseño según municipiosargentinos.net)
+- **Historias reescritas**: ya no clonan la ficha estática. `historia.js` arma cada capítulo con los JSON del sitio (portada, transparencia, servicios y seguridad, gestión, control, contexto y resumen), con barras de progreso (9 s por capítulo), pausa, toque, teclas, rueda, deslizar para cerrar, siguiente municipio, hoja de método, «Compartir esta parte» y «Reportar». Nuevo `historia.css`.
+- Las tarjetas del carrusel y las filas del ranking abren la historia en su sitio (`#departamento--municipio`), sin recargar.
+- Hero de escritorio: titular a la izquierda y mapa a la derecha con grosor simulado; antes el titular desbordaba y tapaba el mapa.
+- Tarjetas: se quitó un enlace dentro de otro enlace que sacaba la fuente fuera de la tarjeta; el gasto por habitante se muestra completo.
+- Intro a dos columnas con barras de progreso; el mapa ya no desaparece con «reducir movimiento».
+- Barra superior en móvil (nombre en una línea, botón de tema visible), chip de fecha y migas de la ficha sobre el héroe; unidades duplicadas («km² km²») en la ficha.
+- El conteo de la portada usa solo municipios (1.103); el JSON de cada ficha incluye foto con crédito, revisión automática y enlace de reporte.
+
 ### Corregido (legibilidad, formularios y créditos)
 - **Datos sobre las fotos.** El velo del héroe y de las tarjetas de la portada es más denso
   (arriba incluido) y todo el texto que va encima de una foto lleva sombra, así que se lee

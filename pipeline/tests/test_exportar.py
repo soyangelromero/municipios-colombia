@@ -67,3 +67,17 @@ def test_leer_transparencia_auto_agrupa_por_municipio(tmp_path):
     assert len(datos["05001"]) == 2
     assert datos["08001"][0]["resultado"] == "error"
     assert leer_transparencia_auto(tmp_path / "no.csv") == {}
+
+
+def test_url_reporte_prellena_el_issue():
+    from types import SimpleNamespace
+
+    from municipios.exportar.datos_web import url_reporte
+
+    m = SimpleNamespace(nombre="Sopó", departamento="Cundinamarca")
+    datos = SimpleNamespace(
+        municipios={"25758": m}, sitio={"repositorio": "https://github.com/x/y"}
+    )
+    url = url_reporte(datos, "25758")
+    assert url.startswith("https://github.com/x/y/issues/new?template=error-en-dato.yml")
+    assert "25758" in url and "Sop%C3%B3" in url

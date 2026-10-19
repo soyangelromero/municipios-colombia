@@ -2,7 +2,7 @@
 import { formatoNumero, municipios, raiz } from './comun.js';
 import { activarMapa, colorear, insertarMapa } from './mapa.js';
 import { compartir } from './compartir.js';
-import { activarHistoria } from './historia.js';
+import { abrirHistoria } from './historia.js';
 
 const ficha = document.querySelector('.ficha');
 
@@ -45,5 +45,10 @@ function compartirBoton() {
 }
 
 compartirBoton();
-activarHistoria();
+const botonHistoria = document.querySelector('[data-historia]');
+if (botonHistoria && ficha) {
+  botonHistoria.hidden = false;
+  botonHistoria.addEventListener('click', () => abrirHistoria(ficha.dataset.codigo, 0, botonHistoria));
+  if (location.hash.slice(1) === ficha.dataset.codigo || location.hash.slice(1) === ficha.dataset.slug) abrirHistoria(ficha.dataset.codigo);
+}
 mapaDelDepartamento().catch(() => {});

@@ -1,6 +1,7 @@
 // Portada: intro, mapa de departamentos con capas, carrusel y apariciones al desplazar.
 import { cargarJSON, formatoNumero, raiz } from './comun.js';
 import { activarMapa, colorear } from './mapa.js';
+import { enlazarHistorias } from './historia.js';
 
 const NOMBRES = { indice: 'Índice', T: 'Transparencia', S: 'Servicios', G: 'Gestión', C: 'Control' };
 
@@ -111,6 +112,7 @@ async function mapa() {
   );
 }
 
+enlazarHistorias();
 intro();
 carrusel();
 apariciones();

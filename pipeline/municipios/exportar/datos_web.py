@@ -13,6 +13,7 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from statistics import mean
 from typing import Any
+from urllib.parse import urlencode
 
 from municipios.comun.modelos import Fuente, Indicador, Municipio
 from municipios.comun.registro import cargar_fuentes, cargar_indicadores
@@ -119,10 +120,48 @@ class DatosSitio:
         return sorted(con, key=lambda c: (self.indice[c]["puesto"]["nacional"], c))
 
 
+def url_reporte(datos: DatosSitio, codigo: str) -> str:
+    """Issue de GitHub prellenado para reportar un error en la ficha de un municipio."""
+    m = datos.municipios[codigo]
+    return (
+        datos.sitio["repositorio"]
+        + "/issues/new?"
+        + urlencode(
+            {
+                "template": "error-en-dato.yml",
+                "title": f"[Dato] {m.nombre} ({m.departamento}): ",
+                "municipio": f"{m.nombre}, {m.departamento} ({codigo})",
+            }
+        )
+    )
+
+
+def _foto_json(datos: DatosSitio, codigo: str) -> dict[str, str] | None:
+    f = datos.fotos.get(codigo)
+    if not f:
+        return None
+    return {k: f[k] for k in ("autor", "licencia", "url_licencia", "url_pagina")}
+
+
+def _auto_json(datos: DatosSitio, codigo: str) -> dict[str, Any] | None:
+    """Revisión automática del sitio web de la alcaldía (no puntúa), o None si no se hizo."""
+    filas = datos.transparencia_auto.get(codigo)
+    if not filas:
+        return None
+    return {
+        "fecha": filas[0]["fecha"],
+        "sitio": filas[0]["sitio"],
+        "criterios": [[f["criterio"], f["resultado"], f["evidencia"]] for f in filas],
+    }
+
+
 def _ficha_json(datos: DatosSitio, codigo: str) -> dict[str, Any]:
     m = datos.municipios[codigo]
     fila = datos.indice[codigo]
     return {
+        "foto": _foto_json(datos, codigo),
+        "auto": _auto_json(datos, codigo),
+        "reportar": url_reporte(datos, codigo),
         "codigo": codigo,
         "nombre": m.nombre,
         "slug": m.slug,

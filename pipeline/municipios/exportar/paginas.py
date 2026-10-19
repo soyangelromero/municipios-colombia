@@ -2,11 +2,10 @@
 
 from html import escape
 from pathlib import Path
-from urllib.parse import urlencode
 
 from municipios.comun.modelos import Municipio
 from municipios.exportar import formato
-from municipios.exportar.datos_web import NOMBRES_GRUPOS, DatosSitio
+from municipios.exportar.datos_web import NOMBRES_GRUPOS, DatosSitio, url_reporte
 from municipios.exportar.plantillas import (
     Pagina,
     anillo,
@@ -50,6 +49,11 @@ def tramo(valor: float | None) -> str:
     if valor is None:
         return "sin"
     return next(t for limite, t in TRAMOS if valor < limite)
+
+
+def _fecha_corta(iso: str) -> str:
+    """'2026-10-18' -> '18/10/2026'."""
+    return f"{iso[8:10]}/{iso[5:7]}/{iso[:4]}"
 
 
 def _num(valor: float | None, decimales: int = 1) -> str:
@@ -237,8 +241,7 @@ def tarjeta_carrusel(datos: DatosSitio, codigo: str, siluetas: Siluetas, puesto:
     if gasto is not None:
         info = (
             '<span class="card__info-etq">Gasto por habitante</span>'
-            f'<span class="card__info-val">{formato.segun_unidad(gasto["valor"], "pesos")}</span>'
-            f'<span class="f">{enlaces_fuente(datos, gasto["fuentes"])}</span>'
+            f'<span class="card__info-val">{formato.segun_unidad(gasto["valor"], "pesos por habitante")}</span>'
         )
     else:
         info = '<span class="card__info-etq">Dato informativo</span><span class="card__info-val">—</span>'
@@ -312,7 +315,7 @@ def inicio(datos: DatosSitio, dir_mapas: Path) -> Pagina:
         for cod in DEPARTAMENTOS
     }
     siluetas = Siluetas(dir_mapas)
-    total = len(datos.municipios)
+    total = sum(1 for m in datos.municipios.values() if m.tipo == "municipio")
 
     pilares = "".join(
         f'<li class="tarjeta"><h3>{escape(p.nombre)} <small>{p.peso:g} %</small></h3>'
@@ -344,6 +347,7 @@ def inicio(datos: DatosSitio, dir_mapas: Path) -> Pagina:
     intro = f"""
 <div class="intro" id="intro" data-intro role="dialog" aria-modal="true" aria-label="Presentación del proyecto">
   <div class="intro__fondo" aria-hidden="true"></div>
+  <div class="intro__prog" aria-hidden="true"><span><i></i></span><span><i></i></span><span><i></i></span></div>
   <div class="intro__mapa" aria-hidden="true">{mapa_en_linea(dir_mapas / "colombia.svg", {}, "Mapa de Colombia")}</div>
   <button type="button" class="pill intro__salto" data-intro-salto>Saltar</button>
   <div class="intro__contenido">
@@ -425,7 +429,7 @@ def inicio(datos: DatosSitio, dir_mapas: Path) -> Pagina:
   <ul class="rejilla">{pilares}</ul>
   <p><a class="pill pill--claro" href="metodologia/">Cómo se calcula, paso a paso</a> <a class="pill" href="ranking/">Ver el ranking completo</a></p>
 </section>
-<a class="chip-datos chip-datos--fijo mono" href="fuentes/">Datos oficiales · actualizado el {escape(datos.sitio["actualizado"])}</a>
+<a class="chip-datos chip-datos--fijo mono" href="fuentes/" data-fecha="Datos oficiales · {_fecha_corta(datos.sitio["actualizado"])}">Datos oficiales · actualizado el {_fecha_corta(datos.sitio["actualizado"])}</a>
 """
     return Pagina(
         "",
@@ -670,17 +674,7 @@ def ficha(datos: DatosSitio, codigo: str, dir_mapas: Path | None = None) -> Pagi
             f"<small>{escape(formato.periodo(dato['periodo']))} · {enlaces_fuente(datos, dato['fuentes'])}</small></dd></div>"
         )
 
-    reportar = (
-        datos.sitio["repositorio"]
-        + "/issues/new?"
-        + urlencode(
-            {
-                "template": "error-en-dato.yml",
-                "title": f"[Dato] {m.nombre} ({m.departamento}): ",
-                "municipio": f"{m.nombre}, {m.departamento} ({codigo})",
-            }
-        )
-    )
+    reportar = url_reporte(datos, codigo)
     puesto_html = ""
     if fila.get("puesto"):
         p = fila["puesto"]
@@ -717,7 +711,7 @@ def ficha(datos: DatosSitio, codigo: str, dir_mapas: Path | None = None) -> Pagi
     )
     contenido = f"""
 {miga(raiz, [("", "Inicio"), (f"d/{m.departamento_slug}/", m.departamento), ("", m.nombre)])}
-<article class="ficha" data-codigo="{codigo}" data-nombre="{escape(m.nombre)}"
+<article class="ficha" data-codigo="{codigo}" data-slug="{m.slug}" data-nombre="{escape(m.nombre)}"
   data-indice="{"" if fila.get("indice") is None else fila["indice"]}" data-semaforo="{fila.get("semaforo") or ""}"
   data-reportar="{escape(reportar)}"{f' data-foto="{raiz}assets/fotos/{codigo}-1080.webp"' if foto else ""}>
 <header class="ficha__heroe heroe{" sin-foto" if not foto else ""}" data-capitulo="Portada">
@@ -726,7 +720,7 @@ def ficha(datos: DatosSitio, codigo: str, dir_mapas: Path | None = None) -> Pagi
   <div class="heroe__cuerpo">
     <p class="etiqueta mono">{escape(m.departamento)} · {escape(grupo)}</p>
     <h1 class="big ficha__nombre ficha__nombre--{largo}">{escape(m.nombre)}</h1>
-    <p class="lede">{poblacion} habitantes · {superficie} km² · {densidad} hab/km²</p>
+    <p class="lede">{poblacion} habitantes · {superficie} · {densidad}</p>
     {medidor(fila.get("indice"), "Índice municipal", fila.get("semaforo"))}
     <div class="anillos">{anillos}</div>
     {puesto_html}
