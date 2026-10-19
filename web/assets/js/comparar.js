@@ -2,6 +2,7 @@
 // Los códigos viajan en la URL (?a=05001&b=11001) para que la comparación se comparta.
 import {
   cargarJSON,
+  dibujarSilueta,
   escapar,
   formatoNumero,
   formatoSegunUnidad,
@@ -28,20 +29,22 @@ function fuente(indice, claves) {
   return [...new Set(nombres)].join(' · ') || '—';
 }
 
-function ponerFondo(lado, codigo) {
+function ponerFondo(lado, codigo, depSlug) {
   const fondo = capa.querySelector(`[data-fondo="${lado}"]`);
-  const dep = capa.querySelector(`[data-dep="${lado}"]`);
   if (!fondo) return;
   fondo.style.backgroundImage = '';
   fondo.classList.remove('cmp-fondo--silueta');
+  fondo.querySelector('.cmp-silueta')?.remove();
   if (!codigo) return;
   const img = new Image();
   img.onload = () => {
     fondo.style.backgroundImage = `url('${raiz}assets/fotos/${codigo}-1080.webp')`;
   };
-  img.onerror = () => fondo.classList.add('cmp-fondo--silueta');
+  img.onerror = () => {
+    fondo.classList.add('cmp-fondo--silueta');
+    if (depSlug) dibujarSilueta(depSlug, codigo, fondo, 'cmp-silueta');
+  };
   img.src = `${raiz}assets/fotos/${codigo}-1080.webp`;
-  if (dep) dep.textContent = '';
 }
 
 /** Una barra doble: A hacia la izquierda, B hacia la derecha; el ganador en verde. */
@@ -155,7 +158,7 @@ async function iniciar() {
     if (codigo && porCodigo[codigo]) {
       elegidos[campo] = codigo;
       capa.querySelector(`[data-busqueda-campo="${campo}"] input`).value = porCodigo[codigo].nombre;
-      ponerFondo(campo, codigo);
+      ponerFondo(campo, codigo, pais.departamentos?.[porCodigo[codigo].dep]?.slug);
       const dep = capa.querySelector(`[data-dep="${campo}"]`);
       if (dep) dep.textContent = nombreDep(porCodigo[codigo].dep);
     }
@@ -163,7 +166,7 @@ async function iniciar() {
   capa.addEventListener('municipio-elegido', (evento) => {
     const campo = evento.target.dataset.busquedaCampo;
     elegidos[campo] = evento.detail.codigo;
-    ponerFondo(campo, evento.detail.codigo);
+    ponerFondo(campo, evento.detail.codigo, pais.departamentos?.[evento.detail.dep]?.slug);
     const dep = capa.querySelector(`[data-dep="${campo}"]`);
     if (dep) dep.textContent = nombreDep(evento.detail.dep);
     const url = new URL(window.location.href);

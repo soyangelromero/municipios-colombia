@@ -77,3 +77,25 @@ export function pildoraSemaforo(semaforo, valor) {
   const numeroTexto = valor === null || valor === undefined ? '' : `${formatoNumero(valor)} · `;
   return `<span class="semaforo semaforo--${semaforo}">${numeroTexto}${TEXTO_SEMAFORO[semaforo]}</span>`;
 }
+
+/** Sin foto libre: dibuja el contorno del municipio, tomado del mapa SVG de su departamento. */
+export async function dibujarSilueta(departamentoSlug, codigo, contenedor, clase) {
+  try {
+    const r = await fetch(`${raiz}data/mapas/${departamentoSlug}.svg`);
+    if (!r.ok) return;
+    const doc = new DOMParser().parseFromString(await r.text(), 'image/svg+xml');
+    const trazo = doc.getElementById(`e-${codigo}`);
+    if (!trazo || !contenedor.isConnected) return;
+    contenedor.querySelector(`.${clase}`)?.remove();
+    const NS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('class', clase);
+    svg.setAttribute('aria-hidden', 'true');
+    svg.append(document.importNode(trazo, true));
+    contenedor.append(svg); // debe estar en el documento para poder medirla
+    const b = svg.firstChild.getBBox();
+    svg.setAttribute('viewBox', `${b.x} ${b.y} ${b.width} ${b.height}`);
+  } catch {
+    /* sin silueta queda el degradado */
+  }
+}

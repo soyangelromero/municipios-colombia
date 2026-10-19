@@ -1,6 +1,6 @@
 // Ficha en formato historias (e2e/06): capa a pantalla completa con un capítulo por pantalla.
 // Cada capítulo se arma con los JSON del sitio (data/m/<código>.json, indice.json, pais.json).
-import { cargarJSON, escapar as esc, formatoNumero as num, formatoSegunUnidad as fmt, raiz } from './comun.js';
+import { cargarJSON, dibujarSilueta, escapar as esc, formatoNumero as num, formatoSegunUnidad as fmt, raiz } from './comun.js';
 import { compartir } from './compartir.js';
 
 const DURACION = 9000; // ms por capítulo
@@ -404,27 +404,6 @@ function compartirActual(boton) {
   );
 }
 
-/** Sin foto libre: dibuja el contorno del municipio, tomado del mapa de su departamento. */
-async function dibujarSilueta(m, fondo) {
-  try {
-    const r = await fetch(`${raiz}data/mapas/${m.departamento_slug}.svg`);
-    if (!r.ok) return;
-    const doc = new DOMParser().parseFromString(await r.text(), 'image/svg+xml');
-    const trazo = doc.getElementById(`e-${m.codigo}`);
-    if (!trazo || !fondo.isConnected) return;
-    const NS = 'http://www.w3.org/2000/svg';
-    const svg = document.createElementNS(NS, 'svg');
-    svg.setAttribute('class', 'hi-silueta');
-    svg.setAttribute('aria-hidden', 'true');
-    svg.append(document.importNode(trazo, true));
-    fondo.append(svg); // debe estar en el documento para poder medirla
-    const b = svg.firstChild.getBBox();
-    svg.setAttribute('viewBox', `${b.x} ${b.y} ${b.width} ${b.height}`);
-  } catch {
-    /* sin silueta queda el degradado */
-  }
-}
-
 function cerrar(sinFoco) {
   const a = abierta;
   if (!a) return;
@@ -577,7 +556,7 @@ export async function abrirHistoria(clave, capitulo = 0, origen = null) {
     else if (b.dataset.metodo) abrirHoja(`Cómo se calcula: ${b.closest('li').textContent.split('·')[0].trim()}`, metodo(b.dataset.metodo, m, ctx));
   });
   gestos(capa);
-  if (!foto) dibujarSilueta(m, capa.querySelector('.hi-bg'));
+  if (!foto) dibujarSilueta(m.departamento_slug, m.codigo, capa.querySelector('.hi-bg'), 'hi-silueta');
   document.addEventListener('keydown', teclas, true);
   mostrar(Math.min(capitulo, CAPITULOS.length - 1));
   capa.querySelector('[data-pausa]').focus({ preventScroll: true });

@@ -831,6 +831,29 @@ def departamento(datos: DatosSitio, cod: str, dir_mapas: Path) -> Pagina:
 
 
 # --- ranking --------------------------------------------------------------------------------
+def _fila_pagina(datos: DatosSitio, codigo: str, raiz: str) -> str:
+    """Fila del ranking completo: lleva los cinco puntajes para ordenar y filtrar sin servidor."""
+    m, f = datos.municipios[codigo], datos.indice[codigo]
+    iniciales = "".join(p[0] for p in m.nombre.split()[:2]).upper()
+    valores = {c: datos.valor(codigo, c) for c in ("indice", "T", "S", "G", "C")}
+    attrs = "".join(f' data-{c.lower()}="{v:.1f}"' for c, v in valores.items() if v is not None)
+    valor = valores["indice"]
+    clase = color_puntaje(valor) or "sin"
+    return (
+        f'<li class="rk__fila" data-dep="{m.departamento_codigo}" data-grupo="{escape(f.get("grupo") or "")}"'
+        f' data-semaforo="{f.get("semaforo") or ""}"{attrs}>'
+        f'<a class="rk__enlace" href="{raiz}m/{m.slug}/" data-historia="{codigo}">'
+        f'<span class="rk__puesto mono">{f["puesto"]["nacional"]:02d}</span>'
+        f'<span class="rk__cara" aria-hidden="true">{escape(iniciales)}</span>'
+        f'<span class="rk__texto"><b>{escape(m.nombre)}</b>'
+        f"<small>{escape(m.departamento)} · {escape(NOMBRES_GRUPOS.get(f.get('grupo') or '', 'sin grupo'))}</small></span>"
+        f'<span class="rk__valor">{_num(valor, 0)}</span>'
+        "</a>"
+        '<span class="rk__barra"><span class="bar2"><i class="bar2__f bar2__f--'
+        f'{clase}" style="width:{max(valor or 0, 1):.1f}%"></i></span></span></li>'
+    )
+
+
 def ranking(datos: DatosSitio) -> Pagina:
     codigos = datos.ranking()
     raiz = "../"
@@ -839,28 +862,56 @@ def ranking(datos: DatosSitio) -> Pagina:
         for cod, (nombre, _) in sorted(DEPARTAMENTOS.items(), key=lambda kv: kv[1][0])
     )
     grupos = "".join(f'<option value="{g}">{escape(n)}</option>' for g, n in NOMBRES_GRUPOS.items())
+    tabs = "".join(
+        f'<button type="button" class="pill" data-campo="{c}" aria-pressed="{"true" if c == "indice" else "false"}">{t}</button>'
+        for c, t in CAPAS
+    )
+    # Histograma del índice: 20 tramos de 5 puntos (altura = municipios en el tramo).
+    cuentas = [0] * 20
+    for c in codigos:
+        cuentas[min(19, int(datos.indice[c]["indice"] // 5))] += 1
+    mayor = max(cuentas) or 1
+    hist = "".join(
+        f'<i class="hist__b hist__b--{tramo(5 * i + 2.5)}" style="height:{max(4, 100 * n / mayor):.0f}%"'
+        f' title="{5 * i} a {5 * i + 5}: {n} municipios"></i>'
+        for i, n in enumerate(cuentas)
+    )
+    filas = "".join(_fila_pagina(datos, c, raiz) for c in codigos)
     contenido = f"""
 {miga(raiz, [("", "Inicio"), ("", "Ranking")])}
-<header class="encabezado">
-  <h1>Ranking de municipios</h1>
-  <p class="entradilla">{formato.numero(len(codigos))} municipios ordenados por el índice municipal (v{escape(datos.config.version)}). T = transparencia, S = servicios y seguridad, G = gestión fiscal y contratación, C = control.</p>
-</header>
-<form class="filtros" data-filtros hidden>
-  <label>Buscar <input type="search" name="texto" placeholder="Nombre del municipio"></label>
-  <label>Departamento <select name="dep"><option value="">Todos</option>{deps}</select></label>
-  <label>Grupo <select name="grupo"><option value="">Todos</option>{grupos}</select></label>
-  <label>Semáforo <select name="semaforo"><option value="">Todos</option>
-    <option value="verde">Verde</option><option value="amarillo">Amarillo</option><option value="rojo">Rojo</option></select></label>
-  <p class="filtros__conteo" aria-live="polite"></p>
-</form>
-{tabla_ranking(datos, codigos, raiz, con_departamento=True)}
+<section class="rank-pagina">
+  <h1 class="rank-h"><span class="lt">Quién muestra sus cuentas</span> <span class="o">y da mejores servicios</span></h1>
+  <p class="entradilla">{formato.numero(len(codigos))} municipios ordenados por el índice municipal (v{escape(datos.config.version)}). Transparencia, servicios y seguridad, gestión y control, comparados con municipios de capacidades parecidas.</p>
+  <div class="rk-controles" data-rk-controles hidden>
+    <div class="rk-tabs" role="group" aria-label="Ordenar por">{tabs}</div>
+    <div class="rk-filtros">
+      <label class="visualmente-oculto" for="rk-texto">Buscar por nombre</label>
+      <input id="rk-texto" class="rk-buscar" type="search" placeholder="Busca por nombre" autocomplete="off" data-rk-texto>
+      <label class="sel"><span class="visualmente-oculto">Departamento</span><select data-rk-dep><option value="">Todos los departamentos</option>{deps}</select></label>
+      <label class="sel"><span class="visualmente-oculto">Grupo de capacidades</span><select data-rk-grupo><option value="">Todos los grupos</option>{grupos}</select></label>
+      <div class="rk-sem" role="group" aria-label="Semáforo">
+        <button type="button" class="pill" data-sem="" aria-pressed="true">Todos</button>
+        <button type="button" class="pill" data-sem="verde" aria-pressed="false">Verde</button>
+        <button type="button" class="pill" data-sem="amarillo" aria-pressed="false">Amarillo</button>
+        <button type="button" class="pill" data-sem="rojo" aria-pressed="false">Rojo</button>
+      </div>
+    </div>
+  </div>
+  <div class="rk-resumen">
+    <div class="hist" aria-hidden="true">{hist}</div>
+    <p class="rk-leyenda mono"><span>peor</span><i class="rk-grad" aria-hidden="true"></i><span>mejor</span></p>
+    <p class="mono rk-conteo" aria-live="polite" data-rk-conteo>{formato.numero(len(codigos))} municipios</p>
+  </div>
+  <ol class="rk rk--pagina" data-rk>{filas}</ol>
+  <button type="button" class="mas" data-rk-mas hidden>Ver más <small class="mono"></small></button>
+</section>
 """
     return Pagina(
         "ranking/",
         "Ranking de municipios",
         "Ranking de los municipios de Colombia según el índice municipal, con filtros por departamento y grupo.",
         contenido,
-        ("tablas.js",),
+        ("ranking.js",),
         "pagina-ranking",
     )
 

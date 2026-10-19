@@ -4,6 +4,11 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). S
 
 ## [Sin publicar]
 
+### Rediseño: comparador y ranking (e2e/07 y e2e/09)
+- **Ranking**: titular gigante con pesos mezclados, pestañas por indicador (índice y los cuatro pilares), búsqueda, departamento, grupo y semáforo, histograma del índice con leyenda, barras por fila, «Ver más» (100 y luego de 50 en 50) y apertura de la historia en su sitio. Todo el listado sigue en el HTML para quien no use JavaScript. Nuevo `ranking.js`.
+- **Comparador**: siempre oscuro, silueta del municipio cuando no hay foto, barras que crecen y datos de contexto en violeta. La silueta se comparte con las historias (`comun.js`).
+- Modo claro: tarjetas, velo y mapa legibles; la historia y el comparador se mantienen oscuros.
+
 ### Corregido (rediseño según municipiosargentinos.net)
 - **Historias reescritas**: ya no clonan la ficha estática. `historia.js` arma cada capítulo con los JSON del sitio (portada, transparencia, servicios y seguridad, gestión, control, contexto y resumen), con barras de progreso (9 s por capítulo), pausa, toque, teclas, rueda, deslizar para cerrar, siguiente municipio, hoja de método, «Compartir esta parte» y «Reportar». Nuevo `historia.css`.
 - Las tarjetas del carrusel y las filas del ranking abren la historia en su sitio (`#departamento--municipio`), sin recargar.

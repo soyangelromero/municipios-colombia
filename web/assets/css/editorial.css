@@ -1988,3 +1988,151 @@ html.lock body { overflow: hidden; }
 }
 
 .card .chip { color: #fff; }
+
+/* --- Comparador: siempre oscuro (va sobre fotos) y con silueta si no hay foto ---------------- */
+body.pagina-comparar {
+  --ink: #0b0d10;
+  --ink-2: #14171c;
+  --fg: #f4f5f7;
+  --mute: rgb(244 245 247 / 68%);
+  --line: rgb(255 255 255 / 14%);
+  --glass: rgb(255 255 255 / 8%);
+  --glass-hover: rgb(255 255 255 / 16%);
+  --ok: #22c55e;
+  --warn: #eab308;
+  --bad: #ef4444;
+  --acc: #3d7cff;
+  --q-info: #b58cf0;
+  --texto: var(--fg);
+  --texto-suave: var(--mute);
+  --linea: var(--line);
+  --superficie: var(--ink-2);
+  --fondo: var(--ink);
+  color-scheme: dark;
+  background: #0b0d10;
+  color: var(--fg);
+}
+
+.cmp-silueta {
+  position: absolute;
+  right: 14%;
+  top: 14%;
+  height: 56%;
+  width: auto;
+  max-width: 60%;
+}
+
+.cmp-silueta path {
+  fill: rgb(255 255 255 / 7%);
+  stroke: rgb(255 255 255 / 40%);
+  stroke-width: 1.4;
+  vector-effect: non-scaling-stroke;
+}
+
+.cmp-duelo--info .cmp-duelo__f { background: var(--q-info); }
+.cmp-duelo--info .cmp-duelo__sentido { color: var(--q-info); }
+
+.cmp-duelo__f { transform-origin: left; animation: cmp-crece 0.9s var(--expo) both; }
+.cmp-duelo__mitad--a .cmp-duelo__f { transform-origin: right; }
+@keyframes cmp-crece { from { transform: scaleX(0); } }
+
+/* --- Ranking completo (e2e/09) -------------------------------------------------------------- */
+.pagina-ranking main.contenedor {
+  max-width: var(--ancho);
+  padding: 96px var(--gut) 64px;
+}
+
+.rank-pagina .rank-h { max-width: 14ch; margin-top: 0.4rem; }
+
+.rk-controles {
+  display: grid;
+  gap: 12px;
+  margin: 1.6rem 0 1rem;
+}
+
+.rk-tabs,
+.rk-filtros,
+.rk-sem {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.rk-buscar {
+  height: 38px;
+  min-width: min(100%, 15rem);
+  padding: 0 14px;
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: var(--r-pill);
+  background: var(--glass);
+  color: var(--fg);
+  font: inherit;
+  font-size: 14px;
+}
+
+.rk-resumen { margin: 0.5rem 0 0.4rem; }
+.rk-resumen .hist { height: 84px; gap: 3px; }
+.rk-resumen .hist__b { transition: filter 0.2s; }
+.rk-resumen .hist__b:hover { filter: brightness(1.4); }
+
+.rk-leyenda {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0 4px;
+  font-size: 11px;
+  color: var(--mute);
+}
+
+.rk-leyenda .rk-grad {
+  flex: 0 1 180px;
+  height: 8px;
+  border-radius: 9px;
+  background: var(--q-grad);
+}
+
+.rk-conteo { margin: 0.4rem 0 0; font-size: 11px; color: var(--mute); }
+
+.rk--pagina .rk__fila[hidden] { display: none; }
+.rk--pagina .rk__enlace:hover .rk__texto b { text-decoration: underline; text-underline-offset: 3px; }
+.rk--pagina .bar2__f { transition: width 0.7s var(--ease); }
+
+.mas {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 48px;
+  margin: 24px auto 0;
+  padding: 0 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--glass);
+  color: var(--fg);
+  font: 620 14px/1 var(--fuente);
+  cursor: pointer;
+  transition: background 0.25s, transform 0.25s var(--ease);
+}
+
+.mas:hover { background: var(--glass-hover); }
+.mas:active { transform: scale(0.97); }
+.mas small { color: var(--mute); font-size: 12px; }
+.mas[hidden] { display: none; }
+
+/* Pestañas y filtros en forma de píldora: la activa va en blanco (aria-pressed). */
+.pill[aria-pressed="true"] {
+  background: var(--fg);
+  color: var(--ink);
+}
+
+.miga {
+  font-family: var(--fuente-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
+.miga a { color: inherit; text-underline-offset: 3px; }
+.miga a:hover { color: var(--fg); }
