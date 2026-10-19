@@ -4,6 +4,9 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). S
 
 ## [Sin publicar]
 
+### Corregido
+- «Qué mide el índice» (portada): las tarjetas ya no quedan con sangría doble, los botones tienen aire arriba y entre sí, y ambos miden lo mismo.
+
 ### Corregido: «Compartir esta parte»
 - La hoja de compartir quedaba **oculta** dentro de la historia (la regla que esconde la portada de fondo también la escondía a ella).
 - Vista previa inmediata (la tarjeta se dibuja a escala pequeña) y la imagen completa se prepara de antemano: «Compartir» llama a la hoja del sistema sin esperas, como exigen los navegadores móviles. Antes la generaba tras el toque y podía caer a una descarga.
