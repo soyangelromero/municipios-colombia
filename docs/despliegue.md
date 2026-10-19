@@ -109,3 +109,14 @@ Los datos oficiales cambian: el pipeline se corre cada mes y se vuelve a publica
 ## Revisión antes de publicar
 
 `python -m municipios enlaces` recorre `dist/` y falla si algún enlace o ancla interna apunta a algo que no existe.
+
+## Buscadores (SEO)
+
+Lo que ya hace el sitio: una página estática por municipio con las cifras en el HTML, título y descripción únicos, `canonical`, Open Graph y Twitter con imagen, datos estructurados (JSON-LD: sitio, conjunto de datos, migas y área administrativa), `sitemap.xml` con todas las páginas, `robots.txt` y `noindex` solo en la 404.
+
+Lo que depende de ti:
+
+1. **Dominio propio.** `soyangelromero.github.io/municipios-colombia/` comparte dominio con otros proyectos y le cuesta más posicionar. Con un dominio propio, cambia `url_base` en `pipeline/config/sitio.toml` y sube de nuevo.
+2. **Google Search Console** y **Bing Webmaster Tools**: verifica el sitio y envía `…/sitemap.xml`.
+3. **Enlaces desde fuera**: notas de prensa, universidades, organizaciones de veeduría y la propia fuente (datos.gov.co) que enlacen a las fichas.
+4. Tras cada actualización mensual, el `lastmod` del sitemap se renueva solo.

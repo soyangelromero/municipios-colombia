@@ -2,7 +2,7 @@ import pytest
 
 from municipios.exportar import formato
 from municipios.exportar.paginas import sigla, tramo
-from municipios.exportar.plantillas import Pagina, barra, semaforo
+from municipios.exportar.plantillas import Pagina, barra, documento, semaforo
 
 
 @pytest.mark.parametrize(
@@ -81,3 +81,31 @@ def test_url_reporte_prellena_el_issue():
     url = url_reporte(datos, "25758")
     assert url.startswith("https://github.com/x/y/issues/new?template=error-en-dato.yml")
     assert "25758" in url and "Sop%C3%B3" in url
+
+
+def test_documento_incluye_seo_basico():
+    sitio = {
+        "nombre": "Sitio",
+        "url_base": "https://x.org/s/",
+        "idioma": "es-CO",
+        "repositorio": "https://github.com/x/y",
+        "actualizado": "2026-10-18",
+        "correo": "a@b.c",
+    }
+    pagina = Pagina(
+        "m/a/",
+        "A",
+        "Descripción",
+        "<p>hola</p>",
+        titulo_seo="Título completo | Sitio",
+        jsonld=({"@type": "Thing", "name": "</script><b>"},),
+    )
+    html = documento(pagina, sitio)
+    assert "<title>Título completo | Sitio</title>" in html
+    assert 'rel="canonical" href="https://x.org/s/m/a/"' in html
+    assert 'property="og:image" content="https://x.org/s/assets/img/og.jpg"' in html
+    assert "noindex" not in html
+    assert "</script><b>" not in html  # el JSON-LD escapa «</»
+    assert 'type="application/ld+json"' in html
+    sin_indexar = documento(Pagina("404.html", "x", "y", "", indexar=False), sitio)
+    assert 'name="robots" content="noindex, follow"' in sin_indexar

@@ -87,7 +87,9 @@ def titular(nombre: str) -> str:
     )
 
 
-def foto_img(datos: DatosSitio, codigo: str, raiz: str, *, primera: bool, tamanos: str) -> str:
+def foto_img(
+    datos: DatosSitio, codigo: str, raiz: str, *, primera: bool, tamanos: str, alt: str = ""
+) -> str:
     """<img> de la foto del municipio con srcset, o cadena vacía si no hay foto libre."""
     if codigo not in datos.fotos:
         return ""
@@ -95,7 +97,7 @@ def foto_img(datos: DatosSitio, codigo: str, raiz: str, *, primera: bool, tamano
     carga = 'fetchpriority="high"' if primera else 'loading="lazy" decoding="async"'
     return (
         f'<img class="foto" src="{base}-1080.webp" '
-        f'srcset="{base}-480.webp 480w, {base}-1080.webp 1080w" sizes="{tamanos}" alt="" {carga}>'
+        f'srcset="{base}-480.webp 480w, {base}-1080.webp 1080w" sizes="{tamanos}" alt="{escape(alt)}" {carga}>'
     )
 
 
@@ -205,6 +207,59 @@ def tabla_ranking(datos: DatosSitio, codigos: list[str], raiz: str, con_departam
         '<th scope="col" data-orden="num">Población</th></tr></thead>'
         f"<tbody>{''.join(filas)}</tbody></table></div>"
     )
+
+
+# --- datos estructurados (schema.org) -------------------------------------------------------
+def _ld_migas(datos: DatosSitio, pasos: list[tuple[str, str]]) -> dict:
+    """BreadcrumbList: pasos = [(ruta relativa a la raíz, nombre)]."""
+    base = datos.sitio["url_base"]
+    return {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": i, "name": nombre, "item": base + ruta}
+            for i, (ruta, nombre) in enumerate(pasos, 1)
+        ],
+    }
+
+
+def _ld_sitio(datos: DatosSitio) -> list[dict]:
+    """Organización, sitio y conjunto de datos abiertos (aparece en Google Dataset Search)."""
+    s = datos.sitio
+    base = s["url_base"]
+    return [
+        {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": s["nombre"],
+            "url": base,
+            "inLanguage": s["idioma"],
+            "description": s["descripcion"],
+        },
+        {
+            "@context": "https://schema.org",
+            "@type": "Dataset",
+            "name": "Índice municipal de Colombia",
+            "description": (
+                "Índice de transparencia, servicios y seguridad, gestión y control de los "
+                "municipios de Colombia, con la fuente oficial de cada dato."
+            ),
+            "url": base,
+            "license": "https://creativecommons.org/licenses/by/4.0/",
+            "isAccessibleForFree": True,
+            "inLanguage": s["idioma"],
+            "dateModified": s["actualizado"],
+            "spatialCoverage": {"@type": "Country", "name": "Colombia"},
+            "creator": {"@type": "Organization", "name": s["nombre"], "url": base},
+            "distribution": [
+                {
+                    "@type": "DataDownload",
+                    "encodingFormat": "application/json",
+                    "contentUrl": base + "data/pais.json",
+                }
+            ],
+        },
+    ]
 
 
 # --- inicio ---------------------------------------------------------------------------------
@@ -354,7 +409,7 @@ def inicio(datos: DatosSitio, dir_mapas: Path) -> Pagina:
   <button type="button" class="pill intro__salto" data-intro-salto>Saltar</button>
   <div class="intro__contenido">
     <p class="intro__marca"><span class="logo logo--grande" aria-hidden="true"><i></i><i></i><i></i><i></i></span></p>
-    <h1 class="intro__h1"><span class="o">Municipios</span> <span class="lt">Colombia</span></h1>
+    <p class="intro__h1"><span class="o">Municipios</span> <span class="lt">Colombia</span></p>
     <p class="lede">Transparencia, servicios, seguridad, gestión y control de cada alcaldía, con la fuente oficial de cada dato.</p>
     <div class="intro__cifras">
       <div><strong data-contar="{total}">{formato.numero(total)}</strong>municipios</div>
@@ -440,6 +495,8 @@ def inicio(datos: DatosSitio, dir_mapas: Path) -> Pagina:
         contenido,
         ("inicio.js", "carrusel.js"),
         "pagina-inicio",
+        titulo_seo=f"Municipios Colombia: transparencia y servicios de los {formato.numero(total)} municipios",
+        jsonld=tuple(_ld_sitio(datos)),
     )
 
 
@@ -620,6 +677,28 @@ def _cap_resumen(datos: DatosSitio, codigo: str) -> str:
     )
 
 
+def _titulo_ficha(datos: DatosSitio, codigo: str) -> str:
+    """Título de la pestaña y de los buscadores: nombre, índice y puesto (hasta ~70 caracteres)."""
+    m, f = datos.municipios[codigo], datos.indice[codigo]
+    nombre = datos.sitio["nombre"]
+    if f.get("indice") is None:
+        return f"{m.nombre} ({m.departamento}): transparencia, servicios y gestión | {nombre}"
+    p = f["puesto"]
+    completo = (
+        f"{m.nombre} ({m.departamento}): índice {_num(f['indice'])}/100, "
+        f"puesto {p['nacional']} de {formato.numero(p['nacional_de'])} | {nombre}"
+    )
+    if len(completo) <= 72:
+        return completo
+    # Los buscadores cortan hacia los 60-70 caracteres: se quita primero el puesto, luego la marca.
+    medio = f"{m.nombre} ({m.departamento}): índice {_num(f['indice'])}/100 | {nombre}"
+    return (
+        medio
+        if len(medio) <= 72
+        else f"{m.nombre} ({m.departamento}): índice {_num(f['indice'])}/100"
+    )
+
+
 def ficha(datos: DatosSitio, codigo: str, dir_mapas: Path | None = None) -> Pagina:
     m = datos.municipios[codigo]
     fila = datos.indice[codigo]
@@ -687,7 +766,14 @@ def ficha(datos: DatosSitio, codigo: str, dir_mapas: Path | None = None) -> Pagi
             f"<div><dt>En su grupo</dt><dd>{p['grupo']}<small> de {p['grupo_de']}</small></dd></div>"
             "</dl>"
         )
-    foto = foto_img(datos, codigo, raiz, primera=True, tamanos="100vw")
+    foto = foto_img(
+        datos,
+        codigo,
+        raiz,
+        primera=True,
+        tamanos="100vw",
+        alt=f"Vista de {m.nombre}, {m.departamento}",
+    )
     fondo = foto or (
         Siluetas(dir_mapas).de(m.departamento_slug, codigo) if dir_mapas is not None else None
     )
@@ -774,6 +860,24 @@ def ficha(datos: DatosSitio, codigo: str, dir_mapas: Path | None = None) -> Pagi
         ("ficha.js", "formularios.js"),
         "pagina-ficha",
         f"assets/fotos/{codigo}-1080.webp" if codigo in datos.fotos else "",
+        titulo_seo=_titulo_ficha(datos, codigo),
+        jsonld=(
+            _ld_migas(
+                datos,
+                [
+                    ("", "Inicio"),
+                    (f"d/{m.departamento_slug}/", m.departamento),
+                    (ruta, m.nombre),
+                ],
+            ),
+            {
+                "@context": "https://schema.org",
+                "@type": "AdministrativeArea",
+                "name": m.nombre,
+                "containedInPlace": {"@type": "AdministrativeArea", "name": m.departamento},
+                "url": datos.sitio["url_base"] + ruta,
+            },
+        ),
     )
 
 
@@ -829,6 +933,8 @@ def departamento(datos: DatosSitio, cod: str, dir_mapas: Path) -> Pagina:
         contenido,
         ("departamento.js", "tablas.js"),
         "pagina-departamento",
+        titulo_seo=f"Municipios de {nombre}: índice de transparencia y servicios | {datos.sitio['nombre']}",
+        jsonld=(_ld_migas(datos, [("", "Inicio"), (f"d/{slug}/", nombre)]),),
     )
 
 
@@ -1143,5 +1249,10 @@ def no_encontrada(datos: DatosSitio) -> Pagina:
 </header>
 """
     return Pagina(
-        "404.html", "Página no encontrada", "Página no encontrada.", contenido, clase="pagina-texto"
+        "404.html",
+        "Página no encontrada",
+        "Página no encontrada.",
+        contenido,
+        clase="pagina-texto",
+        indexar=False,
     )

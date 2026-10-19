@@ -4,6 +4,13 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). S
 
 ## [Sin publicar]
 
+### Agregado: SEO
+- **Datos estructurados** (JSON-LD): `WebSite` y `Dataset` en la portada (para Google Dataset Search); `BreadcrumbList` en fichas y departamentos y `AdministrativeArea` en cada ficha.
+- **Títulos** de ficha con índice y puesto («Sogamoso (Boyacá): índice 86,5/100, puesto 1 de 1.103 | …»), acortados cuando pasan de ~72 caracteres; título propio para la portada y los departamentos.
+- **Imagen para redes** por defecto (`assets/img/og.jpg`, 1200 × 630) en todas las páginas sin foto, `og:locale`, `og:image:alt` y `twitter:image`.
+- Un solo `h1` en la portada (la intro usa un párrafo), `alt` descriptivo en la foto de cada ficha y `noindex` en la 404.
+- `docs/despliegue.md`: qué hace el sitio, dominio propio y Search Console.
+
 ### Corregido
 - «Qué mide el índice» (portada): las tarjetas ya no quedan con sangría doble, los botones tienen aire arriba y entre sí, y ambos miden lo mismo.
 

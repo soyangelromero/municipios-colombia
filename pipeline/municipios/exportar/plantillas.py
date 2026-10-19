@@ -5,6 +5,7 @@ página conoce su `raiz` (la ruta relativa hasta la carpeta del sitio, por ejemp
 el sitio funciona igual en un dominio propio o en una subcarpeta (GitHub Pages).
 """
 
+import json
 import math
 from dataclasses import dataclass
 from html import escape
@@ -21,6 +22,11 @@ class Pagina:
     scripts: tuple[str, ...] = ()
     clase: str = ""
     imagen: str = ""  # ruta (desde la raíz del sitio) de la imagen para redes sociales
+    titulo_seo: str = (
+        ""  # título completo de la pestaña y de los buscadores (si no, «titulo · sitio»)
+    )
+    jsonld: tuple[dict, ...] = ()  # datos estructurados (schema.org)
+    indexar: bool = True  # False: la página lleva noindex (por ejemplo, la 404)
 
     @property
     def raiz(self) -> str:
@@ -32,17 +38,32 @@ class Pagina:
 def documento(pagina: Pagina, sitio: dict) -> str:
     raiz = pagina.raiz
     url = sitio["url_base"] + pagina.ruta.removesuffix("index.html")
-    titulo = (
+    titulo = pagina.titulo_seo or (
         f"{pagina.titulo} · {sitio['nombre']}"
         if pagina.titulo != sitio["nombre"]
         else pagina.titulo
     )
-    imagen = sitio["url_base"] + pagina.imagen if pagina.imagen else ""
+    # Sin foto propia, las redes y los buscadores usan la imagen de marca (1200 x 630).
+    imagen = sitio["url_base"] + (pagina.imagen or "assets/img/og.jpg")
+    medidas = (
+        ""
+        if pagina.imagen
+        else '\n<meta property="og:image:width" content="1200">\n'
+        '<meta property="og:image:height" content="630">'
+    )
     og_imagen = (
-        f'<meta property="og:image" content="{escape(imagen)}">\n'
-        '<meta name="twitter:card" content="summary_large_image">'
-        if imagen
-        else '<meta name="twitter:card" content="summary">'
+        f'<meta property="og:image" content="{escape(imagen)}">{medidas}\n'
+        f'<meta property="og:image:alt" content="{escape(sitio["nombre"])}">\n'
+        '<meta name="twitter:card" content="summary_large_image">\n'
+        f'<meta name="twitter:title" content="{escape(titulo)}">\n'
+        f'<meta name="twitter:image" content="{escape(imagen)}">'
+    )
+    robots = "" if pagina.indexar else '<meta name="robots" content="noindex, follow">\n'
+    datos_estructurados = "".join(
+        '<script type="application/ld+json">'
+        + json.dumps(d, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+        + "</script>\n"
+        for d in pagina.jsonld
     )
     intro = (
         "if(!localStorage.getItem('intro-vista')&&!matchMedia('(prefers-reduced-motion: reduce)')."
@@ -63,7 +84,8 @@ def documento(pagina: Pagina, sitio: dict) -> str:
 {base}<title>{escape(titulo)}</title>
 <meta name="description" content="{escape(pagina.descripcion)}">
 <link rel="canonical" href="{escape(url)}">
-<meta property="og:type" content="website">
+{robots}<meta property="og:type" content="website">
+<meta property="og:locale" content="es_CO">
 <meta property="og:site_name" content="{escape(sitio["nombre"])}">
 <meta property="og:title" content="{escape(titulo)}">
 <meta property="og:description" content="{escape(pagina.descripcion)}">
@@ -71,6 +93,7 @@ def documento(pagina: Pagina, sitio: dict) -> str:
 {og_imagen}
 <meta name="theme-color" content="#0b0d10">
 <meta name="raiz" content="{raiz}">
+{datos_estructurados}
 <link rel="icon" href="{raiz}assets/img/icono.svg" type="image/svg+xml">
 <link rel="preload" href="{raiz}assets/fonts/Geist-Variable.woff2" as="font" type="font/woff2" crossorigin>
 <script>var d=document.documentElement;d.classList.add('js');try{{var t=localStorage.getItem('tema');if(t==='claro'||t==='oscuro')d.dataset.tema=t;{intro}}}catch(e){{}}</script>
