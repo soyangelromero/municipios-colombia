@@ -290,7 +290,7 @@
   display: block;
   height: 10px;
   border-radius: 99px;
-  background: rgb(255 255 255 / 14%);
+  background: color-mix(in srgb, var(--fg) 16%, transparent);
   overflow: hidden;
 }
 
@@ -370,7 +370,7 @@
 
 .gauge__pista {
   fill: none;
-  stroke: rgb(255 255 255 / 14%);
+  stroke: color-mix(in srgb, var(--fg) 16%, transparent);
   stroke-width: 14;
   stroke-linecap: round;
 }
@@ -440,7 +440,7 @@
 
 .ring__pista {
   fill: none;
-  stroke: rgb(255 255 255 / 14%);
+  stroke: color-mix(in srgb, var(--fg) 16%, transparent);
   stroke-width: 7;
 }
 
@@ -586,7 +586,7 @@
 
 @media (min-width: 1024px) {
   .mapa__velo {
-    background: linear-gradient(90deg, var(--ink) 0, rgb(11 13 16 / 80%) 30%, transparent 62%),
+    background: linear-gradient(90deg, var(--ink) 0, color-mix(in srgb, var(--ink) 80%, transparent) 30%, transparent 62%),
       linear-gradient(180deg, var(--ink) 0, transparent 130px, transparent calc(100% - 180px), var(--ink) 100%);
   }
 }
@@ -927,8 +927,8 @@
   aspect-ratio: 9 / 15;
   overflow: hidden;
   border-radius: var(--r-card);
-  background: var(--ink-2);
-  color: var(--fg);
+  background: #14171c;
+  color: #fff; /* siempre sobre foto oscura: no depende del tema */
   text-decoration: none;
   scroll-snap-align: center;
   transform-style: preserve-3d;
@@ -961,7 +961,7 @@
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  background: radial-gradient(120% 80% at 50% 100%, #1b2028, var(--ink));
+  background: radial-gradient(120% 80% at 50% 100%, #1b2028, #0b0d10);
 }
 
 .card__fondo--silueta .silueta {
@@ -1979,3 +1979,12 @@ html.lock body { overflow: hidden; }
   .intro__mapa .mapa__svg path { stroke-dasharray: none; }
   .intro__prog i { transform: scaleX(1); }
 }
+
+/* Modo claro: sombras del mapa más suaves y mapa de la intro sobre fondo claro. */
+:root[data-tema="claro"] .hero__mapa .mapa__svg {
+  filter: drop-shadow(0 1px 0 rgb(15 23 42 / 45%)) drop-shadow(0 2px 0 rgb(15 23 42 / 40%))
+    drop-shadow(0 3px 0 rgb(15 23 42 / 35%)) drop-shadow(0 4px 0 rgb(15 23 42 / 30%))
+    drop-shadow(0 5px 0 rgb(15 23 42 / 25%)) drop-shadow(0 30px 40px rgb(15 23 42 / 22%));
+}
+
+.card .chip { color: #fff; }

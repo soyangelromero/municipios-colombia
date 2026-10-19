@@ -106,5 +106,11 @@
   --acento-suave: #e6edff;
   --texto-suave: var(--mute);
   --escala-sin: #c9cfd7;
+  /* Escala del mapa: tonos vivos (los de texto, más oscuros, no sirven de relleno). */
+  --escala-e1: #d64545;
+  --escala-e2: #ee8a3c;
+  --escala-e3: #e8b923;
+  --escala-e4: #8cc152;
+  --escala-e5: #2f9e55;
   --sombra: 0 1px 2px rgb(15 23 42 / 6%), 0 4px 16px rgb(15 23 42 / 6%);
 }
