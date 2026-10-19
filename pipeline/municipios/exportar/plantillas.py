@@ -122,9 +122,9 @@ def documento(pagina: Pagina, sitio: dict) -> str:
     <span class="top__nombre"><b>Municipios</b> <span>Colombia</span></span>
   </a>
   <div class="top__acciones">
-    <a class="pill" href="{raiz}"><svg class="ico"><use href="#i-mapa"/></svg><span>Mapa</span></a>
-    <a class="pill" href="{raiz}comparar/"><svg class="ico"><use href="#i-comparar"/></svg><span>Comparar</span></a>
-    <a class="pill" href="{raiz}acerca/#contacto"><svg class="ico"><use href="#i-contacto"/></svg><span>Contacto</span></a>
+    <a class="pill" href="{raiz}" aria-label="Mapa"><svg class="ico"><use href="#i-mapa"/></svg><span>Mapa</span></a>
+    <a class="pill" href="{raiz}comparar/" aria-label="Comparar"><svg class="ico"><use href="#i-comparar"/></svg><span>Comparar</span></a>
+    <a class="pill" href="{raiz}acerca/#contacto" aria-label="Contacto"><svg class="ico"><use href="#i-contacto"/></svg><span>Contacto</span></a>
     <button type="button" class="pill pill--icono" data-tema-boton hidden
       aria-label="Cambiar entre modo oscuro y claro"><span aria-hidden="true">◐</span></button>
   </div>

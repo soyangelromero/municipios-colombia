@@ -4,6 +4,9 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). S
 
 ## [Sin publicar]
 
+### Corregido
+- Accesibilidad: los enlaces «Mapa», «Comparar» y «Contacto» del encabezado tenían nombre accesible vacío en pantallas angostas (solo se veía el icono); ahora llevan `aria-label` (aviso de PageSpeed Insights).
+
 ### Agregado
 - Etiqueta de verificación de Google Search Console en todas las páginas (`google_verificacion` en `pipeline/config/sitio.toml`; quien haga un fork pone la suya).
 
