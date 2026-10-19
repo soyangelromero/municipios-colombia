@@ -13,4 +13,4 @@ MAX_APOYOS_HORA = "30"
 binding = "DB"
 database_name = "municipios-pedidos"
 # Lo escribe «wrangler d1 create»: reemplaza este valor por el database_id que te devuelve.
-database_id = "REEMPLAZA-CON-EL-ID-DE-D1"
+database_id = "f0b6ccfc-4d75-4981-8736-c1be0cd3e8a2"

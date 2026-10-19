@@ -3,7 +3,8 @@
 import { CONFIG } from './config.js';
 import { escapar as esc, formatoNumero as num, raiz } from './comun.js';
 
-const servidor = CONFIG.endpoint ? CONFIG.endpoint.replace(/\/$/, '') : null;
+const direccion = CONFIG.pedidos ?? CONFIG.endpoint;
+const servidor = direccion ? direccion.replace(/\/$/, '') : null;
 const cargada = Date.now();
 const GUARDADO = 'pedidos-mios';
 

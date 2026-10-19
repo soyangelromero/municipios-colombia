@@ -52,11 +52,11 @@ nada en el proyecto.
    npx wrangler deploy
    ```
 
-7. **Conecta el sitio**: en `web/assets/js/config.js` pon esa URL (sin barra final) en `endpoint`,
-   haz commit y push. En 9 minutos «Publicar sitio» lo despliega.
+7. **Conecta el sitio**: en `web/assets/js/config.js` pon esa URL (sin barra final) en `pedidos`
+   (no en `endpoint`: ese es para los formularios de la API PHP), haz commit y push. En 9 minutos «Publicar sitio» lo despliega.
 
    ```js
-   endpoint: 'https://municipios-pedidos.TU-USUARIO.workers.dev',
+   pedidos: 'https://municipios-pedidos.TU-USUARIO.workers.dev',
    ```
 
 8. **Comprueba** (debe responder `{"ok":true,"municipios":[],"reciente":null}`):
