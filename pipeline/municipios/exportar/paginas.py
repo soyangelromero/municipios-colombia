@@ -317,7 +317,7 @@ def inicio(datos: DatosSitio, dir_mapas: Path) -> Pagina:
         for cod in DEPARTAMENTOS
     }
     siluetas = Siluetas(dir_mapas)
-    total = sum(1 for m in datos.municipios.values() if m.tipo == "municipio")
+    total = sum(1 for m in datos.municipios.values() if m.tipo in ("municipio", "isla"))
 
     pilares = "".join(
         f'<li class="tarjeta"><h3>{escape(p.nombre)} <small>{p.peso:g} %</small></h3>'
@@ -372,6 +372,17 @@ def inicio(datos: DatosSitio, dir_mapas: Path) -> Pagina:
     contenido = f"""
 {intro}
 <section class="hero" data-mapa-pais>
+  <div class="hero__texto">
+    <h1 class="hero__h1"><span class="lt">¿Tu municipio</span> <span class="o">muestra</span> <span class="lt">sus</span> <span class="acc">cuentas</span><span class="o">?</span></h1>
+    <p class="lede">{escape(datos.sitio["descripcion"])}</p>
+    <form class="buscador" data-busqueda action="ranking/" role="search">
+      <svg class="buscador__ico" aria-hidden="true"><use href="#i-lupa"/></svg>
+      <label class="visualmente-oculto" for="buscar-portada">Busca tu municipio</label>
+      <input id="buscar-portada" name="q" type="search" placeholder="Busca tu municipio"
+        autocomplete="off" role="combobox" aria-expanded="false" aria-controls="buscar-portada-lista">
+      <ul id="buscar-portada-lista" class="busqueda__lista" role="listbox" hidden></ul>
+    </form>
+  </div>
   <div class="hero__mapa" data-mapa>
     <div class="mseg" role="group" aria-label="Qué mostrar en el mapa">
       <span class="mseg__th" aria-hidden="true"></span>{botones_capa}
@@ -385,17 +396,6 @@ def inicio(datos: DatosSitio, dir_mapas: Path) -> Pagina:
       <p class="leyenda-card__pie f">Fuente: cálculo propio a partir de fuentes oficiales.</p>
     </div>
     <div class="mapa__velo" aria-hidden="true"></div>
-  </div>
-  <div class="hero__texto">
-    <h1 class="hero__h1"><span class="lt">¿Tu municipio</span> <span class="o">muestra</span> <span class="lt">sus</span> <span class="acc">cuentas</span><span class="o">?</span></h1>
-    <p class="lede">{escape(datos.sitio["descripcion"])}</p>
-    <form class="buscador" data-busqueda action="ranking/" role="search">
-      <svg class="buscador__ico" aria-hidden="true"><use href="#i-lupa"/></svg>
-      <label class="visualmente-oculto" for="buscar-portada">Busca tu municipio</label>
-      <input id="buscar-portada" name="q" type="search" placeholder="Busca tu municipio"
-        autocomplete="off" role="combobox" aria-expanded="false" aria-controls="buscar-portada-lista">
-      <ul id="buscar-portada-lista" class="busqueda__lista" role="listbox" hidden></ul>
-    </form>
   </div>
 </section>
 
@@ -924,6 +924,7 @@ def comparar(datos: DatosSitio) -> Pagina:
     contenido = f"""
 {miga(raiz, [("", "Inicio"), ("", "Comparar")])}
 <div id="cmp">
+  <h1 class="visualmente-oculto">Comparar municipios</h1>
   <a class="cmp-cerrar pill pill--icono" href="{raiz}" aria-label="Cerrar y volver al inicio">&times;</a>
   <div class="cmp-top">
     <div class="cmp-lado" data-lado="a">

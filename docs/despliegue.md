@@ -83,7 +83,7 @@ SFTP. Antes de usarlo, crea estos *secrets* en GitHub:
 | `SFTP_CLAVE` | (la contraseña, o `SFTP_LLAVE` con la clave privada) |
 | `SFTP_RUTA` | `/home/tucuenta/public_html/` |
 
-Sube solo el contenido de `dist/`. El primer despliegue debe crear a mano `privado/config.php`
+Sube solo el contenido de `dist/` y **borra lo que ya no existe** (`mirror --delete`): `SFTP_RUTA` debe ser la carpeta pública y nada más (nunca la raíz de la cuenta, donde vive `privado/`). El primer despliegue debe crear a mano `privado/config.php`
 en el servidor: el workflow nunca lo toca.
 
 ## Comprobaciones tras desplegar
@@ -92,3 +92,20 @@ en el servidor: el workflow nunca lo toca.
 - Con `MUNICIPIOS_CONFIG` apuntando a una base local puedes probar todo sin publicar:
   `php -S 127.0.0.1:8765 -t dist` y luego `POST` a `/api/reportes.php` con cabecera `Origin`
   igual a tu `origen`.
+
+## Actualización mensual
+
+Los datos oficiales cambian: el pipeline se corre cada mes y se vuelve a publicar.
+
+- **GitHub Pages**: ya es automática (`pages.yml`, el día 1 de cada mes a las 9:00 UTC); también se lanza a mano desde la pestaña *Actions*.
+- **Hosting propio**:
+  1. En tu PC: `python -m municipios --tolerante todo` (o lanza el workflow *Desplegar por SFTP* a mano).
+  2. Revisa que no haya enlaces rotos: `python -m municipios enlaces`.
+  3. Sube `dist/` con `rsync` o SFTP. `privado/` no se toca.
+  4. Con `cron` en el servidor puedes repetir 1 y 3 si el hosting permite Python; si no, usa el workflow.
+- Para actualizar la revisión automática de transparencia de las capitales (no está en `todo`): `python -m municipios relevamiento` (necesita `scrapling install`) y haz commit de `datos/relevamiento/`.
+- Para actualizar las fotos de los municipios: `python -m municipios fotos` y haz commit de `datos/fotos/`.
+
+## Revisión antes de publicar
+
+`python -m municipios enlaces` recorre `dist/` y falla si algún enlace o ancla interna apunta a algo que no existe.

@@ -97,7 +97,7 @@ async function mapa() {
     texto: (cod) => {
       const d = deps[cod];
       if (!d) return cod;
-      return `${d.nombre}: ${NOMBRES[capa]} ${formatoNumero(d[capa])} (${d.municipios} municipios)`;
+      return `${d.nombre}: ${NOMBRES[capa]} ${formatoNumero(d[capa])} (${d.municipios} ${d.municipios === 1 ? 'municipio' : 'municipios'})`;
     },
     enlace: (cod) => (deps[cod] ? `${raiz}d/${deps[cod].slug}/` : null),
   });

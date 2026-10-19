@@ -14,7 +14,7 @@ from municipios.comun.registro import cargar_fuentes, cargar_indicadores
 from municipios.comun.salida import ahora_iso, escribir_json, leer_json
 from municipios.comun.socrata import ClienteSocrata
 from municipios.config import DIR_CRUDOS, DIR_INTERMEDIOS, RAIZ, cargar_env
-from municipios.exportar import mapas, sitio
+from municipios.exportar import enlaces, mapas, sitio
 from municipios.exportar.datos_web import DatosSitio
 from municipios.fotos import commons as fotos
 from municipios.fuentes import (
@@ -223,6 +223,16 @@ def comando_sitio(_: Contexto) -> None:
     sitio.construir(datos, DIR_WEB, DIR_DIST)
 
 
+def comando_enlaces(_: Contexto) -> None:
+    """Revisa que los enlaces internos de dist/ apunten a algo que exista (no está en `todo`)."""
+    rotos = enlaces.revisar(DIR_DIST)
+    for pagina, enlace, motivo in rotos[:200]:
+        log.error("%s → %s (%s)", pagina, enlace, motivo)
+    if rotos:
+        raise SystemExit(f"{len(rotos)} enlaces rotos en dist/")
+    log.info("Enlaces internos de dist/: sin rotos")
+
+
 def comando_todo(contexto: Contexto) -> None:
     """Corre todo en orden. Con --tolerante, una fuente que falla no detiene a las demás."""
     comando_divipola(contexto)
@@ -257,6 +267,7 @@ COMANDOS = {
         comando_fotos,
         "Descarga la foto con licencia libre de cada municipio (no está en `todo`)",
     ),
+    "enlaces": (comando_enlaces, "Revisa los enlaces internos de dist/ (no está en `todo`)"),
     "sitio": (comando_sitio, "Arma el sitio publicable en dist/ (páginas y datos)"),
     "todo": (comando_todo, "Corre todo, en orden"),
 }

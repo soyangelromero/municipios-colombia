@@ -4,6 +4,13 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). S
 
 ## [Sin publicar]
 
+### Fase 7: despliegue y revisión final
+- `python -m municipios enlaces`: revisa que todos los enlaces y anclas internas de `dist/` existan (con prueba). Resultado actual: sin enlaces rotos.
+- `docs/despliegue.md`: actualización mensual, revisión antes de publicar y aviso sobre `mirror --delete` en el workflow SFTP.
+- Revisión de accesibilidad: el comparador tiene `h1`, el texto del hero va antes del mapa en el orden de tabulación (antes había que pasar por 33 departamentos para llegar al buscador) y «1 municipio» en singular.
+- El conteo de la portada incluye la isla (1.104 municipios, igual que el resto del sitio).
+- README con capturas (`docs/capturas/`, generadas con Chromium sin interfaz).
+
 ### Rendimiento de la portada
 - La portada ya no descarga `pais.json` (118 KB) al abrir: el buscador lo pide la primera vez que se usa y el mapa lee un `departamentos.json` pequeño.
 - `historia.js` (26 KB) y su CSS se cargan bajo demanda (al tocar, al apuntar o cuando el navegador está ocioso); `historia-enlaces.js` pesa 1 KB.

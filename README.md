@@ -8,7 +8,7 @@ Observatorio cívico, abierto y neutral sobre los **1.104 municipios de Colombia
 
 Cada cifra lleva su fuente oficial.
 
-> Estado: **fases 5 y 6, sitio web y formularios**. El pipeline descarga y cruza con DIVIPOLA 12 fuentes oficiales, calcula el índice municipal (ver [docs/metodologia.md](docs/metodologia.md)) y genera el sitio completo, con un rediseño editorial (modo oscuro por defecto, héroe con foto, carrusel y tarjetas para compartir):
+> Estado: **fase 7, despliegue y revisión final** (fases 0 a 6 terminadas). El pipeline descarga y cruza con DIVIPOLA 12 fuentes oficiales, calcula el índice municipal (ver [docs/metodologia.md](docs/metodologia.md)) y genera el sitio completo, con un rediseño editorial (modo oscuro por defecto, héroe con foto, carrusel y tarjetas para compartir):
 > - portada con mapa, carrusel e introducción;
 > - una ficha por municipio, con mapa, fotos y modo historia;
 > - una página por departamento;
@@ -17,6 +17,15 @@ Cada cifra lleva su fuente oficial.
 **Sitio (en construcción):** https://soyangelromero.github.io/municipios-colombia/ · Mapas generados: https://soyangelromero.github.io/municipios-colombia/data/mapas/
 
 Los formularios para reportar un error, pedir un dato o escribir al proyecto son **opcionales**: sin servidor caen al issue de GitHub o al correo; en un hosting con PHP envían a la API (ver [docs/despliegue.md](docs/despliegue.md)).
+
+## Capturas
+
+| Portada | Historia del municipio | Ranking |
+|---|---|---|
+| ![Portada en escritorio](docs/capturas/portada-escritorio.jpg) | ![Historia en escritorio](docs/capturas/historia-portada-escritorio.jpg) | ![Ranking en escritorio](docs/capturas/ranking-escritorio.jpg) |
+| ![Portada en móvil](docs/capturas/portada-movil.jpg) | ![Historia en móvil](docs/capturas/historia-transparencia-movil.jpg) | ![Ranking en móvil](docs/capturas/ranking-movil.jpg) |
+
+También hay un [comparador](docs/capturas/comparador-escritorio.jpg) de dos municipios. Las fotos de los municipios vienen de Wikimedia Commons con licencia libre; en el sitio cada una lleva su autor y su licencia.
 
 ## Cómo está hecho
 
