@@ -545,6 +545,6 @@
 }
 
 /* Mientras la historia está abierta, lo de abajo no se pinta (ahorra trabajo y evita parpadeos). */
-html.lock body > :not(.hi):not(script):not(.compartir-fondo) {
+html.lock body > :not(.hi):not(script):not(.sheet):not(.fondo-hoja) {
   visibility: hidden;
 }

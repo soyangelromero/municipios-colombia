@@ -403,20 +403,29 @@ async function vecino(d) {
   abrirHistoria(o.codigo, 0, origen);
 }
 
-function compartirActual(boton) {
-  const { m } = abierta;
-  compartir(
+async function compartirActual(boton) {
+  const { m, ctx, i } = abierta;
+  const cap = CAPITULOS[i];
+  const pilarCap = ctx.idx.pilares.find((p) => p.id === cap);
+  const info = pilarCap ? m.pilares[cap] : null;
+  const valorPilar = info?.valido ? info.puntaje : null;
+  const compartePilar = pilarCap && valorPilar !== null;
+  const hayPausa = abierta.pausado;
+  if (!hayPausa) pausa(true, true); // la historia no avanza mientras está abierta la hoja
+  await compartir(
     {
       nombre: m.nombre,
-      slug: m.codigo,
-      valor: m.indice,
-      semaforo: m.semaforo,
-      puesto: m.puesto ? String(m.puesto.nacional) : '',
+      slug: compartePilar ? `${m.codigo}-${cap.toLowerCase()}` : m.codigo,
+      etiqueta: compartePilar ? pilarCap.nombre : '',
+      valor: compartePilar ? valorPilar : m.indice,
+      semaforo: compartePilar ? estado(valorPilar, ctx.idx) : m.semaforo,
+      puesto: !compartePilar && m.puesto ? String(m.puesto.nacional) : '',
       foto: m.foto ? new URL(`${raiz}assets/fotos/${m.codigo}-1080.webp`, location.href).href : null,
       url: new URL(`${raiz}m/${m.slug}/`, location.href).href,
     },
     boton,
   );
+  if (abierta && !hayPausa) pausa(false, true);
 }
 
 function cerrar(sinFoco) {
@@ -433,12 +442,12 @@ function cerrar(sinFoco) {
 }
 
 function teclas(e) {
-  if (!abierta) return;
+  if (!abierta || document.querySelector('.sheet')) return; // la hoja de compartir tiene sus propias teclas
   if (e.key === 'Escape') {
     e.preventDefault();
     return document.querySelector('.hi-hoja') ? cerrarHoja() : cerrar();
   }
-  if (document.querySelector('.hi-hoja') || document.querySelector('.compartir')) return;
+  if (document.querySelector('.hi-hoja') || document.querySelector('.sheet')) return;
   if (e.key === 'ArrowRight' || (e.key === ' ' && !e.target.closest('button, a'))) {
     e.preventDefault();
     siguiente();

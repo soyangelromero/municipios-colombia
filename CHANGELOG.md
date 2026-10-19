@@ -4,6 +4,12 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). S
 
 ## [Sin publicar]
 
+### Corregido: «Compartir esta parte»
+- La hoja de compartir quedaba **oculta** dentro de la historia (la regla que esconde la portada de fondo también la escondía a ella).
+- Vista previa inmediata (la tarjeta se dibuja a escala pequeña) y la imagen completa se prepara de antemano: «Compartir» llama a la hoja del sistema sin esperas, como exigen los navegadores móviles. Antes la generaba tras el toque y podía caer a una descarga.
+- La imagen se exporta en JPEG (≈ 180 KB en vez de 1,2 MB en PNG) y la foto ya no se sale de su franja en la tarjeta.
+- «Compartir esta parte» comparte el capítulo en que estás (pilar y su puntaje); la historia se pausa mientras la hoja está abierta y `Esc` cierra solo la hoja.
+
 ### Fase 7: despliegue y revisión final
 - `python -m municipios enlaces`: revisa que todos los enlaces y anclas internas de `dist/` existan (con prueba). Resultado actual: sin enlaces rotos.
 - `docs/despliegue.md`: actualización mensual, revisión antes de publicar y aviso sobre `mirror --delete` en el workflow SFTP.
