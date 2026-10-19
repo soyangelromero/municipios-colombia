@@ -4,6 +4,12 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). S
 
 ## [Sin publicar]
 
+### Agregado y corregido (fase 6: formularios, rendimiento e íconos)
+- **Formularios PHP**: el frontend pedía `reporte.php` y `pedido.php`, pero los archivos son `reportes.php` y `pedidos.php`; corregido. Nuevas pruebas de la API con el servidor integrado de PHP (`test_api_php.py`): origen, método, campo trampa, tiempo mínimo, límite por IP y hora, hash en lugar de la IP y borrado de lo viejo.
+- **Portada más liviana**: el mapa ya no es 3D (sin `perspective`, sin cadena de `drop-shadow`); es un SVG plano con resalte al apuntar. Los trazados se re-simplifican al incrustarlos (`aligerar.py`) y la intro copia el mapa en vez de traerlo dos veces: el HTML de la portada baja de 246 KB a 125 KB. Las tarjetas ya no crean una capa 3D cada una.
+- **Medidor**: el arco se dibuja exactamente hasta la aguja; antes el color podía pasarse del punto (con «reducir movimiento»).
+- **Íconos pálidos**: el `<style>` de los mapas SVG en línea era global y pintaba también los íconos de la interfaz; ahora está acotado a cada mapa.
+
 ### Corregido (móvil y modo claro)
 - Portada en móvil: el mapa va en su propia franja y la leyenda debajo; antes la leyenda tapaba el sur del país.
 - Ranking en móvil: pestañas y semáforo en una fila desplazable y filtros compactos.

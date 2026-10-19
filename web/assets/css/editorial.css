@@ -380,7 +380,9 @@
   stroke: var(--fg);
   stroke-width: 14;
   stroke-linecap: round;
-  animation: gauge-crece 1.4s var(--expo) both;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  animation: gauge-dibuja 1.4s var(--expo) both;
 }
 
 .gauge__arco--verde { stroke: var(--ok); }
@@ -419,8 +421,8 @@
   min-height: 140px;
 }
 
-@keyframes gauge-crece {
-  from { stroke-dasharray: 0 100; }
+@keyframes gauge-dibuja {
+  from { stroke-dashoffset: 1; }
 }
 
 /* --- Anillo --------------------------------------------------------------------------------- */
@@ -530,7 +532,6 @@
   inset: 0;
   z-index: 1;
   overflow: hidden;
-  perspective: 1200px;
 }
 
 .hero__mapa .mapa {
@@ -545,14 +546,37 @@
 .hero__mapa .mapa__svg {
   width: min(86vw, 920px);
   height: auto;
-  transform: rotateX(38deg) rotateZ(-4deg);
-  transform-style: preserve-3d;
-  /* Cada sombra dura se apoya en la anterior: simula el grosor (extrusión) del mapa. */
-  filter: drop-shadow(0 1px 0 rgb(0 0 0 / 70%)) drop-shadow(0 2px 0 rgb(0 0 0 / 65%))
-    drop-shadow(0 3px 0 rgb(0 0 0 / 60%)) drop-shadow(0 4px 0 rgb(0 0 0 / 55%))
-    drop-shadow(0 5px 0 rgb(0 0 0 / 50%)) drop-shadow(0 6px 0 rgb(0 0 0 / 45%))
-    drop-shadow(0 7px 0 rgb(0 0 0 / 40%)) drop-shadow(0 8px 0 rgb(0 0 0 / 35%))
-    drop-shadow(0 40px 60px rgb(0 0 0 / 60%));
+  /* Plano y ligero: sin transformaciones 3D ni filtros, solo trazados SVG. */
+  shape-rendering: geometricPrecision;
+}
+
+/* Halo suave detrás del país (un degradado, no un filtro). */
+.hero__mapa .mapa::before {
+  content: "";
+  position: absolute;
+  inset: 8% 0 8% 0;
+  background: radial-gradient(48% 52% at 50% 50%, color-mix(in srgb, var(--acc) 14%, transparent), transparent 72%);
+  pointer-events: none;
+}
+
+.hero__mapa .mapa__svg path {
+  stroke: var(--ink);
+  stroke-width: 0.9;
+  stroke-linejoin: round;
+  transition: opacity 0.25s var(--ease), fill 0.5s var(--ease);
+}
+
+/* Al apuntar a un departamento, los demás bajan de intensidad. */
+.hero__mapa .mapa__svg:has(path:hover) path:not(:hover),
+.hero__mapa .mapa__svg:has(path:focus-visible) path:not(:focus-visible) {
+  opacity: 0.55;
+}
+
+.hero__mapa .mapa__svg path:hover,
+.hero__mapa .mapa__svg path:focus-visible {
+  stroke: var(--fg);
+  stroke-width: 2;
+  outline: none;
 }
 
 .hero__mapa .mapa__ayuda {
@@ -564,10 +588,6 @@
   text-align: right;
   font-size: 11px;
   color: var(--mute);
-}
-
-.hero__mapa .mapa__svg path {
-  transition: fill 0.5s var(--ease), transform 0.5s var(--ease);
 }
 
 .mapa__velo {
@@ -586,8 +606,8 @@
 
 @media (min-width: 1024px) {
   .mapa__velo {
-    background: linear-gradient(90deg, var(--ink) 0, color-mix(in srgb, var(--ink) 80%, transparent) 30%, transparent 62%),
-      linear-gradient(180deg, var(--ink) 0, transparent 130px, transparent calc(100% - 180px), var(--ink) 100%);
+    background: linear-gradient(90deg, var(--ink) 0, color-mix(in srgb, var(--ink) 80%, transparent) 20%, transparent 44%),
+      linear-gradient(180deg, var(--ink) 0, transparent 90px, transparent calc(100% - 70px), var(--ink) 100%);
   }
 }
 
@@ -931,8 +951,6 @@
   color: #fff; /* siempre sobre foto oscura: no depende del tema */
   text-decoration: none;
   scroll-snap-align: center;
-  transform-style: preserve-3d;
-  will-change: transform;
 }
 
 .card__fondo {
@@ -1306,7 +1324,6 @@ html.lock body { overflow: hidden; }
   width: 100%;
   height: auto;
   opacity: 0.55;
-  filter: drop-shadow(0 0 24px rgb(61 124 255 / 35%));
 }
 
 .intro__mapa .mapa__svg path {
@@ -1635,7 +1652,6 @@ html.lock body { overflow: hidden; }
   }
 
   .js .revela { opacity: 1; transform: none; }
-  .gauge__arco { stroke-dasharray: inherit; }
   .st-bg { transform: none; }
 }
 
@@ -1980,12 +1996,6 @@ html.lock body { overflow: hidden; }
   .intro__prog i { transform: scaleX(1); }
 }
 
-/* Modo claro: sombras del mapa más suaves y mapa de la intro sobre fondo claro. */
-:root[data-tema="claro"] .hero__mapa .mapa__svg {
-  filter: drop-shadow(0 1px 0 rgb(15 23 42 / 45%)) drop-shadow(0 2px 0 rgb(15 23 42 / 40%))
-    drop-shadow(0 3px 0 rgb(15 23 42 / 35%)) drop-shadow(0 4px 0 rgb(15 23 42 / 30%))
-    drop-shadow(0 5px 0 rgb(15 23 42 / 25%)) drop-shadow(0 30px 40px rgb(15 23 42 / 22%));
-}
 
 .card .chip { color: #fff; }
 
@@ -2194,3 +2204,6 @@ body.pagina-comparar {
   .rk-filtros .sel { flex: 1 1 45%; }
   .rk-filtros .sel select { width: 100%; }
 }
+
+/* El halo del mapa solo se ve bien sobre fondo oscuro. */
+:root[data-tema="claro"] .hero__mapa .mapa::before { display: none; }

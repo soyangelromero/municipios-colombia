@@ -34,6 +34,14 @@ function intro() {
     }
   };
   capa.querySelector('[data-intro-salto]')?.addEventListener('click', terminar);
+  // El mapa de la intro es una copia del de la portada (así el HTML no lo trae dos veces).
+  const origen = document.querySelector('.hero__mapa .mapa');
+  const destino = capa.querySelector('[data-intro-mapa]');
+  if (origen && destino) {
+    const copia = origen.cloneNode(true);
+    copia.querySelectorAll('style, figcaption').forEach((n) => n.remove());
+    destino.append(copia);
+  }
   capa.querySelectorAll('[data-contar]').forEach((el) => contar(el, Number(el.dataset.contar), 1000));
   // Cascada de departamentos en el mapa de la intro.
   const caminos = capa.querySelectorAll('.intro__mapa path[data-codigo]');

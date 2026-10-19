@@ -3,8 +3,11 @@ import { CONFIG } from './config.js';
 
 const endpoint = CONFIG.endpoint ? CONFIG.endpoint.replace(/\/$/, '') : null;
 
+// Cada tipo de formulario tiene su archivo en api/ (reporte → reportes.php, etc.).
+const ARCHIVOS = { reporte: 'reportes', pedido: 'pedidos', contacto: 'contacto' };
+
 async function enviar(datos, tipo) {
-  const respuesta = await fetch(`${endpoint}/${tipo}.php`, {
+  const respuesta = await fetch(`${endpoint}/${ARCHIVOS[tipo]}.php`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(datos),

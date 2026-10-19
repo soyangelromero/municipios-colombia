@@ -25,10 +25,14 @@ DECIMALES = 1
 
 # Aspecto por defecto (por ejemplo, al abrir el SVG suelto). `:where` tiene especificidad cero,
 # así que cualquier regla de la web lo reemplaza sin pelear.
+# Estilo base acotado al propio mapa: un <style> dentro de un SVG en línea es global en la página,
+# y una regla suelta sobre `path` pintaba también los íconos de la interfaz.
+_MAPA = 'svg[aria-labelledby="titulo-mapa"]'
 ESTILO_BASE = (
-    ":where(path){fill:#cfd5dc;stroke:#fff;stroke-width:.6;"
+    f":where({_MAPA} path){{fill:#cfd5dc;stroke:#fff;stroke-width:.6;"
     "vector-effect:non-scaling-stroke;stroke-linejoin:round}"
-    ":where(.recuadro){fill:none;stroke:#a4abb5;stroke-width:1;vector-effect:non-scaling-stroke}"
+    f":where({_MAPA} .recuadro){{fill:none;stroke:#a4abb5;stroke-width:1;"
+    "vector-effect:non-scaling-stroke}"
 )
 
 

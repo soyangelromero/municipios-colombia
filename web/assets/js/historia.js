@@ -95,12 +95,13 @@ function medidor(valor, idx, etiqueta) {
   if (valor === null || valor === undefined) return '<div class="nd-red"><span class="nd-red__ico">!</span><span>Sin dato suficiente</span></div>';
   const t = Math.max(0, Math.min(1, valor / 100));
   const a = Math.PI * (1 - t);
-  const x = (100 + 80 * Math.cos(a)).toFixed(1);
-  const y = (100 - 80 * Math.sin(a)).toFixed(1);
+  const x = (100 + 80 * Math.cos(a)).toFixed(2);
+  const y = (100 - 80 * Math.sin(a)).toFixed(2);
   const e = estado(valor, idx);
+  // El arco termina exactamente en la aguja (nunca más allá), con o sin animación.
+  const arco = t > 0.002 ? `<path class="gauge__arco gauge__arco--${e}" d="M20 100 A80 80 0 0 1 ${x} ${y}" pathLength="1"/>` : '';
   return `<figure class="gauge" role="img" aria-label="${esc(etiqueta)}: ${num(valor)} de 100, estado ${TEXTO[e]}">
-    <svg viewBox="0 0 200 108" aria-hidden="true"><path class="gauge__pista" d="M20 100 A80 80 0 0 1 180 100" pathLength="100"/>
-    <path class="gauge__arco gauge__arco--${e}" d="M20 100 A80 80 0 0 1 180 100" pathLength="100" style="stroke-dasharray:${valor.toFixed(1)} 100"/>
+    <svg viewBox="0 0 200 108" aria-hidden="true"><path class="gauge__pista" d="M20 100 A80 80 0 0 1 180 100"/>${arco}
     <circle class="gauge__aguja" cx="${x}" cy="${y}" r="7"/></svg>
     <figcaption><span class="gauge__valor" data-cuenta="${valor}">${num(valor)}</span><span class="gauge__de">de 100</span>
     <span class="chip chip--sombra"><span class="chip__punto chip__punto--${e}"></span>${TEXTO[e]}</span></figcaption></figure>`;

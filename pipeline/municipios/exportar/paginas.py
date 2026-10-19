@@ -5,6 +5,7 @@ from pathlib import Path
 
 from municipios.comun.modelos import Municipio
 from municipios.exportar import formato
+from municipios.exportar.aligerar import aligerar_svg
 from municipios.exportar.datos_web import NOMBRES_GRUPOS, DatosSitio, url_reporte
 from municipios.exportar.plantillas import (
     Pagina,
@@ -161,7 +162,8 @@ def mapa_en_linea(ruta_svg: Path, colores: dict[str, str], etiqueta: str) -> str
     """Inserta el SVG del mapa con una regla de color por entidad (funciona sin JavaScript)."""
     if not ruta_svg.exists():
         return '<p class="nota">El mapa no está disponible en esta versión.</p>'
-    svg = ruta_svg.read_text(encoding="utf-8")
+    tolerancia = 0.8 if ruta_svg.stem == "colombia" else 0.35
+    svg = aligerar_svg(ruta_svg.read_text(encoding="utf-8"), tolerancia)
     svg = svg.replace("<svg ", '<svg class="mapa__svg" focusable="false" ', 1)
     reglas = "".join(f'[data-codigo="{c}"]{{fill:var(--escala-{t})}}' for c, t in colores.items())
     return (
@@ -348,7 +350,7 @@ def inicio(datos: DatosSitio, dir_mapas: Path) -> Pagina:
 <div class="intro" id="intro" data-intro role="dialog" aria-modal="true" aria-label="Presentación del proyecto">
   <div class="intro__fondo" aria-hidden="true"></div>
   <div class="intro__prog" aria-hidden="true"><span><i></i></span><span><i></i></span><span><i></i></span></div>
-  <div class="intro__mapa" aria-hidden="true">{mapa_en_linea(dir_mapas / "colombia.svg", {}, "Mapa de Colombia")}</div>
+  <div class="intro__mapa" data-intro-mapa aria-hidden="true"></div>
   <button type="button" class="pill intro__salto" data-intro-salto>Saltar</button>
   <div class="intro__contenido">
     <p class="intro__marca"><span class="logo logo--grande" aria-hidden="true"><i></i><i></i><i></i><i></i></span></p>

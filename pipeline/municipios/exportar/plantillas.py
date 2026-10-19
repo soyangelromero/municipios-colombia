@@ -171,16 +171,23 @@ def medidor(
         return '<figure class="gauge gauge--vacio"><p class="gauge__sin">Sin dato</p></figure>'
     fraccion = max(0.0, min(1.0, valor / 100))
     angulo = math.pi - fraccion * math.pi
-    aguja_x = 100 + 76 * math.cos(angulo)
-    aguja_y = 100 - 76 * math.sin(angulo)
+    # El arco se dibuja exactamente hasta la aguja (no con un recorte del trazo completo):
+    # así el color nunca se pasa del punto, con o sin animación.
+    fin_x = 100 + 80 * math.cos(angulo)
+    fin_y = 100 - 80 * math.sin(angulo)
+    arco = (
+        f'<path class="gauge__arco gauge__arco--{color}" d="M20 100 A80 80 0 0 1 {fin_x:.2f} {fin_y:.2f}"'
+        ' pathLength="1"></path>'
+        if fraccion > 0.002
+        else ""
+    )
     return (
         f'<figure class="gauge" role="img" aria-label="{escape(etiqueta)}: {_dec(valor)} de 100, '
         f'estado {SEMAFORO_TEXTO.get(color or "", "sin dato")}">'
         '<svg viewBox="0 0 200 108" aria-hidden="true">'
-        '<path class="gauge__pista" d="M20 100 A80 80 0 0 1 180 100" pathLength="100"></path>'
-        f'<path class="gauge__arco gauge__arco--{color}" d="M20 100 A80 80 0 0 1 180 100" '
-        f'pathLength="100" style="stroke-dasharray:{fraccion * 100:.2f} 100"></path>'
-        f'<circle class="gauge__aguja" cx="{aguja_x:.1f}" cy="{aguja_y:.1f}" r="7"></circle>'
+        '<path class="gauge__pista" d="M20 100 A80 80 0 0 1 180 100"></path>'
+        f"{arco}"
+        f'<circle class="gauge__aguja" cx="{fin_x:.1f}" cy="{fin_y:.1f}" r="7"></circle>'
         "</svg>"
         f'<figcaption><span class="gauge__valor">{_dec(valor)}</span>'
         f'<span class="gauge__de">de 100</span>{semaforo(color)}</figcaption>'
