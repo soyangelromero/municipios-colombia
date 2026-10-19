@@ -4,6 +4,11 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). S
 
 ## [Sin publicar]
 
+### Corregido (móvil y modo claro)
+- Portada en móvil: el mapa va en su propia franja y la leyenda debajo; antes la leyenda tapaba el sur del país.
+- Ranking en móvil: pestañas y semáforo en una fila desplazable y filtros compactos.
+- Modo claro: el histograma usa la escala viva del mapa en lugar de los tonos de texto.
+
 ### Rediseño: comparador y ranking (e2e/07 y e2e/09)
 - **Ranking**: titular gigante con pesos mezclados, pestañas por indicador (índice y los cuatro pilares), búsqueda, departamento, grupo y semáforo, histograma del índice con leyenda, barras por fila, «Ver más» (100 y luego de 50 en 50) y apertura de la historia en su sitio. Todo el listado sigue en el HTML para quien no use JavaScript. Nuevo `ranking.js`.
 - **Comparador**: siempre oscuro, silueta del municipio cuando no hay foto, barras que crecen y datos de contexto en violeta. La silueta se comparte con las historias (`comun.js`).

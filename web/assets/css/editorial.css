@@ -809,11 +809,11 @@
   background: var(--mute);
 }
 
-.hist__b--e1 { background: var(--bad); }
-.hist__b--e2 { background: #f0954a; }
-.hist__b--e3 { background: var(--warn); }
-.hist__b--e4 { background: #92bf55; }
-.hist__b--e5 { background: var(--ok); }
+.hist__b--e1 { background: var(--escala-e1); }
+.hist__b--e2 { background: var(--escala-e2); }
+.hist__b--e3 { background: var(--escala-e3); }
+.hist__b--e4 { background: var(--escala-e4); }
+.hist__b--e5 { background: var(--escala-e5); }
 .hist__b--sin { background: var(--escala-sin); }
 
 .leyenda-card__extremos {
@@ -2136,3 +2136,61 @@ body.pagina-comparar {
 
 .miga a { color: inherit; text-underline-offset: 3px; }
 .miga a:hover { color: var(--fg); }
+
+/* --- Móvil: el mapa va en su propia franja y la leyenda debajo, sin taparlo ------------------ */
+@media (max-width: 1023px) {
+  .hero__mapa {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    height: auto;
+    padding-bottom: 8px;
+    overflow: visible;
+  }
+
+  .hero__mapa .mapa {
+    position: relative;
+    inset: auto;
+    flex: none;
+    height: min(58vh, 460px);
+    overflow: hidden;
+  }
+
+  .hero__mapa .mapa__svg { width: min(92vw, 520px); max-height: 100%; }
+  .hero__mapa .mapa__ayuda { display: none; }
+
+  .hero__mapa .mseg {
+    position: static;
+    align-self: flex-start;
+    margin: 0 var(--gut);
+  }
+
+  .hero__mapa .leyenda-card {
+    position: static;
+    transform: none;
+    width: auto;
+    max-width: none;
+    margin: 0 var(--gut);
+  }
+
+  .mapa__velo { display: none; }
+}
+
+/* --- Ranking en móvil: pestañas y semáforo en una sola fila desplazable ---------------------- */
+@media (max-width: 700px) {
+  .rk-tabs,
+  .rk-sem {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin-inline: calc(-1 * var(--gut));
+    padding-inline: var(--gut);
+    scrollbar-width: none;
+  }
+
+  .rk-tabs::-webkit-scrollbar,
+  .rk-sem::-webkit-scrollbar { display: none; }
+  .rk-tabs .pill, .rk-sem .pill { flex: none; }
+  .rk-buscar { flex: 1 1 100%; }
+  .rk-filtros .sel { flex: 1 1 45%; }
+  .rk-filtros .sel select { width: 100%; }
+}
