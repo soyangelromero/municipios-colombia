@@ -42,6 +42,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). S
 - **Móvil a 360 px**: la barra superior ocultaba parcialmente el botón de tema; sin la palabra «Colombia» caben los cuatro botones.
 
 ### Corregido
+- Comparador: ya no aparecen dos barras de desplazamiento; la capa a pantalla completa tiene la suya y la página de debajo queda bloqueada mientras está abierta.
 - Portada: el carrusel de municipios tiene botones de flecha (anterior/siguiente, que se apagan en los extremos); antes solo se podía avanzar con el teclado. Las listas desplegables de los filtros ya no salen en blanco sobre blanco en modo oscuro.
 - Cifras en pesos: singular correcto («$ 1 millón», «$ 1 billón») y un decimal por debajo de 10 («$ 1,4 millones»); antes salía «$ 1 millones» y se perdía precisión. La cifra grande de «Gastó por vecino» en la ficha muestra el valor completo (como la historia) y se quitó el «(contexto)» del título, que ya dice «Contexto · no puntúa» encima.
 - «Lo que más le piden los vecinos»: usa el mismo contenedor centrado y el mismo título grande que el resto de la portada; el armazón de la sección pasa a `editorial.css` (antes se veía sin estilo hasta que cargaba `pedidos.css`) y el estado vacío es una tarjeta contenida.

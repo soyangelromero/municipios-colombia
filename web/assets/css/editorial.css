@@ -1771,6 +1771,9 @@ html.lock body { overflow: hidden; }
   padding: 0;
 }
 
+/* La capa tiene su propio desplazamiento: la página de debajo no debe mostrar una segunda barra. */
+html:has(#cmp:not([hidden])) { overflow: hidden; }
+
 #cmp {
   position: fixed;
   inset: 0;
