@@ -29,6 +29,9 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). S
 - **Sin hosting propio**: `worker/` es el mismo servicio para Cloudflare Workers (plan gratuito + D1), con la misma API y pruebas; guía paso a paso en `docs/cloudflare.md`. La página de privacidad declara que, con el servicio activo, el navegador consulta a Cloudflare.
 - **API PHP**: `apoyos.php` (una persona cuenta una vez por municipio y dato, por hash de IP) y `pedidos-ranking.php` (ranking y detalle por municipio); retención `dias_apoyos` (365) y límite `max_apoyos_hora`. Pruebas con `php -S`. Sin servidor, el bloque muestra el buscador y la hoja remite al formulario de la ficha.
 
+### Cambiado
+- Portada: la tarjeta «Índice municipal · promedio por departamento» crece en escritorio (400–660 px según la pantalla, barras más altas y textos algo mayores) para aprovechar el espacio libre a su izquierda del mapa; en móvil no cambia.
+
 ### Corregido: modo claro y modo oscuro (auditoría de contraste)
 - Auditoría automática de **todo el texto visible** (WCAG AA, 4,5:1) en claro y oscuro, escritorio y móvil, páginas y estados (buscador, historia, hojas, comparador, filtros): de 96 fallos a 0.
 - **Etiquetas de semáforo** (verde/amarillo/rojo) en claro: tenían fondo casi negro con letra oscura; ahora fondos claros propios y colores de texto más oscuros (`--ok`, `--warn`).

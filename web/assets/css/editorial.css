@@ -850,6 +850,19 @@
   font-size: 9.5px;
 }
 
+/* En escritorio hay espacio libre a la derecha de la tarjeta: crece con la pantalla (sin llegar al mapa). */
+@media (min-width: 1024px) {
+  .leyenda-card {
+    width: clamp(400px, 38vw, 660px);
+    padding: 22px 24px;
+  }
+
+  .leyenda-card__tit { margin-bottom: 14px; font-size: 15px; }
+  .leyenda-card .hist { height: clamp(76px, 7.5vw, 130px); gap: 3px; margin-bottom: 10px; }
+  .leyenda-card__extremos { font-size: 11px; }
+  .leyenda-card__pie { font-size: 10.5px; }
+}
+
 @media (max-width: 767px) {
   .leyenda-card {
     left: 50%;
