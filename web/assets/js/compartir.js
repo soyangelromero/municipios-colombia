@@ -265,8 +265,14 @@ function dibujar(ctx, info, ancho, alto, foto) {
   ctx.font = '400 30px "Geist", system-ui, sans-serif';
   ctx.fillText('Datos públicos y fuentes oficiales. Lectura de datos, no una acusación.', margen, alto - 104);
   ctx.fillStyle = '#ffffff';
-  ctx.font = '600 38px "Geist Mono", monospace';
-  ctx.fillText(info.url.replace(/^https?:\/\//, '').replace(/\/$/, ''), margen, alto - 52);
+  const direccion = info.url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+  let cuerpoUrl = 38; // la dirección completa, achicada hasta que quepa en el ancho útil
+  ctx.font = `600 ${cuerpoUrl}px "Geist Mono", monospace`;
+  while (ctx.measureText(direccion).width > interior && cuerpoUrl > 18) {
+    cuerpoUrl -= 1;
+    ctx.font = `600 ${cuerpoUrl}px "Geist Mono", monospace`;
+  }
+  ctx.fillText(direccion, margen, alto - 52);
 }
 
 /** Vista previa rápida: la misma tarjeta a escala pequeña y sin codificar PNG. */
