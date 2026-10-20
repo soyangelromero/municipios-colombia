@@ -158,6 +158,11 @@
   }
 }
 
+/* Pantallas de 360 px: sin la palabra «Colombia» caben los cuatro botones. */
+@media (max-width: 380px) {
+  .top__nombre span { display: none; }
+}
+
 @media (max-width: 430px) {
   .top__acciones .pill {
     width: 36px;

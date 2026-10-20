@@ -10,7 +10,7 @@
   --fg: #f4f5f7; /* texto principal */
   --mute: rgb(244 245 247 / 68%); /* texto secundario */
   --line: rgb(255 255 255 / 14%); /* bordes y separadores */
-  --acc: #3d7cff; /* único acento fuerte (azul bandera) */
+  --acc: #4a85ff; /* único acento fuerte (azul bandera) */
   --acc-fg: #06101f; /* texto sobre el acento */
   --ok: #22c55e; /* semáforo verde */
   --warn: #eab308; /* semáforo amarillo */
@@ -91,8 +91,8 @@
   --line: rgb(17 21 27 / 14%);
   --acc: #1c4fd8;
   --acc-fg: #ffffff;
-  --ok: #15803d;
-  --warn: #a16207;
+  --ok: #12763a;
+  --warn: #8d5a05;
   --bad: #b91c1c;
   --q-info: #7c4fd6;
   --glass: rgb(17 21 27 / 6%);
@@ -104,6 +104,10 @@
   --linea: var(--line);
   --acento-fuerte: #13328f;
   --acento-suave: #e6edff;
+  /* Fondos de las etiquetas de semáforo: tonos claros (los del modo oscuro son casi negros). */
+  --verde-suave: #eaf7ee;
+  --amarillo-suave: #fdf3d0;
+  --rojo-suave: #fadada;
   --texto-suave: var(--mute);
   --escala-sin: #c9cfd7;
   /* Escala del mapa: tonos vivos (los de texto, más oscuros, no sirven de relleno). */

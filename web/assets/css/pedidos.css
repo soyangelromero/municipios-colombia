@@ -178,7 +178,7 @@
 .vp-hoy {
   padding: 0.25rem 0.7rem;
   border-radius: var(--r-pill);
-  background: color-mix(in srgb, var(--acc) 25%, transparent);
+  background: rgb(11 13 16 / 72%);
   color: var(--acc);
   font-family: var(--fuente-mono);
   font-size: 0.78rem;

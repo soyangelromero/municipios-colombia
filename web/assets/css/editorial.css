@@ -297,7 +297,7 @@
 .bar2__f {
   display: block;
   height: 100%;
-  background: rgb(255 255 255 / 75%);
+  background: color-mix(in srgb, var(--fg) 75%, transparent);
   transform-origin: left center;
 }
 
@@ -306,7 +306,7 @@
 .bar2__f--rojo { background: var(--bad); }
 
 .bar2--vacio {
-  background: repeating-linear-gradient(45deg, rgb(255 255 255 / 14%) 0 6px, transparent 6px 12px);
+  background: repeating-linear-gradient(45deg, color-mix(in srgb, var(--fg) 14%, transparent) 0 6px, transparent 6px 12px);
 }
 
 /* --- KPI ------------------------------------------------------------------------------------ */
@@ -939,7 +939,7 @@
   appearance: none;
   height: 38px;
   padding: 0 34px 0 14px;
-  border: 1px solid rgb(255 255 255 / 20%);
+  border: 1px solid color-mix(in srgb, var(--fg) 22%, transparent);
   border-radius: var(--r-pill);
   background: var(--glass);
   color: var(--fg);
@@ -1195,16 +1195,6 @@ select optgroup {
   color: var(--mute);
 }
 
-.vp-filtro select {
-  min-height: 44px;
-  padding: 0 1rem;
-  border: 1px solid var(--line);
-  border-radius: var(--r-pill);
-  background: var(--ink-2);
-  color: var(--fg);
-  font: inherit;
-}
-
 [data-vp-cuerpo] > .nota { margin: 0; color: var(--mute); }
 
 /* --- Bloques de apoyo ----------------------------------------------------------------------- */
@@ -1381,6 +1371,9 @@ html.con-intro .intro {
   color: var(--fg);
   text-align: center;
 }
+
+/* Sin foto y en modo claro el fondo ya es claro: el velo oscuro lo dejaría gris sucio. */
+:root[data-tema="claro"] .heroe.sin-foto .st-shade { display: none; }
 
 html.lock,
 html.lock body { overflow: hidden; }
@@ -1668,7 +1661,7 @@ html.lock body { overflow: hidden; }
   display: grid;
   gap: 2px;
   padding: 12px;
-  background: rgb(255 255 255 / 5%);
+  background: var(--glass-card);
   border-radius: 14px;
 }
 
@@ -2037,7 +2030,7 @@ html.lock body { overflow: hidden; }
 }
 
 .tabla tbody tr:hover {
-  background: rgb(255 255 255 / 4%);
+  background: color-mix(in srgb, var(--fg) 5%, transparent);
 }
 
 .tabla .num {
@@ -2079,15 +2072,18 @@ html.lock body { overflow: hidden; }
   font-size: 11px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: rgb(255 255 255 / 72%);
+  color: var(--mute);
 }
+
+.pagina-ficha:has(.heroe:not(.sin-foto)) .miga { color: rgb(255 255 255 / 72%); }
 
 .pagina-ficha .miga a {
   color: inherit;
   text-underline-offset: 3px;
 }
 
-.pagina-ficha .miga a:hover { color: #fff; }
+.pagina-ficha .miga a:hover { color: var(--fg); }
+.pagina-ficha:has(.heroe:not(.sin-foto)) .miga a:hover { color: #fff; }
 
 @media (prefers-reduced-motion: reduce) {
   .intro__mapa .mapa__svg path { stroke-dasharray: none; }
@@ -2098,7 +2094,13 @@ html.lock body { overflow: hidden; }
 .card .chip { color: #fff; }
 
 /* --- Comparador: siempre oscuro (va sobre fotos) y con silueta si no hay foto ---------------- */
-body.pagina-comparar {
+/* Zonas que van siempre sobre foto o fondo oscuro: llevan sus propios tokens oscuros aunque el sitio esté en claro.
+   (el hero de la ficha con foto y la barra superior mientras está encima de esa foto) */
+body.pagina-comparar,
+.heroe:not(.sin-foto),
+.vp-card,
+.intro,
+body:has(.heroe:not(.sin-foto)) .top:not(.solid) {
   --ink: #0b0d10;
   --ink-2: #14171c;
   --fg: #f4f5f7;
@@ -2109,17 +2111,38 @@ body.pagina-comparar {
   --ok: #22c55e;
   --warn: #eab308;
   --bad: #ef4444;
-  --acc: #3d7cff;
+  --acc: #4a85ff;
   --q-info: #b58cf0;
   --texto: var(--fg);
   --texto-suave: var(--mute);
   --linea: var(--line);
   --superficie: var(--ink-2);
   --fondo: var(--ink);
+  /* Los alias de :root se resuelven allí (con los valores del tema claro): hay que repetirlos. */
+  --acento: var(--acc);
+  --acento-fuerte: #2a5fe0;
+  --acento-suave: #0e1a38;
+  --enfoque: var(--acc);
+  --verde: var(--ok);
+  --amarillo: var(--warn);
+  --rojo: var(--bad);
+  --verde-suave: #0c2a18;
+  --amarillo-suave: #2e2406;
+  --rojo-suave: #331111;
+  --superficie-2: #1b2029;
+  --escala-sin: #3a4350;
+  --sombra: 0 1px 2px rgb(0 0 0 / 40%), 0 4px 18px rgb(0 0 0 / 30%);
   color-scheme: dark;
+}
+
+body.pagina-comparar {
   background: #0b0d10;
   color: var(--fg);
 }
+
+.heroe:not(.sin-foto),
+.vp-card,
+.intro { color: var(--fg); }
 
 .cmp-silueta {
   position: absolute;
@@ -2171,7 +2194,7 @@ body.pagina-comparar {
   height: 38px;
   min-width: min(100%, 15rem);
   padding: 0 14px;
-  border: 1px solid rgb(255 255 255 / 20%);
+  border: 1px solid color-mix(in srgb, var(--fg) 22%, transparent);
   border-radius: var(--r-pill);
   background: var(--glass);
   color: var(--fg);

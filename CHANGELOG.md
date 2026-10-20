@@ -29,6 +29,15 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). S
 - **Sin hosting propio**: `worker/` es el mismo servicio para Cloudflare Workers (plan gratuito + D1), con la misma API y pruebas; guía paso a paso en `docs/cloudflare.md`. La página de privacidad declara que, con el servicio activo, el navegador consulta a Cloudflare.
 - **API PHP**: `apoyos.php` (una persona cuenta una vez por municipio y dato, por hash de IP) y `pedidos-ranking.php` (ranking y detalle por municipio); retención `dias_apoyos` (365) y límite `max_apoyos_hora`. Pruebas con `php -S`. Sin servidor, el bloque muestra el buscador y la hoja remite al formulario de la ficha.
 
+### Corregido: modo claro y modo oscuro (auditoría de contraste)
+- Auditoría automática de **todo el texto visible** (WCAG AA, 4,5:1) en claro y oscuro, escritorio y móvil, páginas y estados (buscador, historia, hojas, comparador, filtros): de 96 fallos a 0.
+- **Etiquetas de semáforo** (verde/amarillo/rojo) en claro: tenían fondo casi negro con letra oscura; ahora fondos claros propios y colores de texto más oscuros (`--ok`, `--warn`).
+- **Ficha con foto** en claro: cabecera, habitantes, alcalde, anillos y miga de pan se leían oscuros sobre la foto; el héroe y la barra superior sobre la foto llevan tokens oscuros propios. Sin foto, el héroe ya no lleva el velo oscuro (quedaba gris) y la miga usa el color del tema.
+- **Comparador** en claro: los alias de color (`--acento`, `--verde`…) se resolvían con los valores del tema claro; ahora se redefinen en el bloque oscuro.
+- **Portada**: el podio de «Lo que más le piden los vecinos» y la intro llevan tokens oscuros propios (van sobre fotos/fondo oscuro); el selector de departamento usa el mismo estilo que los demás.
+- Bordes y rellenos escritos en blanco fijo (selectores, buscador del ranking, barras vacías, filas de tablas y de hojas) ahora usan el color del tema; el azul de acento en oscuro sube a `#4a85ff` (4,7:1 sobre las superficies).
+- **Móvil a 360 px**: la barra superior ocultaba parcialmente el botón de tema; sin la palabra «Colombia» caben los cuatro botones.
+
 ### Corregido
 - Portada: el carrusel de municipios tiene botones de flecha (anterior/siguiente, que se apagan en los extremos); antes solo se podía avanzar con el teclado. Las listas desplegables de los filtros ya no salen en blanco sobre blanco en modo oscuro.
 - Cifras en pesos: singular correcto («$ 1 millón», «$ 1 billón») y un decimal por debajo de 10 («$ 1,4 millones»); antes salía «$ 1 millones» y se perdía precisión. La cifra grande de «Gastó por vecino» en la ficha muestra el valor completo (como la historia) y se quitó el «(contexto)» del título, que ya dice «Contexto · no puntúa» encima.
