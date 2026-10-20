@@ -223,8 +223,8 @@ function dibujar(ctx, info, ancho, alto, foto) {
   medidor(ctx, cx, cy, 262, info.valor, color);
   ctx.textAlign = 'center';
   ctx.fillStyle = '#ffffff';
-  ctx.font = '800 210px "Geist", system-ui, sans-serif';
-  ctx.fillText(info.valor === null || info.valor === undefined ? '—' : formatoNumero(info.valor), cx, cy - 10);
+  ctx.font = '800 150px "Geist", system-ui, sans-serif';
+  ctx.fillText(info.valor === null || info.valor === undefined ? '—' : formatoNumero(info.valor), cx, cy - 18);
   ctx.fillStyle = '#b7c0cf';
   ctx.font = '500 34px "Geist Mono", monospace';
   ctx.fillText(info.etiqueta ? `${info.etiqueta.toUpperCase()} SOBRE 100` : 'ÍNDICE MUNICIPAL SOBRE 100', cx, cy + 64);
