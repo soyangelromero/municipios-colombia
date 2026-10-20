@@ -508,7 +508,7 @@ def inicio(datos: DatosSitio, dir_mapas: Path) -> Pagina:
 
 <section class="vp revela" id="vecinos-piden" data-vecinos aria-labelledby="vp-t">
   <p class="vp-k"><span class="vp-vivo" aria-hidden="true"></span>En vivo</p>
-  <h2 id="vp-t"><span class="lt">Lo que más le piden</span> <span class="o">los vecinos</span></h2>
+  <h2 id="vp-t" class="rank-h"><span class="lt">Lo que más le piden</span> <span class="o">los vecinos</span></h2>
   <p class="vp-sub">Municipios con más pedidos de datos que no encontramos en su sitio web. Cada vecino cuenta una vez. No mide calidad ni acusa a nadie: muestra qué información quiere ver la gente.</p>
   <label class="vp-filtro"><span>Departamento</span><select data-vp-dep><option value="">Todo el país</option></select></label>
   <div class="vp-tk" data-vp-cinta aria-live="polite" hidden></div>

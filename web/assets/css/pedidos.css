@@ -114,51 +114,7 @@
 
 .red__t { font-family: var(--fuente-mono); font-size: 0.7rem; letter-spacing: 0.02em; }
 
-/* --- Bloque de la portada ---------------------------------------------------------------------- */
-.vp { padding-block: clamp(2.5rem, 6vw, 5rem); }
-
-.vp-k {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin: 0 0 0.6rem;
-  color: var(--acc);
-  font-family: var(--fuente-mono);
-  font-size: 0.78rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-.vp-vivo {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--acc);
-  animation: vp-pulso 2s ease-in-out infinite;
-}
-
-@keyframes vp-pulso { 50% { opacity: 0.3; } }
-
-.vp-sub { max-width: 60ch; color: var(--mute); }
-
-.vp-filtro {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.7rem;
-  margin-top: 0.6rem;
-  color: var(--mute);
-}
-
-.vp-filtro select {
-  min-height: 44px;
-  padding: 0 1rem;
-  border: 1px solid var(--line);
-  border-radius: var(--r-pill);
-  background: var(--ink-2);
-  color: var(--fg);
-  font: inherit;
-}
-
+/* --- Bloque de la portada (el armazón de la sección está en editorial.css) ------------------ */
 .vp-tk {
   display: flex;
   align-items: center;
@@ -300,32 +256,37 @@
 .vp-mas[hidden] { display: none; }
 
 .vp-vacio {
-  padding: 1.6rem;
+  display: grid;
+  gap: 0.5rem;
+  max-width: 40rem;
+  padding: 1.5rem 1.6rem 1.7rem;
   border: 1px solid var(--line);
   border-radius: var(--r-card);
-  background: var(--glass);
+  background: var(--glass-card);
 }
 
-.vp-vacio h3 { margin: 0 0 0.4rem; font-size: 1.5rem; font-weight: 400; }
-.vp-vacio h3 span { color: var(--acc); }
-.vp-vacio p { margin: 0 0 1rem; color: var(--mute); }
+.vp-vacio h3 { margin: 0; font-size: clamp(1.3rem, 2.6vw, 1.7rem); font-weight: 400; letter-spacing: -0.02em; }
+.vp-vacio h3 span { color: var(--acc); font-weight: 650; }
+.vp-vacio p { margin: 0 0 0.9rem; color: var(--mute); max-width: 46ch; }
 
-.vp-buscar { position: relative; max-width: 460px; }
+.vp-buscar { position: relative; max-width: 34rem; }
 
 .vp-buscar input {
   width: 100%;
-  min-height: 48px;
+  height: 54px;
   padding: 0 1.1rem;
   border: 1px solid var(--line);
-  border-radius: var(--r-pill);
+  border-radius: var(--r-input);
   background: var(--ink-2);
   color: var(--fg);
   font: inherit;
 }
 
+.vp-buscar input:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
+
 .vp-buscar ul {
   position: absolute;
-  inset: 54px 0 auto;
+  inset: 60px 0 auto;
   z-index: 5;
   max-height: 260px;
   margin: 0;

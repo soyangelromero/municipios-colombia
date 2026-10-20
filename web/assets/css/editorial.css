@@ -1111,6 +1111,60 @@
 .rk__barra { display: block; margin: -4px 0 10px; }
 .rk__barra .bar2 { height: 6px; }
 
+/* --- «Lo que más le piden los vecinos» (armazón; el podio y la lista están en pedidos.css) ---- */
+.vp {
+  max-width: var(--ancho);
+  margin: 0 auto;
+  padding: 24px var(--gut) 72px;
+}
+
+.vp .rank-h { max-width: none; margin-bottom: 1rem; }
+.vp .rank-h span { display: block; }
+
+.vp-k {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.9rem;
+  color: var(--acc);
+  font-family: var(--fuente-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.vp-vivo {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--acc);
+  animation: vp-pulso 2s ease-in-out infinite;
+}
+
+@keyframes vp-pulso { 50% { opacity: 0.3; } }
+
+.vp-sub { max-width: 60ch; margin: 0 0 1.1rem; color: var(--mute); }
+
+.vp-filtro {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin: 0 0 1.4rem;
+  color: var(--mute);
+}
+
+.vp-filtro select {
+  min-height: 44px;
+  padding: 0 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--ink-2);
+  color: var(--fg);
+  font: inherit;
+}
+
+[data-vp-cuerpo] > .nota { margin: 0; color: var(--mute); }
+
 /* --- Bloques de apoyo ----------------------------------------------------------------------- */
 .bloque-pilares {
   max-width: var(--ancho);
