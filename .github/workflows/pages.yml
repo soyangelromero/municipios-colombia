@@ -4,6 +4,13 @@ name: Publicar sitio
 # Solo las descargas pesadas y estables (MGN ~240 MB, Excel de población del DANE) quedan en la
 # caché de Actions; las consultas a datos.gov.co se hacen frescas en cada ejecución.
 # Para forzar una nueva descarga del MGN o del Excel, sube la versión de la clave de caché.
+#
+# Además, el resultado del pipeline (datos/intermedios y los mapas) se guarda en caché con una clave
+# que incluye el mes y un hash del código que calcula datos. Así un push que solo toca la web, los
+# textos o el generador de páginas arma el sitio en ~1 minuto en vez de ~10: no vuelve a descargar ni a
+# recalcular. Los datos se refrescan solos el día 1 (cambia el mes) o a mano con «Run workflow» y la
+# casilla «refrescar». Si alguna fuente falla, esa corrida no guarda caché para no arrastrar datos
+# incompletos todo el mes.
 
 on:
   push:
@@ -11,6 +18,11 @@ on:
   schedule:
     - cron: "0 9 1 * *" # el día 1 de cada mes, para refrescar los datos
   workflow_dispatch:
+    inputs:
+      refrescar:
+        description: "Volver a descargar y recalcular todos los datos (ignora la caché del mes)"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -45,10 +57,48 @@ jobs:
             datos/crudos/dane
           key: crudos-pesados-v1
 
-      - name: Correr el pipeline
+      - name: Calcular la clave de los datos
+        id: clave
+        run: |
+          echo "clave=datos-v1-$(date -u +%Y-%m)-${{ hashFiles('pipeline/municipios/fuentes/**', 'pipeline/municipios/indice/**', 'pipeline/municipios/comun/**', 'pipeline/config/**', 'pipeline/pyproject.toml') }}${{ inputs.refrescar && format('-{0}', github.run_id) || '' }}" >> "$GITHUB_OUTPUT"
+
+      - name: Restaurar los datos ya calculados
+        id: datos
+        uses: actions/cache/restore@v6
+        with:
+          path: |
+            datos/intermedios
+            dist/data/mapas
+          key: ${{ steps.clave.outputs.clave }}
+
+      - name: Correr el pipeline completo
+        if: steps.datos.outputs.cache-hit != 'true'
         env:
           SOCRATA_APP_TOKEN: ${{ secrets.SOCRATA_APP_TOKEN }}
         run: python -m municipios --tolerante todo
+
+      - name: Armar el sitio con los datos en caché
+        if: steps.datos.outputs.cache-hit == 'true'
+        run: python -m municipios sitio
+
+      - name: Comprobar que ninguna fuente falló
+        id: completas
+        if: steps.datos.outputs.cache-hit != 'true'
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          fallidas = json.load(open("datos/intermedios/estado.json", encoding="utf-8")).get("fallidas", {})
+          print("ok=" + ("true" if not fallidas else "false"))
+          PY
+
+      - name: Guardar los datos calculados
+        if: steps.datos.outputs.cache-hit != 'true' && steps.completas.outputs.ok == 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: |
+            datos/intermedios
+            dist/data/mapas
+          key: ${{ steps.clave.outputs.clave }}
 
       - uses: actions/configure-pages@v6
 
