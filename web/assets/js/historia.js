@@ -124,7 +124,7 @@ function botonesCapitulo(cap) {
 // --- capítulos -------------------------------------------------------------------------------
 function portada(m, { idx, pais }) {
   const dato = (k) => (m.datos[k] ? fmt(m.datos[k].valor, idx.indicadores[k]?.unidad ?? '') : null);
-  const lineas = [dato('poblacion') && `${dato('poblacion')} habitantes`, dato('superficie_km2'), dato('densidad')].filter(Boolean);
+  const lineas = [dato('poblacion') && `${dato('poblacion')} habitantes`, dato('superficie_km2'), dato('densidad')].filter((x) => x && x !== '—');
   const p = m.puesto;
   const tam = m.nombre.length > 18 ? 9 : m.nombre.length > 12 ? 13 : 18;
   const puestos = p

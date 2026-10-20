@@ -267,6 +267,19 @@ def _dato(fila: dict, clave: str) -> dict | None:
     return fila.get("datos", {}).get(clave)
 
 
+def linea_portada(datos: DatosSitio, fila: dict) -> str:
+    """«137.624 habitantes · 876 km² · 157 hab./km²», sin los datos que falten."""
+    partes = []
+    if _dato(fila, "poblacion") is not None:
+        partes.append(f"{_valor_dato(datos, fila, 'poblacion')} habitantes")
+    partes += [
+        _valor_dato(datos, fila, clave)
+        for clave in ("superficie_km2", "densidad")
+        if _dato(fila, clave) is not None
+    ]
+    return " · ".join(partes)
+
+
 def _valor_dato(datos: DatosSitio, fila: dict, clave: str, unidad: str | None = None) -> str:
     """Valor formateado de un indicador de contexto (o «—»)."""
     dato = _dato(fila, clave)
@@ -807,9 +820,6 @@ def ficha(datos: DatosSitio, codigo: str, dir_mapas: Path | None = None) -> Pagi
         for p in datos.config.pilares
     )
     largo = "corto" if len(m.nombre) <= 12 else "medio" if len(m.nombre) <= 18 else "largo"
-    poblacion = _valor_dato(datos, fila, "poblacion")
-    superficie = _valor_dato(datos, fila, "superficie_km2")
-    densidad = _valor_dato(datos, fila, "densidad")
     anexo = (
         f'<h3>Los cuatro pilares</h3><ul class="pilares">{resumen_pilares}</ul>'
         f"{''.join(secciones)}"
@@ -827,7 +837,7 @@ def ficha(datos: DatosSitio, codigo: str, dir_mapas: Path | None = None) -> Pagi
   <div class="heroe__cuerpo">
     <p class="etiqueta mono">{escape(m.departamento)} · {escape(grupo)}</p>
     <h1 class="big ficha__nombre ficha__nombre--{largo}">{escape(m.nombre)}</h1>
-    <p class="lede">{poblacion} habitantes · {superficie} · {densidad}</p>
+    <p class="lede">{linea_portada(datos, fila)}</p>
     {medidor(fila.get("indice"), "Índice municipal", fila.get("semaforo"))}
     <div class="anillos">{anillos}</div>
     {puesto_html}

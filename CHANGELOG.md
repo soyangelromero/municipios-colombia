@@ -20,6 +20,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). S
 - **API PHP**: `apoyos.php` (una persona cuenta una vez por municipio y dato, por hash de IP) y `pedidos-ranking.php` (ranking y detalle por municipio); retención `dias_apoyos` (365) y límite `max_apoyos_hora`. Pruebas con `php -S`. Sin servidor, el bloque muestra el buscador y la hoja remite al formulario de la ficha.
 
 ### Corregido
+- La portada de la ficha (y la de la historia) omite la población, la superficie o la densidad cuando no hay dato, en lugar de mostrar «—».
 - La portada de la ficha mostraba «habitantes · — · —» en el sitio publicado: `todo` calculaba el índice antes de los mapas, y la superficie (de donde sale la densidad) viene de los mapas. En una máquina limpia, como la de la publicación, esos datos no existían al calcular el índice. Ahora `todo` corre `mapas` antes que `indice` (con prueba del orden).
 - Accesibilidad: los enlaces «Mapa», «Comparar» y «Contacto» del encabezado tenían nombre accesible vacío en pantallas angostas (solo se veía el icono); ahora llevan `aria-label` (aviso de PageSpeed Insights).
 

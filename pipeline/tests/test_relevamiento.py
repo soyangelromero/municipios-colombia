@@ -160,3 +160,21 @@ def test_json_de_la_ficha_lleva_el_detalle_de_cada_criterio():
     assert auto["criterios"] == [
         ["contratacion", "fuente_oficial", "https://x", "SECOP II: 9 contratos"]
     ]
+
+
+def test_linea_de_portada_omite_los_datos_que_faltan():
+    from types import SimpleNamespace
+
+    from municipios.exportar.paginas import linea_portada
+
+    datos = SimpleNamespace(indicadores={})
+
+    def fila(**valores):
+        return {"datos": {k: {"valor": v} for k, v in valores.items()}}
+
+    completa = linea_portada(datos, fila(poblacion=137624, superficie_km2=876.3, densidad=157))
+    assert completa.startswith("137.624 habitantes · ") and completa.count("·") == 2
+    solo_poblacion = linea_portada(datos, fila(poblacion=137624))
+    assert "—" not in solo_poblacion and "·" not in solo_poblacion
+    assert linea_portada(datos, fila(superficie_km2=876.3)).count("·") == 0
+    assert linea_portada(datos, fila()) == ""
