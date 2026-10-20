@@ -1,23 +1,20 @@
 // Ficha de municipio: mapa del departamento, compartir y modo historia.
-import { formatoNumero, municipios, raiz } from './comun.js';
+import { cargarJSON, formatoNumero, municipios, raiz } from './comun.js';
 import { activarMapa, colorear, insertarMapa } from './mapa.js';
-import { compartir } from './compartir.js';
+import { compartir, infoTarjeta } from './compartir.js';
 const abrirHistoria = (codigo, cap, origen) => import('./historia.js').then((m) => m.abrirHistoria(codigo, cap, origen));
 
 const ficha = document.querySelector('.ficha');
 
-/** Datos de la ficha para la tarjeta de compartir, leídos del propio HTML. */
-function infoFicha() {
-  const indice = ficha?.dataset.indice ?? '';
-  return {
-    nombre: ficha?.dataset.nombre ?? document.title,
-    slug: ficha?.dataset.codigo ?? '',
-    valor: indice === '' ? null : Number(indice.replace(',', '.')),
-    semaforo: ficha?.dataset.semaforo || null,
-    puesto: document.querySelector('.puestos dd')?.childNodes[0]?.textContent.trim() ?? '',
-    foto: ficha?.dataset.foto ?? null,
-    url: window.location.href,
-  };
+/** Datos de la ficha para la tarjeta de compartir: salen de los JSON del sitio. */
+async function infoFicha() {
+  const codigo = ficha?.dataset.codigo ?? '';
+  const [m, idx, pais] = await Promise.all([
+    cargarJSON(`data/m/${codigo}.json`),
+    cargarJSON('data/indice.json'),
+    cargarJSON('data/pais.json'),
+  ]);
+  return infoTarjeta(m, idx, pais, { slug: codigo, foto: ficha?.dataset.foto ?? null, url: window.location.href });
 }
 
 async function mapaDelDepartamento() {
@@ -41,7 +38,13 @@ function compartirBoton() {
   const boton = document.querySelector('[data-compartir]');
   if (!boton) return;
   boton.hidden = false;
-  boton.addEventListener('click', () => compartir(infoFicha(), boton));
+  boton.addEventListener('click', async () => {
+    try {
+      compartir(await infoFicha(), boton);
+    } catch {
+      /* sin los datos no hay tarjeta: el botón no hace nada */
+    }
+  });
 }
 
 compartirBoton();

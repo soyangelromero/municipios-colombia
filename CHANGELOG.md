@@ -4,6 +4,10 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). S
 
 ## [Sin publicar]
 
+### Mejorado: tarjeta para compartir
+- Nuevo diseño (feed 1080×1350 e historias 1080×1920): foto del municipio a toda la tarjeta, nombre grande, habitantes y grupo, medidor en arco de rojo a verde con el índice al centro, puesto en el departamento y en el país, y los cuatro pilares con su puntaje y color. Pie con «Datos públicos y fuentes oficiales. Lectura de datos, no una acusación.» y la dirección de la ficha.
+- Los datos de la tarjeta salen ahora de los JSON del sitio (`infoTarjeta` en `compartir.js`), igual desde la ficha que desde la historia. Al compartir un pilar desde la historia, el medidor muestra el puntaje de ese pilar.
+
 ### Mejorado: el relevamiento de transparencia halla más (menos falsos «no hallado»)
 - **Rastreo más profundo** (`relevamiento/rastreo.py`): si tras leer el menú de transparencia faltan criterios, abre hasta 2 niveles de las secciones que podrían tenerlos (según la estructura de la Resolución MinTIC 1519: información de la entidad, planeación, presupuesto, contratación, control, participación, datos abiertos), solo del mismo sitio, sin archivos y con tope de 6 páginas por municipio. Respeta `robots.txt` (y su `Crawl-delay`, con tope de 10 s), espera 2 s entre páginas del mismo sitio y se identifica con el agente propio. Los enlaces sin texto (iconos) se leen ahora por su texto interno, `title`, `aria-label` o dirección.
 - **Cruce con fuentes oficiales** (`relevamiento/cruces.py`): un criterio que el sitio no muestra pero que SECOP II (contratación), SIGEP II (directorio y salarios, por NIT) o el catálogo de datos.gov.co (conjuntos de la propia alcaldía) sí muestran pasa a `fuente_oficial`, con la URL y un detalle. No se usan buscadores. El Kit de Planeación Territorial del DNP no se cruza: no tiene datos abiertos por municipio legibles sin raspar su portal (ver `docs/metodologia.md`).

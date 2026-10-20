@@ -1,7 +1,7 @@
 // Ficha en formato historias (e2e/06): capa a pantalla completa con un capítulo por pantalla.
 // Cada capítulo se arma con los JSON del sitio (data/m/<código>.json, indice.json, pais.json).
 import { cargarJSON, dibujarSilueta, escapar as esc, formatoNumero as num, formatoSegunUnidad as fmt, raiz } from './comun.js';
-import { compartir } from './compartir.js';
+import { compartir, infoTarjeta } from './compartir.js';
 import { CRITERIOS, ICONO_ALTAVOZ, abrirHojaPedido, cargarEstilos as estilosPedidos, detalle as detallePedidos } from './pedidos.js';
 
 const DURACION = 9000; // ms por capítulo
@@ -444,16 +444,14 @@ async function compartirActual(boton) {
   const hayPausa = abierta.pausado;
   if (!hayPausa) pausa(true, true); // la historia no avanza mientras está abierta la hoja
   await compartir(
-    {
-      nombre: m.nombre,
+    infoTarjeta(m, ctx.idx, ctx.pais, {
       slug: compartePilar ? `${m.codigo}-${cap.toLowerCase()}` : m.codigo,
       etiqueta: compartePilar ? pilarCap.nombre : '',
       valor: compartePilar ? valorPilar : m.indice,
       semaforo: compartePilar ? estado(valorPilar, ctx.idx) : m.semaforo,
-      puesto: !compartePilar && m.puesto ? String(m.puesto.nacional) : '',
       foto: m.foto ? new URL(`${raiz}assets/fotos/${m.codigo}-1080.webp`, location.href).href : null,
       url: new URL(`${raiz}m/${m.slug}/`, location.href).href,
-    },
+    }),
     boton,
   );
   if (abierta && !hayPausa) pausa(false, true);

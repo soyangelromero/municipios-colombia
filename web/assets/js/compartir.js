@@ -52,75 +52,209 @@ async function prepararFuentes() {
   try {
     await document.fonts.ready;
     await Promise.all([
-      document.fonts.load('300 96px Geist'),
-      document.fonts.load('800 300px Geist'),
-      document.fonts.load('600 32px "Geist Mono"'),
+      document.fonts.load('400 38px Geist'),
+      document.fonts.load('600 38px Geist'),
+      document.fonts.load('800 150px Geist'),
+      document.fonts.load('500 32px "Geist Mono"'),
+      document.fonts.load('600 38px "Geist Mono"'),
     ]);
   } catch {
     /* si las fuentes no cargan, se dibuja con la del sistema */
   }
 }
 
+const PILARES_CORTOS = { T: 'Transparencia', S: 'Servicios y seguridad', G: 'Gestión fiscal', C: 'Control' };
+const estadoDe = (v, semaforo) =>
+  v === null || v === undefined ? 'sin' : v < semaforo.rojo_menor_a ? 'rojo' : v >= semaforo.verde_desde ? 'verde' : 'amarillo';
+
+/**
+ * Datos de la tarjeta a partir de la ficha (data/m/<código>.json), indice.json y pais.json.
+ * `extra` puede traer { url, foto, slug, etiqueta, valor, semaforo } para sustituir el índice por
+ * el de un pilar (al compartir un capítulo de la historia).
+ */
+export function infoTarjeta(m, idx, pais, extra = {}) {
+  const poblacion = m.datos?.poblacion?.valor;
+  const detalle = [
+    poblacion ? `${formatoNumero(poblacion, 0)} habitantes` : null,
+    m.grupo ? (pais.grupos?.[m.grupo] ?? m.grupo) : null,
+  ].filter(Boolean);
+  const p = m.puesto;
+  return {
+    nombre: m.nombre,
+    departamento: m.departamento,
+    detalle: detalle.join(' · '),
+    valor: m.indice,
+    semaforo: m.semaforo,
+    puestos: p
+      ? [
+          p.departamento ? `Puesto ${p.departamento} de ${formatoNumero(p.departamento_de, 0)} en ${m.departamento}` : null,
+          p.nacional ? `Puesto ${formatoNumero(p.nacional, 0)} de ${formatoNumero(p.nacional_de, 0)} en el país` : null,
+        ].filter(Boolean)
+      : [],
+    pilares: idx.pilares.map((x) => {
+      const v = m.pilares?.[x.id]?.valido ? m.pilares[x.id].puntaje : null;
+      return { nombre: PILARES_CORTOS[x.id] ?? x.nombre, valor: v, semaforo: estadoDe(v, idx.semaforo) };
+    }),
+    ...extra,
+  };
+}
+
+function rectRedondeado(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+function fondo(ctx, ancho, alto, foto, color) {
+  ctx.fillStyle = '#0a0d12';
+  ctx.fillRect(0, 0, ancho, alto);
+  if (foto) {
+    const escala = Math.max(ancho / foto.width, alto / foto.height);
+    const w = foto.width * escala;
+    const h = foto.height * escala;
+    ctx.drawImage(foto, (ancho - w) / 2, (alto - h) / 2, w, h);
+  } else {
+    const halo = ctx.createRadialGradient(ancho / 2, alto * 0.4, 40, ancho / 2, alto * 0.4, ancho);
+    halo.addColorStop(0, `${color}33`);
+    halo.addColorStop(1, 'rgba(10,13,18,0)');
+    ctx.fillStyle = halo;
+    ctx.fillRect(0, 0, ancho, alto);
+  }
+  const velo = ctx.createLinearGradient(0, 0, 0, alto);
+  velo.addColorStop(0, 'rgba(10,13,18,0.30)');
+  velo.addColorStop(0.45, 'rgba(10,13,18,0.50)');
+  velo.addColorStop(0.7, 'rgba(10,13,18,0.90)');
+  velo.addColorStop(1, 'rgba(10,13,18,0.97)');
+  ctx.fillStyle = velo;
+  ctx.fillRect(0, 0, ancho, alto);
+}
+
+/** Medidor semicircular: pista tenue, arco de rojo a verde hasta el valor y una perilla. */
+function medidor(ctx, cx, cy, radio, valor, color) {
+  ctx.lineCap = 'round';
+  ctx.lineWidth = 46;
+  ctx.strokeStyle = 'rgba(255,255,255,0.14)';
+  ctx.beginPath();
+  ctx.arc(cx, cy, radio, Math.PI, 2 * Math.PI);
+  ctx.stroke();
+  if (valor === null || valor === undefined) return;
+  const fin = Math.PI + (Math.PI * Math.min(Math.max(valor, 0), 100)) / 100;
+  const degradado = ctx.createLinearGradient(cx - radio, 0, cx + radio, 0);
+  degradado.addColorStop(0, '#EF4444');
+  degradado.addColorStop(0.5, '#EAB308');
+  degradado.addColorStop(1, '#22C55E');
+  ctx.strokeStyle = degradado;
+  ctx.beginPath();
+  ctx.arc(cx, cy, radio, Math.PI, fin);
+  ctx.stroke();
+  const x = cx + radio * Math.cos(fin);
+  const y = cy + radio * Math.sin(fin);
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.arc(x, y, 31, 0, 2 * Math.PI);
+  ctx.fill();
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(x, y, 19, 0, 2 * Math.PI);
+  ctx.fill();
+}
+
 /** Dibuja la tarjeta (ancho × alto) en un contexto ya listo: sin esperas y sin red. */
 function dibujar(ctx, info, ancho, alto, foto) {
   const color = COLORES[info.semaforo] ?? COLORES.sin;
-  ctx.fillStyle = '#0a0d12';
-  ctx.fillRect(0, 0, ancho, alto);
-
-  if (foto) {
-    const altoFoto = Math.round(alto * 0.46);
-    const escala = Math.max(ancho / foto.width, altoFoto / foto.height);
-    const w = foto.width * escala;
-    const h = foto.height * escala;
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(0, 0, ancho, altoFoto); // la foto no se sale de su franja
-    ctx.clip();
-    ctx.drawImage(foto, (ancho - w) / 2, (altoFoto - h) / 2, w, h);
-    ctx.restore();
-    const degradado = ctx.createLinearGradient(0, 0, 0, altoFoto);
-    degradado.addColorStop(0, 'rgba(10,13,18,0.15)');
-    degradado.addColorStop(1, 'rgba(10,13,18,1)');
-    ctx.fillStyle = degradado;
-    ctx.fillRect(0, 0, ancho, altoFoto);
-  }
-
-  ctx.fillStyle = color;
-  ctx.fillRect(0, 0, ancho, 18);
-
-  const margen = 84;
+  const margen = 72;
+  const interior = ancho - margen * 2;
+  const sobra = Math.max(alto - 1350, 0); // en historias sobra alto: se reparte entre bloques
+  const bajoCabecera = Math.round(sobra * 0.22);
+  const bajoMedidor = Math.round(sobra * 0.5);
+  fondo(ctx, ancho, alto, foto, color);
   ctx.textBaseline = 'alphabetic';
-  ctx.fillStyle = '#97a3b8';
-  ctx.font = '600 32px "Geist Mono", monospace';
-  ctx.fillText('MUNICIPIOS · COLOMBIA', margen, 158);
+  ctx.textAlign = 'left';
 
-  const base = foto ? Math.round(alto * 0.4) : Math.round(alto * 0.3);
-  ctx.fillStyle = '#f4f5f7';
-  ctx.font = '300 96px "Geist", system-ui, sans-serif';
-  const n = lineas(ctx, envolver(info.nombre, 28).split(' '), margen, base, ancho - margen * 2, 104);
-
-  ctx.fillStyle = color;
-  ctx.font = '800 300px "Geist", system-ui, sans-serif';
-  ctx.fillText(formatoNumero(info.valor), margen, base + n * 104 + 240);
-
-  ctx.fillStyle = '#97a3b8';
-  ctx.font = '600 44px "Geist Mono", monospace';
-  const etiqueta = info.etiqueta ? `${info.etiqueta.toUpperCase()} · ` : '';
-  const estado = (TEXTO[info.semaforo] ?? TEXTO.sin).toUpperCase();
-  ctx.fillText(`${etiqueta}/ 100 · ${estado}`, margen, base + n * 104 + 320);
-
-  if (info.puesto) {
+  // Cabecera: marca y departamento.
+  [36, 52, 68].forEach((h, i) => {
     ctx.fillStyle = '#f4f5f7';
-    ctx.font = '400 48px "Geist", system-ui, sans-serif';
-    ctx.fillText(`Puesto ${info.puesto} del país`, margen, base + n * 104 + 420);
-  }
-
-  ctx.fillStyle = '#97a3b8';
-  ctx.font = '400 32px "Geist", system-ui, sans-serif';
-  ctx.fillText('Cada cifra con su fuente oficial', margen, alto - 170);
+    rectRedondeado(ctx, margen + i * 30, 124 - h, 22, h, 6);
+    ctx.fill();
+  });
   ctx.fillStyle = '#f4f5f7';
-  ctx.font = '600 34px "Geist Mono", monospace';
-  ctx.fillText(info.url.replace(/^https?:\/\//, ''), margen, alto - 104);
+  ctx.font = '600 38px "Geist", system-ui, sans-serif';
+  ctx.fillText('Municipios Colombia', margen + 104, 120);
+  ctx.fillStyle = '#b7c0cf';
+  ctx.font = '500 32px "Geist Mono", monospace';
+  ctx.textAlign = 'right';
+  ctx.fillText((info.departamento ?? '').toUpperCase(), ancho - margen, 118);
+  ctx.textAlign = 'left';
+
+  // Nombre: el cuerpo más grande en que cabe en una línea.
+  let cuerpo = 150;
+  const nombre = envolver(info.nombre, 34);
+  ctx.font = `800 ${cuerpo}px "Geist", system-ui, sans-serif`;
+  while (ctx.measureText(nombre).width > interior && cuerpo > 60) {
+    cuerpo -= 4;
+    ctx.font = `800 ${cuerpo}px "Geist", system-ui, sans-serif`;
+  }
+  const yNombre = 252 + bajoCabecera;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(nombre, margen, yNombre);
+  ctx.fillStyle = '#c3cad6';
+  ctx.font = '400 38px "Geist", system-ui, sans-serif';
+  if (info.detalle) ctx.fillText(info.detalle, margen, yNombre + 62);
+
+  // Medidor con el valor al centro.
+  const cx = ancho / 2;
+  const cy = 690 + bajoCabecera + Math.round(bajoMedidor * 0.4);
+  medidor(ctx, cx, cy, 262, info.valor, color);
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '800 210px "Geist", system-ui, sans-serif';
+  ctx.fillText(info.valor === null || info.valor === undefined ? '—' : formatoNumero(info.valor), cx, cy - 10);
+  ctx.fillStyle = '#b7c0cf';
+  ctx.font = '500 34px "Geist Mono", monospace';
+  ctx.fillText(info.etiqueta ? `${info.etiqueta.toUpperCase()} SOBRE 100` : 'ÍNDICE MUNICIPAL SOBRE 100', cx, cy + 64);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '600 44px "Geist", system-ui, sans-serif';
+  const puestos = info.etiqueta ? [] : (info.puestos ?? []);
+  puestos.forEach((linea, i) => ctx.fillText(linea, cx, cy + 126 + i * 54));
+  ctx.textAlign = 'left';
+
+  // Los cuatro pilares.
+  const alturaCaja = 112;
+  const anchoCaja = (interior - 24) / 2;
+  const y0 = cy + 126 + Math.max(puestos.length, 1) * 54 + 30 + Math.round(bajoMedidor * 0.15);
+  (info.pilares ?? []).slice(0, 4).forEach((p, i) => {
+    const x = margen + (i % 2) * (anchoCaja + 24);
+    const y = y0 + Math.floor(i / 2) * (alturaCaja + 14);
+    ctx.fillStyle = 'rgba(20,25,34,0.78)';
+    rectRedondeado(ctx, x, y, anchoCaja, alturaCaja, 26);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    const c = COLORES[p.semaforo] ?? COLORES.sin;
+    ctx.fillStyle = c;
+    ctx.beginPath();
+    ctx.arc(x + 38, y + 38, 11, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.fillStyle = '#d9dee7';
+    ctx.font = '400 32px "Geist", system-ui, sans-serif';
+    ctx.fillText(envolver(p.nombre, 24), x + 62, y + 49);
+    ctx.fillStyle = c;
+    ctx.font = '800 56px "Geist", system-ui, sans-serif';
+    ctx.fillText(p.valor === null || p.valor === undefined ? 'Sin dato' : `${formatoNumero(p.valor, 0)}/100`, x + 30, y + 98);
+  });
+
+  // Pie: aviso y dirección.
+  ctx.fillStyle = '#9aa5b6';
+  ctx.font = '400 30px "Geist", system-ui, sans-serif';
+  ctx.fillText('Datos públicos y fuentes oficiales. Lectura de datos, no una acusación.', margen, alto - 104);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '600 38px "Geist Mono", monospace';
+  ctx.fillText(info.url.replace(/^https?:\/\//, '').replace(/\/$/, ''), margen, alto - 52);
 }
 
 /** Vista previa rápida: la misma tarjeta a escala pequeña y sin codificar PNG. */
