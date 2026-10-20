@@ -11,16 +11,25 @@ def numero(valor: float | int | None, decimales: int = 0) -> str:
 
 
 def pesos(valor: float | None) -> str:
-    """Pesos con abreviatura legible: $ 1,2 billones, $ 345 mil millones, $ 12 millones."""
+    """Pesos abreviados: $ 1,2 billones, $ 345 mil millones, $ 1 millón, $ 12 millones."""
     if valor is None:
         return "—"
     if abs(valor) >= 1e12:
-        return f"$ {numero(valor / 1e12, 1)} billones"
+        return f"$ {_cantidad(valor / 1e12, 'billón', 'billones')}"
     if abs(valor) >= 1e9:
         return f"$ {numero(valor / 1e9, 0)} mil millones"
     if abs(valor) >= 1e6:
-        return f"$ {numero(valor / 1e6, 0)} millones"
+        return f"$ {_cantidad(valor / 1e6, 'millón', 'millones')}"
     return f"$ {numero(valor)}"
+
+
+def _cantidad(valor: float, singular: str, plural: str) -> str:
+    """«1 millón» (singular), «1,4 millones», «12 millones»: un decimal solo por debajo de 10."""
+    redondo = round(valor, 1) if abs(valor) < 10 else round(valor)
+    if redondo == 1:
+        return f"1 {singular}"
+    decimales = 1 if abs(valor) < 10 and redondo != int(redondo) else 0
+    return f"{numero(redondo, decimales)} {plural}"
 
 
 def segun_unidad(valor: float | int | str | None, unidad: str) -> str:

@@ -18,6 +18,10 @@ def test_numero_en_formato_colombiano(valor, decimales, esperado):
     [
         (1.2e12, "pesos corrientes", "$ 1,2 billones"),
         (345e9, "pesos corrientes", "$ 345 mil millones"),
+        (1.04e6, "pesos corrientes", "$ 1 millón"),
+        (1.4e6, "pesos corrientes", "$ 1,4 millones"),
+        (12.3e6, "pesos corrientes", "$ 12 millones"),
+        (1.0e12, "pesos corrientes", "$ 1 billón"),
         (2650826, "pesos por habitante", "$ 2.650.826"),
         (87.04, "% del gasto comprometido", "87,0 %"),
         (100, "sí/no", "Sí"),

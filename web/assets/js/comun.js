@@ -33,6 +33,14 @@ export function formatoNumero(valor, decimales = 1) {
   return (decimales === 0 ? entero : numero).format(valor);
 }
 
+/** «1 millón» (singular), «1,4 millones», «12 millones»: un decimal solo por debajo de 10. */
+function cantidad(valor, singular, plural) {
+  const redondo = Math.abs(valor) < 10 ? Math.round(valor * 10) / 10 : Math.round(valor);
+  if (redondo === 1) return `1 ${singular}`;
+  const decimales = Math.abs(valor) < 10 && !Number.isInteger(redondo) ? 1 : 0;
+  return `${formatoNumero(redondo, decimales)} ${plural}`;
+}
+
 /** Igual criterio que pipeline/municipios/exportar/formato.py: según la unidad del indicador. */
 export function formatoSegunUnidad(valor, unidad = '') {
   if (valor === null || valor === undefined) return '—';
@@ -40,9 +48,9 @@ export function formatoSegunUnidad(valor, unidad = '') {
   if (u === 'sí/no') return valor >= 50 ? 'Sí' : 'No';
   if (u.includes('peso')) {
     if (u.includes('por habitante')) return `$ ${formatoNumero(valor, 0)}`;
-    if (Math.abs(valor) >= 1e12) return `$ ${formatoNumero(valor / 1e12)} billones`;
+    if (Math.abs(valor) >= 1e12) return `$ ${cantidad(valor / 1e12, 'billón', 'billones')}`;
     if (Math.abs(valor) >= 1e9) return `$ ${formatoNumero(valor / 1e9, 0)} mil millones`;
-    if (Math.abs(valor) >= 1e6) return `$ ${formatoNumero(valor / 1e6, 0)} millones`;
+    if (Math.abs(valor) >= 1e6) return `$ ${cantidad(valor / 1e6, 'millón', 'millones')}`;
     return `$ ${formatoNumero(valor, 0)}`;
   }
   if (u.startsWith('%')) return `${formatoNumero(valor)} %`;

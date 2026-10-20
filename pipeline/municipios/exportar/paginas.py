@@ -383,7 +383,7 @@ def _señales(datos: DatosSitio, codigo: str) -> list[tuple[str, str, str]]:
             (
                 "info",
                 "Gasto por habitante (contexto, no puntúa)",
-                formato.segun_unidad(gasto["valor"], "pesos"),
+                formato.segun_unidad(gasto["valor"], "pesos por habitante"),
             )
         )
     return señales
@@ -664,7 +664,7 @@ def _cap_contexto(datos: DatosSitio, codigo: str) -> str:
     fila = datos.indice[codigo]
     gasto = _dato(fila, "gasto_por_habitante")
     if gasto is not None:
-        cifra = f'<p class="big money">{formato.segun_unidad(gasto["valor"], "pesos")}</p>'
+        cifra = f'<p class="big money">{formato.segun_unidad(gasto["valor"], "pesos por habitante")}</p>'
         pie = (
             f'<p class="mono">{escape(formato.periodo(gasto["periodo"]))} · '
             f"{enlaces_fuente(datos, gasto['fuentes'])}</p>"
@@ -690,7 +690,7 @@ def _cap_contexto(datos: DatosSitio, codigo: str) -> str:
     return (
         '<section class="cap cap--contexto" data-capitulo="Contexto">'
         '<p class="ojo mono"><span class="acc">05</span> Contexto · no puntúa</p>'
-        '<h2 class="h"><span class="lt">Gastó por vecino</span> <span class="q-info">(contexto)</span></h2>'
+        '<h2 class="h"><span class="lt">Gastó por vecino</span></h2>'
         f"{cifra}{pie}"
         f'<div class="kpi-grid">{"".join(kpis) or "<p>Sin datos de contexto.</p>"}</div></section>'
     )
