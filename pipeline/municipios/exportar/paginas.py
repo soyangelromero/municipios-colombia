@@ -483,7 +483,13 @@ def inicio(datos: DatosSitio, dir_mapas: Path) -> Pagina:
 <section class="rail revela">
   <div class="rail-h">
     <h2>Elige un municipio</h2>
-    <p class="mono">{formato.numero(total)} municipios · los 40 primeros</p>
+    <div class="rail-h__der">
+      <p class="mono">{formato.numero(total)} municipios · los 40 primeros</p>
+      <div class="rail-nav">
+        <button type="button" class="rail-btn" data-carrusel-nav="ant" aria-label="Municipios anteriores" disabled><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><path d="m12 4-6 6 6 6"/></svg></button>
+        <button type="button" class="rail-btn" data-carrusel-nav="sig" aria-label="Más municipios"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><path d="m8 4 6 6-6 6"/></svg></button>
+      </div>
+    </div>
   </div>
   <div class="rail__filtros">
     <label class="sel">

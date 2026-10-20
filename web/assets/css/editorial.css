@@ -888,6 +888,41 @@
 
 .rail-h .mono { color: var(--mute); }
 
+.rail-h__der { display: flex; align-items: center; gap: 1rem; }
+.rail-nav { display: flex; gap: 0.5rem; }
+
+.rail-btn {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--glass);
+  color: var(--fg);
+  cursor: pointer;
+  transition: background 0.2s var(--ease), opacity 0.2s var(--ease);
+}
+
+.rail-btn:hover:not(:disabled) { background: var(--glass-hover); }
+.rail-btn:disabled { opacity: 0.3; cursor: default; }
+
+.rail-btn .ico {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (width <= 700px) {
+  .rail-h { flex-wrap: wrap; align-items: center; }
+  .rail-h__der .mono { display: none; }
+}
+
 .rail__filtros {
   display: flex;
   gap: 0.5rem;
@@ -911,6 +946,13 @@
   font: inherit;
   font-size: 13px;
   cursor: pointer;
+}
+
+/* La lista desplegable la pinta el sistema: sin fondo propio saldría blanca con letra clara. */
+select option,
+select optgroup {
+  background-color: var(--ink-2);
+  color: var(--fg);
 }
 
 .sel::after {

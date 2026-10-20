@@ -56,12 +56,25 @@ function intro() {
 function carrusel() {
   const pista = document.querySelector('[data-carrusel]');
   if (!pista) return;
-  document.querySelectorAll('[data-carrusel-nav]').forEach((boton) => {
+  const botones = document.querySelectorAll('[data-carrusel-nav]');
+  // Los botones se apagan en los extremos de la pista (y al filtrar, cuando cambia lo que cabe).
+  const actualizar = () => {
+    const final = pista.scrollWidth - pista.clientWidth - 2;
+    botones.forEach((b) => {
+      b.disabled = b.dataset.carruselNav === 'ant' ? pista.scrollLeft <= 2 : pista.scrollLeft >= final;
+    });
+  };
+  botones.forEach((boton) => {
     boton.addEventListener('click', () => {
       const paso = pista.clientWidth * 0.8 * (boton.dataset.carruselNav === 'sig' ? 1 : -1);
       pista.scrollBy({ left: paso, behavior: 'smooth' });
     });
   });
+  pista.addEventListener('scroll', actualizar, { passive: true });
+  pista.addEventListener('scrollend', actualizar);
+  addEventListener('resize', actualizar);
+  document.querySelectorAll('.rail__filtros select').forEach((s) => s.addEventListener('change', () => requestAnimationFrame(actualizar)));
+  actualizar();
 }
 
 /** Aparición suave de los elementos con la clase «revela» (desactivada con reduced motion). */

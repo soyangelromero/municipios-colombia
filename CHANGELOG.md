@@ -30,6 +30,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). S
 - **API PHP**: `apoyos.php` (una persona cuenta una vez por municipio y dato, por hash de IP) y `pedidos-ranking.php` (ranking y detalle por municipio); retención `dias_apoyos` (365) y límite `max_apoyos_hora`. Pruebas con `php -S`. Sin servidor, el bloque muestra el buscador y la hoja remite al formulario de la ficha.
 
 ### Corregido
+- Portada: el carrusel de municipios tiene botones de flecha (anterior/siguiente, que se apagan en los extremos); antes solo se podía avanzar con el teclado. Las listas desplegables de los filtros ya no salen en blanco sobre blanco en modo oscuro.
 - Cifras en pesos: singular correcto («$ 1 millón», «$ 1 billón») y un decimal por debajo de 10 («$ 1,4 millones»); antes salía «$ 1 millones» y se perdía precisión. La cifra grande de «Gastó por vecino» en la ficha muestra el valor completo (como la historia) y se quitó el «(contexto)» del título, que ya dice «Contexto · no puntúa» encima.
 - «Lo que más le piden los vecinos»: usa el mismo contenedor centrado y el mismo título grande que el resto de la portada; el armazón de la sección pasa a `editorial.css` (antes se veía sin estilo hasta que cargaba `pedidos.css`) y el estado vacío es una tarjeta contenida.
 - La portada de la ficha (y la de la historia) omite la población, la superficie o la densidad cuando no hay dato, en lugar de mostrar «—».
