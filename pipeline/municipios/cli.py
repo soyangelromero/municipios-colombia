@@ -266,8 +266,10 @@ def comando_todo(contexto: Contexto) -> None:
                 raise
             log.exception("%s falló; se continúa con las demás fuentes", nombre)
             fallidas[nombre] = repr(error)[:300]
-    comando_indice(contexto)
+    # Los mapas van antes del índice: de ellos sale la superficie (territorio.json) que el
+    # índice lee para la densidad. En una máquina limpia, al revés, la ficha queda sin ese dato.
     comando_mapas(contexto)
+    comando_indice(contexto)
     comando_sitio(contexto)
     escribir_json(DIR_INTERMEDIOS / "estado.json", {"generado": ahora_iso(), "fallidas": fallidas})
     if fallidas:
