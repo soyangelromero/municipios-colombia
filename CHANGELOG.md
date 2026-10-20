@@ -6,7 +6,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). S
 
 ### Agregado: «Lo que más le piden los vecinos»
 - **Portada**: bloque con podio de 3 municipios (foto, total de pedidos, datos más pedidos, «Súmate al reclamo» y fila para compartir), lista del 4.º en adelante con «Cargar más», filtro por departamento y aviso «en vivo» con el último pedido. Se descarga solo al acercarse (`vecinos.js`, `pedidos.css`).
-- **Historia de transparencia**: botón «Súmate al pedido · N pedidos» que abre la hoja «Lo que no publica»: cada dato pendiente con su contador y «Quiero que lo publiquen»; al pedir, confirmación y compartir en WhatsApp, Instagram, Facebook, X, Threads, Telegram, copiar enlace o el menú del sistema.
+- **Historia de transparencia**: botón «Súmate al pedido · N pedidos» que abre la hoja «Lo que no encontramos» (con la fecha de la revisión automática, «sin verificación humana» y un enlace para avisar si ya lo publica): cada dato pendiente con su contador y «Quiero que lo publiquen»; al pedir, confirmación y compartir en WhatsApp, Instagram, Facebook, X, Threads, Telegram, copiar enlace o el menú del sistema.
 - **Sin hosting propio**: `worker/` es el mismo servicio para Cloudflare Workers (plan gratuito + D1), con la misma API y pruebas; guía paso a paso en `docs/cloudflare.md`. La página de privacidad declara que, con el servicio activo, el navegador consulta a Cloudflare.
 - **API PHP**: `apoyos.php` (una persona cuenta una vez por municipio y dato, por hash de IP) y `pedidos-ranking.php` (ranking y detalle por municipio); retención `dias_apoyos` (365) y límite `max_apoyos_hora`. Pruebas con `php -S`. Sin servidor, el bloque muestra el buscador y la hoja remite al formulario de la ficha.
 

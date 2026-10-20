@@ -1,4 +1,4 @@
-// Portada: «Lo que más le piden los vecinos». Municipios con más pedidos de datos que hoy no publican.
+// Portada: «Lo que más le piden los vecinos». Municipios con más pedidos de datos que no encontramos en su sitio web.
 // Los conteos vienen de la API PHP opcional; sin ella se muestra el buscador para elegir un municipio.
 import { cargarJSON, escapar as esc, formatoNumero as num, municipios, normalizar, raiz } from './comun.js';
 import { CRITERIOS, cargarEstilos, hayServidor, htmlCompartir, manejarRed, ranking, sumar } from './pedidos.js';
@@ -58,7 +58,7 @@ function fila(x, i) {
 
 function vacio() {
   return `<div class="vp-vacio"><h3>Sé el primero: <span>elige tu municipio</span></h3>
-    <p>Todavía hay pocos pedidos${estado.dep ? ' en este departamento' : ''}. Busca tu municipio, mira qué datos no publica y súmate al pedido.</p>
+    <p>Todavía hay pocos pedidos${estado.dep ? ' en este departamento' : ''}. Busca tu municipio, mira qué datos no encontramos en su sitio y súmate al pedido.</p>
     <div class="vp-buscar"><input type="search" data-vp-q placeholder="Escribe el nombre de tu municipio" autocomplete="off" aria-label="Buscar municipio"><ul data-vp-ql hidden></ul></div></div>`;
 }
 

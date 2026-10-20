@@ -483,10 +483,10 @@ def inicio(datos: DatosSitio, dir_mapas: Path) -> Pagina:
 <section class="vp revela" id="vecinos-piden" data-vecinos aria-labelledby="vp-t">
   <p class="vp-k"><span class="vp-vivo" aria-hidden="true"></span>En vivo</p>
   <h2 id="vp-t"><span class="lt">Lo que más le piden</span> <span class="o">los vecinos</span></h2>
-  <p class="vp-sub">Municipios con más pedidos de datos que hoy no publican. Cada vecino cuenta una vez. No mide calidad ni acusa a nadie: muestra qué información quiere ver la gente.</p>
+  <p class="vp-sub">Municipios con más pedidos de datos que no encontramos en su sitio web. Cada vecino cuenta una vez. No mide calidad ni acusa a nadie: muestra qué información quiere ver la gente.</p>
   <label class="vp-filtro"><span>Departamento</span><select data-vp-dep><option value="">Todo el país</option></select></label>
   <div class="vp-tk" data-vp-cinta aria-live="polite" hidden></div>
-  <div data-vp-cuerpo><p class="nota">Elige un municipio, mira qué datos no publica y súmate al pedido. <a href="ranking/">Ver el ranking completo</a>.</p></div>
+  <div data-vp-cuerpo><p class="nota">Elige un municipio, mira qué datos no encontramos en su sitio y súmate al pedido. <a href="ranking/">Ver el ranking completo</a>.</p></div>
 </section>
 
 <section class="revela bloque-pilares">
@@ -850,7 +850,7 @@ def ficha(datos: DatosSitio, codigo: str, dir_mapas: Path | None = None) -> Pagi
   <h2>¿Ves algo mal o falta un dato?</h2>
   <p class="nota">Tu aviso se publica con su fecha en el registro de correcciones. Si una alcaldía quiere responder, este es su derecho de réplica.</p>
   {formulario("reporte", datos, titulo="Reportar un error en un dato", ayuda="Si el sitio no tiene servidor, se abre un issue en GitHub con tu mensaje.", municipio=f"{m.nombre}, {m.departamento} ({codigo})")}
-  {formulario("pedido", datos, titulo="Pedir un dato que la alcaldía no publica", ayuda="Nos ayuda a completar la ficha y a ejercer el derecho de petición.", municipio=f"{m.nombre}, {m.departamento} ({codigo})", asunto=True)}
+  {formulario("pedido", datos, titulo="Pedir un dato que no encontramos publicado", ayuda="Nos ayuda a completar la ficha y a ejercer el derecho de petición.", municipio=f"{m.nombre}, {m.departamento} ({codigo})", asunto=True)}
 </section>
 </article>
 <footer class="nota-final contenedor">

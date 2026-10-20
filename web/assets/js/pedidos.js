@@ -151,8 +151,8 @@ export async function manejarRed(boton) {
 
 // --- hoja: elegir qué dato pedir --------------------------------------------------------------------
 /**
- * Abre la hoja «Lo que no publica» con los datos pendientes; cada fila tiene su botón.
- * `m` = { codigo, nombre, slug }, `opciones` = [{ id, nombre }]. La promesa se cumple al cerrar.
+ * Abre la hoja «Lo que no encontramos» con los datos pendientes; cada fila tiene su botón.
+ * `m` = { codigo, nombre, slug, revision, reportar }, `opciones` = [{ id, nombre }]. La promesa se cumple al cerrar.
  */
 export async function abrirHojaPedido(m, opciones, origen = null) {
   await cargarEstilos();
@@ -163,7 +163,11 @@ export async function abrirHojaPedido(m, opciones, origen = null) {
     hoja.className = 'sheet sheet--pedir';
     hoja.setAttribute('role', 'dialog');
     hoja.setAttribute('aria-modal', 'true');
-    hoja.setAttribute('aria-label', `Datos que ${m.nombre} no publica`);
+    hoja.setAttribute('aria-label', `Datos que no encontramos de ${m.nombre}`);
+    const dia = m.revision ? new Date(`${m.revision}T12:00:00`) : null;
+    const revision = dia && !Number.isNaN(dia.getTime())
+      ? ` (revisión automática del ${dia.toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' })}, sin verificación humana)`
+      : '';
     const urlFicha = new URL(`${raiz}m/${m.slug}/`, location.href).href;
     const filas = opciones
       .map(
@@ -176,8 +180,9 @@ export async function abrirHojaPedido(m, opciones, origen = null) {
       ? ''
       : `<p class="nota">Este sitio todavía no cuenta pedidos. Por ahora puedes pedirlo con el <a href="${raiz}m/${esc(m.slug)}/#reportar">formulario de la ficha</a>.</p>`;
     hoja.innerHTML = `
-      <div class="sheet__cabecera"><h2>Lo que no publica</h2>
+      <div class="sheet__cabecera"><h2>Lo que no encontramos</h2>
         <button type="button" class="st-btn" data-cerrar aria-label="Cerrar">✕</button></div>
+      <p class="nota">No encontramos estos datos de <b>${esc(m.nombre)}</b> en su sitio web${revision}. Si ya los publica, <a href="${esc(m.reportar ?? `${raiz}m/${m.slug}/#reportar`)}" rel="noopener">avísanos</a>.</p>
       <p class="nota">Súmate al pedido: cada persona cuenta una vez y el total muestra cuánta gente quiere que ${esc(m.nombre)} publique ese dato. No mide calidad ni acusa a nadie.</p>
       ${sinServidor}
       <ul class="pedir-lista">${filas || '<li class="pedir-fila"><span>No hay datos pendientes que pedir.</span></li>'}</ul>

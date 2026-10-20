@@ -170,7 +170,7 @@ function botonPedir() {
   return `<div class="hi-pedir"><button type="button" class="pill pill--claro" data-pedir>${ICONO_ALTAVOZ}<b>Súmate al pedido</b><span class="mono" data-pedir-n hidden></span></button></div>`;
 }
 
-/** Datos de transparencia que el municipio no publica: criterios no hallados y cifras sin dato. */
+/** Datos de transparencia que no encontramos: criterios no hallados por el robot y cifras sin dato. */
 function datosPendientes(m, idx) {
   const faltan = new Set((m.auto?.criterios ?? []).filter(([, r]) => r === 'no_encontrado').map(([c]) => c));
   const criterios = Object.keys(CRITERIOS).filter((c) => (m.auto ? faltan.has(c) : true)).map((c) => ({ id: c, nombre: CRITERIOS[c] }));
@@ -192,7 +192,11 @@ async function pedirActual(boton) {
   const hayPausa = abierta.pausado;
   if (!hayPausa) pausa(true, true);
   boton.addEventListener('pedido', mostrarPedidos, { once: true });
-  await abrirHojaPedido({ codigo: m.codigo, nombre: m.nombre, slug: m.slug }, datosPendientes(m, ctx.idx), boton);
+  await abrirHojaPedido(
+    { codigo: m.codigo, nombre: m.nombre, slug: m.slug, revision: m.auto?.fecha, reportar: m.reportar },
+    datosPendientes(m, ctx.idx),
+    boton,
+  );
   if (abierta && !hayPausa) pausa(false, true);
 }
 
