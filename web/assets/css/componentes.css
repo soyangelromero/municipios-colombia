@@ -1275,6 +1275,9 @@
    pero sin desbordar la página en móvil, y tentador para los robots. */
 
 /* Revisión automática del sitio web de la alcaldía (no puntúa) */
+.ficha .alcalde { margin: 0.35rem 0 0; color: var(--texto-suave); }
+.ficha .alcalde strong { color: var(--texto); font-weight: 600; }
+.ficha .alcalde small { display: block; font-size: 0.8em; }
 .revision-auto {
   margin-top: 1.5rem;
   padding: 1rem 1.25rem;

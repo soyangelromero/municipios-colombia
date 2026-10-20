@@ -18,6 +18,7 @@ from municipios.exportar import enlaces, mapas, sitio
 from municipios.exportar.datos_web import DatosSitio
 from municipios.fotos import commons as fotos
 from municipios.fuentes import (
+    alcaldes,
     cuipo,
     divipola,
     educacion,
@@ -43,6 +44,7 @@ log = logging.getLogger("municipios")
 
 RUTA_MUNICIPIOS = DIR_INTERMEDIOS / "municipios.json"
 RUTA_INDICE = DIR_INTERMEDIOS / "indice.json"
+RUTA_ALCALDES = DIR_INTERMEDIOS / "alcaldes.json"
 RUTA_RELEVAMIENTO = RAIZ / "datos" / "relevamiento" / "transparencia_automatica.csv"
 DIR_FOTOS = RAIZ / "datos" / "fotos"
 DIR_PARCIALES = RAIZ / "datos" / "relevamiento" / "parciales"
@@ -228,6 +230,12 @@ def comando_relevamiento(contexto: Contexto) -> None:
     log.info("Relevamiento: %d municipios → %s", total, salida)
 
 
+def comando_alcaldes(contexto: Contexto) -> None:
+    """Alcalde vigente de cada municipio (SIGEP II, personas expuestas políticamente)."""
+    total = alcaldes.ejecutar(contexto, RUTA_ALCALDES)
+    log.info("Alcaldes: %d municipios con alcalde vigente sin duda → %s", total, RUTA_ALCALDES.name)
+
+
 def comando_fotos(contexto: Contexto) -> None:
     """Descarga la foto con licencia libre de cada municipio (Wikidata y Commons)."""
     total = fotos.descargar(contexto.codigos, DIR_FOTOS)
@@ -268,6 +276,13 @@ def comando_todo(contexto: Contexto) -> None:
             fallidas[nombre] = repr(error)[:300]
     # Los mapas van antes del índice: de ellos sale la superficie (territorio.json) que el
     # índice lee para la densidad. En una máquina limpia, al revés, la ficha queda sin ese dato.
+    try:
+        comando_alcaldes(contexto)
+    except Exception as error:
+        if not contexto.tolerante:
+            raise
+        log.exception("alcaldes falló; la ficha sale sin el nombre del alcalde")
+        fallidas["alcaldes"] = repr(error)[:300]
     comando_mapas(contexto)
     comando_indice(contexto)
     comando_sitio(contexto)
@@ -286,6 +301,7 @@ COMANDOS = {
         comando_relevamiento,
         "Revisión automática del menú de transparencia de las alcaldías (no está en `todo`)",
     ),
+    "alcaldes": (comando_alcaldes, "Alcalde vigente de cada municipio (SIGEP II)"),
     "fotos": (
         comando_fotos,
         "Descarga la foto con licencia libre de cada municipio (no está en `todo`)",

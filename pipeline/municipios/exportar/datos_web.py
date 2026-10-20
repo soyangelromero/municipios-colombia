@@ -47,6 +47,11 @@ def leer_transparencia_auto(ruta: Path) -> dict[str, list[dict[str, str]]]:
     return dict(por_municipio)
 
 
+def leer_alcaldes(ruta: Path) -> dict[str, dict[str, str]]:
+    """Alcalde vigente por código DIVIPOLA ({} si todavía no se descargó)."""
+    return leer_json(ruta)["alcaldes"] if ruta.exists() else {}
+
+
 def leer_fotos(dir_fotos: Path) -> dict[str, dict[str, str]]:
     """Crédito de las fotos con licencia libre, por código DIVIPOLA ({} si no hay)."""
     ruta = dir_fotos / "fotos.csv"
@@ -71,6 +76,8 @@ class DatosSitio:
     anios_referencia: dict[str, int | None]
     # Revisión automática del menú de transparencia: código -> filas (una por criterio).
     transparencia_auto: dict[str, list[dict[str, str]]] = field(default_factory=dict)
+    # Alcalde vigente (SIGEP II): código -> {nombre, desde, fuente}. Solo donde no hay duda.
+    alcaldes: dict[str, dict[str, str]] = field(default_factory=dict)
     # Fotos con licencia libre: código -> {autor, licencia, url_licencia, url_pagina, …}.
     fotos: dict[str, dict[str, str]] = field(default_factory=dict)
 
@@ -94,6 +101,7 @@ class DatosSitio:
             anios_referencia=indice["anios_referencia"],
             transparencia_auto=leer_transparencia_auto(RUTA_TRANSPARENCIA_AUTO),
             fotos=leer_fotos(DIR_FOTOS),
+            alcaldes=leer_alcaldes(dir_intermedios / "alcaldes.json"),
         )
 
     # --- consultas útiles para las páginas -------------------------------------------------
@@ -163,6 +171,7 @@ def _ficha_json(datos: DatosSitio, codigo: str) -> dict[str, Any]:
     return {
         "foto": _foto_json(datos, codigo),
         "auto": _auto_json(datos, codigo),
+        "alcalde": datos.alcaldes.get(codigo),
         "reportar": url_reporte(datos, codigo),
         "codigo": codigo,
         "nombre": m.nombre,

@@ -83,6 +83,7 @@ export function infoTarjeta(m, idx, pais, extra = {}) {
     nombre: m.nombre,
     departamento: m.departamento,
     detalle: detalle.join(' · '),
+    alcalde: m.alcalde?.nombre ?? null,
     valor: m.indice,
     semaforo: m.semaforo,
     puestos: p
@@ -204,6 +205,17 @@ function dibujar(ctx, info, ancho, alto, foto) {
   ctx.fillStyle = '#c3cad6';
   ctx.font = '400 38px "Geist", system-ui, sans-serif';
   if (info.detalle) ctx.fillText(info.detalle, margen, yNombre + 62);
+  if (info.alcalde) {
+    const y = yNombre + 116;
+    ctx.font = '500 28px "Geist Mono", monospace';
+    ctx.fillStyle = '#9aa5b6';
+    const rotulo = 'ALCALDÍA 2024-2027  ';
+    ctx.fillText(rotulo, margen, y);
+    const anchoRotulo = ctx.measureText(rotulo).width;
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '600 38px "Geist", system-ui, sans-serif';
+    ctx.fillText(envolver(info.alcalde, 30), margen + anchoRotulo, y);
+  }
 
   // Medidor con el valor al centro.
   const cx = ancho / 2;

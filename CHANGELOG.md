@@ -4,6 +4,12 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). S
 
 ## [Sin publicar]
 
+### Agregado: alcalde de cada municipio
+- `python -m municipios alcaldes` descarga las «Personas Expuestas Políticamente» de SIGEP II (Función Pública) y deja en `datos/intermedios/alcaldes.json` el alcalde vigente de cada municipio, unido por nombre de entidad, NIT y el mapa del ITA. Va dentro de `todo`; si falla, el sitio sale sin el nombre.
+- Solo se publica un nombre cuando hay una única persona vigente (sin fecha de desvinculación) posesionada desde el 1 de enero de 2024. Con dos o más, o ninguna, el municipio no muestra alcalde: 637 de 1.104 al día de hoy (61 dudosos).
+- La ficha («Alcaldía 2024-2027: nombre», con enlace a SIGEP II y la fecha de posesión registrada), la historia y la tarjeta para compartir muestran el nombre. No se muestra el género del cargo ni foto: SIGEP no trae género y no hay fuente abierta de fotos.
+- Pruebas del cruce, los casos dudosos y la línea de la ficha.
+
 ### Mejorado: tarjeta para compartir
 - Nuevo diseño (feed 1080×1350 e historias 1080×1920): foto del municipio a toda la tarjeta, nombre grande, habitantes y grupo, medidor en arco de rojo a verde con el índice al centro, puesto en el departamento y en el país, y los cuatro pilares con su puntaje y color. Pie con «Datos públicos y fuentes oficiales. Lectura de datos, no una acusación.» y la dirección de la ficha.
 - Los datos de la tarjeta salen ahora de los JSON del sitio (`infoTarjeta` en `compartir.js`), igual desde la ficha que desde la historia. Al compartir un pilar desde la historia, el medidor muestra el puntaje de ese pilar.

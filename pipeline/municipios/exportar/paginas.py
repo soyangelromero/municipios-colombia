@@ -267,6 +267,19 @@ def _dato(fila: dict, clave: str) -> dict | None:
     return fila.get("datos", {}).get(clave)
 
 
+def linea_alcalde(datos: DatosSitio, codigo: str) -> str:
+    """«Alcaldía 2024-2027: Nombre», con su fuente; vacío si no hay un nombre sin duda."""
+    a = datos.alcaldes.get(codigo)
+    if not a:
+        return ""
+    desde = a["desde"].split("-")
+    return (
+        f'<p class="alcalde">Alcaldía 2024-2027: <strong>{escape(a["nombre"])}</strong> '
+        f'<small>según <a href="{escape(a["fuente"])}" rel="noopener">SIGEP II</a>, '
+        f"posesión registrada el {desde[2]}/{desde[1]}/{desde[0]}</small></p>"
+    )
+
+
 def linea_portada(datos: DatosSitio, fila: dict) -> str:
     """«137.624 habitantes · 876 km² · 157 hab./km²», sin los datos que falten."""
     partes = []
@@ -838,6 +851,7 @@ def ficha(datos: DatosSitio, codigo: str, dir_mapas: Path | None = None) -> Pagi
     <p class="etiqueta mono">{escape(m.departamento)} · {escape(grupo)}</p>
     <h1 class="big ficha__nombre ficha__nombre--{largo}">{escape(m.nombre)}</h1>
     <p class="lede">{linea_portada(datos, fila)}</p>
+    {linea_alcalde(datos, codigo)}
     {medidor(fila.get("indice"), "Índice municipal", fila.get("semaforo"))}
     <div class="anillos">{anillos}</div>
     {puesto_html}

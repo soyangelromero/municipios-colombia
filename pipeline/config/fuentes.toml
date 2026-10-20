@@ -127,3 +127,11 @@ url = "https://www.datos.gov.co/d/4rxi-8m8d"
 conjunto = "4rxi-8m8d"
 licencia = "Por verificar en la ficha del conjunto (datos.gov.co)"
 oficial = true
+
+[sigep_pep]
+organismo = "Departamento Administrativo de la Función Pública (SIGEP II)"
+titulo = "Personas Expuestas Políticamente (PEP)"
+url = "https://www.datos.gov.co/d/3qxn-uc22"
+conjunto = "3qxn-uc22"
+licencia = "Por verificar en la ficha del conjunto (datos.gov.co)"
+oficial = true

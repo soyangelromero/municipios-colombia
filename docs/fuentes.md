@@ -22,7 +22,7 @@ El registro que usa el código es [`pipeline/config/fuentes.toml`](../pipeline/c
 
 - **Índice de Desempeño Fiscal (DNP):** se publica como Excel anual, sin conjunto de datos abierto. Pendiente de automatizar.
 - **Servicios públicos:** acueducto y alcantarillado (CNPV 2018 y SUI-REC de Superservicios) y calidad del agua (IRCA, SIVICAP del INS). No tienen API; se publican como reportes.
-- **Alcaldes y partidos (Registraduría):** sin conjunto descargable; irá como CSV curado a mano en `datos/manual/alcaldes.csv`.
+- **Alcaldes (nombre):** salen de las «Personas Expuestas Políticamente» de SIGEP II (`3qxn-uc22`), unidas por nombre de entidad con `h8rs-jxum` (NIT) y el mapa del ITA. Solo se muestra cuando hay una única persona vigente posesionada desde 2024 (≈ 640 de 1.104 municipios); si hay dudas, no se muestra. Pendientes: el **partido** (Registraduría, sin conjunto descargable) y la **foto** (solo se usaría con licencia libre en Wikimedia Commons).
 - **Relevamiento propio de transparencia:** revisión automática del menú de transparencia de las alcaldías (`datos/relevamiento/transparencia_automatica.csv`). Lee el menú y hasta dos niveles de sus secciones y lo cruza con SECOP II, SIGEP II (`h8rs-jxum`) y el catálogo de datos.gov.co. No puntúa; ver `docs/metodologia.md`.
 
 ## Cómo se cruza cada fuente

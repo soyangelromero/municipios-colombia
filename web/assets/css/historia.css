@@ -258,6 +258,8 @@
 .hi-h .lt, .hi-nombre .lt { font-weight: 250; color: rgb(255 255 255 / 78%); }
 .hi-h .neg { font-weight: 800; }
 
+.hi-alcalde { margin: 4px 0 0; font-size: 15px; letter-spacing: 0.02em; color: rgb(255 255 255 / 70%); }
+.hi-alcalde b { color: #fff; font-weight: 600; }
 .hi-lede {
   margin: 0;
   max-width: 62ch;

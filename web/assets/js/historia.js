@@ -139,6 +139,7 @@ function portada(m, { idx, pais }) {
     ${cred}
     <h2 class="hi-nombre" style="font-size:clamp(48px,min(${tam}vw,15vh),180px)">${esc(m.nombre)}</h2>
     <p class="hi-lede">${lineas.map(esc).join(' · ')}${m.grupo ? ` · ${esc(pais.grupos[m.grupo] ?? m.grupo)}` : ''}</p>
+    ${m.alcalde ? `<p class="hi-alcalde mono">Alcaldía 2024-2027 · <b>${esc(m.alcalde.nombre)}</b></p>` : ''}
     <div class="hi-indice">${medidor(m.indice, idx, 'Índice municipal')}${puestos}</div>
     ${m.indice === null ? `<div class="nd-red"><span class="nd-red__ico">!</span><span>${esc(m.motivo_sin_indice ?? 'Este municipio no tiene índice.')}</span></div>` : ''}
     <div class="hi-acciones">
