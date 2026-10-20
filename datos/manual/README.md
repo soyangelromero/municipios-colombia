@@ -16,7 +16,7 @@ Reglas:
 
 ## Flujo de la revisión de transparencia
 
-1. `python -m municipios relevamiento` (necesita `scrapling install`) abre el menú de transparencia de cada alcaldía y escribe `datos/relevamiento/transparencia_automatica.csv`: por criterio, `enlace_encontrado` o `no_encontrado`, con la URL de evidencia. Revisa las 31 capitales; con `--alcance todos`, los 1.104 municipios.
+1. `python -m municipios relevamiento` (necesita `scrapling install`) abre el menú de transparencia de cada alcaldía y escribe `datos/relevamiento/transparencia_automatica.csv`: por criterio, `enlace_encontrado` (en el sitio), `fuente_oficial` (SECOP, SIGEP o datos.gov.co), `no_encontrado` (que no es «no publica»), `menu_no_legible`, `sitio_no_encontrado`, `no_permitido` o `error`, con la URL de evidencia, la fecha, el método y un `detalle`. Revisa las 31 capitales; con `--alcance todos`, los 1.104 municipios (con `--particion K/N` se reparte en varios procesos y `--unir` junta las partes; `--reanudar` retoma una corrida; `--solo-cruces` reaplica los cruces oficiales sin rastrear).
 2. Las fichas muestran ese resultado como «Revisión automática del sitio web — sin verificación humana, no puntúa».
 3. Una persona abre la evidencia y comprueba que el documento exista, esté completo y esté al día. Añade una fila a `transparencia.csv` por municipio y criterio (`valor`: `si`, `parcial` o `no`; `evidencia`: URL; `fecha`; `revisor`: nombre público o seudónimo, nunca datos de contacto).
 4. Solo las filas de `transparencia.csv` podrán entrar al índice, en una versión futura de la metodología.

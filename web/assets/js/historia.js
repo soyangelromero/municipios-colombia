@@ -152,18 +152,22 @@ function portada(m, { idx, pais }) {
 function bloqueAuto(m) {
   const a = m.auto;
   if (!a) return '';
-  const hay = a.criterios.some(([, r]) => r === 'enlace_encontrado' || r === 'no_encontrado');
+  const hay = a.criterios.some(([, r]) => ['enlace_encontrado', 'fuente_oficial', 'no_encontrado'].includes(r));
   const lista = hay
     ? `<ul class="tchips">${a.criterios
-        .map(([c, r, ev]) => {
-          const ok = r === 'enlace_encontrado';
-          const txt = ok ? `<a href="${esc(ev)}" target="_blank" rel="noopener">Enlace</a>` : 'No hallado';
-          return `<li class="${ok ? 'c-ok' : 'c-na'}"><i></i><span>${esc(CRITERIOS[c] ?? c)}</span><b>${txt}</b></li>`;
+        .map(([c, r, ev, detalle]) => {
+          const enlace = (texto) => `<a href="${esc(ev)}" target="_blank" rel="noopener" title="${esc(detalle ?? '')}">${texto}</a>`;
+          const [clase, txt] =
+            r === 'enlace_encontrado' ? ['c-ok', enlace('Enlace')]
+            : r === 'fuente_oficial' ? ['c-of', enlace('Fuente oficial')]
+            : r === 'no_encontrado' ? ['c-na', 'No hallado']
+            : ['c-na', 'Sin leer'];
+          return `<li class="${clase}"><i></i><span>${esc(CRITERIOS[c] ?? c)}</span><b>${txt}</b></li>`;
         })
         .join('')}</ul>`
     : '<p class="hi-nota">El menú de transparencia de la alcaldía no se pudo leer de forma automática.</p>';
   return `<section class="hi-auto"><p class="mono hi-auto__t">Revisión automática del sitio web · sin verificación humana · no puntúa</p>${lista}
-    <p class="hi-nota mono">Revisado el ${esc(a.fecha)}. Solo lee la página principal del menú.</p></section>`;
+    <p class="hi-nota mono">Revisado el ${esc(a.fecha)}. Lee el menú y hasta dos niveles de sus secciones, y cruza con SECOP, SIGEP y datos.gov.co. «No hallado» no significa que no se publique.</p></section>`;
 }
 
 function botonPedir() {

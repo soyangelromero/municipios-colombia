@@ -151,7 +151,9 @@ def _auto_json(datos: DatosSitio, codigo: str) -> dict[str, Any] | None:
     return {
         "fecha": filas[0]["fecha"],
         "sitio": filas[0]["sitio"],
-        "criterios": [[f["criterio"], f["resultado"], f["evidencia"]] for f in filas],
+        "criterios": [
+            [f["criterio"], f["resultado"], f["evidencia"], f.get("detalle", "")] for f in filas
+        ],
     }
 
 

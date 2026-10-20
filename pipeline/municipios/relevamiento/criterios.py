@@ -5,6 +5,7 @@ import re
 from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
+from urllib.parse import urlparse
 
 from municipios.comun.cruce import clave
 from municipios.comun.modelos import Municipio
@@ -122,3 +123,85 @@ def clasificar(enlaces: Iterable[tuple[str, str]]) -> dict[str, str | None]:
             None,
         )
     return resultado
+
+
+# Secciones del menú de transparencia (estructura de la Resolución MinTIC 1519 de 2020, anexo 2)
+# donde suelen estar los criterios. Cada patrón se compara con el texto del enlace y dice qué
+# criterios podrían esconderse detrás: solo se abre una sección si puede aportar algo que aún no
+# se halló.
+SECCIONES: tuple[tuple[str, tuple[str, ...]], ...] = (
+    (
+        r"INFORMACION DE LA ENTIDAD|ESTRUCTURA ORGANICA|TALENTO HUMANO|MECANISMOS? DE CONTACTO",
+        ("directorio", "declaraciones", "pqrsd"),
+    ),
+    (
+        r"PLANEACION|PLANES? ESTRATEGICO|PLAN DE ACCION|PROGRAMAS Y PROYECTOS|METAS",
+        ("plan_desarrollo", "plan_adquisiciones", "presupuesto", "ejecucion", "control"),
+    ),
+    (
+        r"PRESUPUESTO|INFORMACION FINANCIERA|HACIENDA",
+        ("presupuesto", "ejecucion"),
+    ),
+    (r"CONTRATACION|ADQUISICIONES|COMPRAS", ("contratacion", "plan_adquisiciones")),
+    (
+        r"CONTROL|AUDITORIA|ORGANOS DE CONTROL|INFORMES? DE GESTION",
+        ("control", "plan_desarrollo"),
+    ),
+    (
+        r"PARTICIPA|ATENCION (AL|A LA) CIUDADAN|SERVICIO AL CIUDADANO|PQR|TRAMITES",
+        ("pqrsd", "declaraciones"),
+    ),
+    (r"DATOS ABIERTOS", ("datos_abiertos",)),
+    (r"NORMATIVA|TRANSPARENCIA|ACCESO A LA INFORMACION|LEY 1712", tuple(c.id for c in CRITERIOS)),
+)
+
+_ARCHIVOS = (
+    ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".zip", ".rar", ".csv",
+    ".jpg", ".jpeg", ".png", ".gif", ".mp3", ".mp4",
+)  # fmt: skip
+
+
+def raiz_del_sitio(url: str) -> str:
+    """'www.x-y.gov.co' y 'transparencia.x-y.gov.co' -> 'x-y.gov.co' (para no salirse del sitio)."""
+    etiquetas = (urlparse(url).hostname or "").lower().split(".")
+    return ".".join(etiquetas[-3:] if etiquetas[-2:] == ["gov", "co"] else etiquetas[-2:])
+
+
+def es_archivo(url: str) -> bool:
+    return urlparse(url).path.lower().endswith(_ARCHIVOS)
+
+
+def secciones_a_abrir(
+    enlaces: Iterable[tuple[str, str]],
+    sitio: str,
+    faltan: set[str],
+    visitadas: set[str],
+    maximo: int,
+) -> list[str]:
+    """URLs de las secciones del menú que podrían contener criterios que aún faltan.
+
+    Solo enlaces del mismo sitio, que no sean archivos ni páginas ya leídas. Van primero las
+    secciones que podrían aportar más criterios faltantes. Sin red.
+    """
+    raiz = raiz_del_sitio(sitio)
+    puntos: dict[str, int] = {}
+    for texto, url in enlaces:
+        url = url.split("#")[0]
+        if url in visitadas or es_archivo(url) or raiz_del_sitio(url) != raiz:
+            continue
+        if not urlparse(url).scheme.startswith("http"):
+            continue
+        ruta = re.sub(r"[-_/.]", " ", urlparse(url).path)
+        normal = clave(f"{texto} {ruta}")
+        aporte = max(
+            (
+                len(faltan & set(criterios))
+                for patron, criterios in SECCIONES
+                if re.search(patron, normal)
+            ),
+            default=0,
+        )
+        if aporte:
+            puntos[url] = max(puntos.get(url, 0), aporte)
+    orden = sorted(puntos, key=lambda u: -puntos[u])  # estable: conserva el orden del menú
+    return orden[:maximo]

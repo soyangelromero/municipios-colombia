@@ -31,3 +31,6 @@ build/
 Thumbs.db
 .vscode/
 .idea/
+
+# Partes del relevamiento (se juntan con `relevamiento --unir`)
+datos/relevamiento/parciales/

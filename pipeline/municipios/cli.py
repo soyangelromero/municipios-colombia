@@ -37,6 +37,7 @@ from municipios.indice.calculo import cargar_config
 from municipios.indice.derivados import Calculadora
 from municipios.relevamiento import transparencia as relevamiento
 from municipios.relevamiento.criterios import leer_sitios_manuales
+from municipios.relevamiento.cruces import descargar_cruces
 
 log = logging.getLogger("municipios")
 
@@ -44,6 +45,7 @@ RUTA_MUNICIPIOS = DIR_INTERMEDIOS / "municipios.json"
 RUTA_INDICE = DIR_INTERMEDIOS / "indice.json"
 RUTA_RELEVAMIENTO = RAIZ / "datos" / "relevamiento" / "transparencia_automatica.csv"
 DIR_FOTOS = RAIZ / "datos" / "fotos"
+DIR_PARCIALES = RAIZ / "datos" / "relevamiento" / "parciales"
 RUTA_SITIOS = RAIZ / "datos" / "manual" / "sitios.csv"
 # Capitales de departamento (Bogotá incluida): alcance inicial del relevamiento.
 CAPITALES = (
@@ -195,16 +197,35 @@ def comando_relevamiento(contexto: Contexto) -> None:
     """Revisión automática del menú de transparencia (necesita `scrapling install`).
 
     Por defecto revisa las capitales; con --alcance todos, los 1.104 municipios (varias horas).
+    Los criterios que el sitio no muestra se cruzan con SECOP, SIGEP y datos.gov.co.
+    --reanudar salta los municipios ya revisados hoy; --solo-cruces reaplica los cruces al CSV
+    existente sin rastrear ningún sitio. --particion K/N revisa solo la parte K de N (para correr
+    varios procesos a la vez; cada uno escribe en datos/relevamiento/parciales/) y --unir junta
+    las partes en el CSV final.
     """
+    cruces = descargar_cruces(contexto, DIR_INTERMEDIOS / "contratacion.json", date.today().year)
+    if contexto.unir:
+        total = relevamiento.unir(DIR_PARCIALES, RUTA_RELEVAMIENTO)
+        log.info("Relevamiento: %d municipios unidos → %s", total, RUTA_RELEVAMIENTO)
+        return
+    if contexto.solo_cruces:
+        total = relevamiento.reaplicar_cruces(RUTA_RELEVAMIENTO, cruces)
+        log.info("Cruces oficiales reaplicados a %d municipios → %s", total, RUTA_RELEVAMIENTO)
+        return
     codigos = (
         CAPITALES
         if contexto.alcance == "capitales"
         else sorted(c for c, m in contexto.municipios.items() if m.tipo == "municipio")
     )
+    salida = RUTA_RELEVAMIENTO
+    if contexto.particion:
+        k, n = contexto.particion
+        codigos = codigos[k::n]
+        salida = DIR_PARCIALES / f"transparencia_{k}.csv"
     lista = [contexto.municipios[c] for c in codigos]
     manuales = leer_sitios_manuales(RUTA_SITIOS)
-    total = relevamiento.relevar(lista, manuales, RUTA_RELEVAMIENTO)
-    log.info("Relevamiento: %d municipios → %s", total, RUTA_RELEVAMIENTO)
+    total = relevamiento.relevar(lista, manuales, salida, cruces, contexto.reanudar)
+    log.info("Relevamiento: %d municipios → %s", total, salida)
 
 
 def comando_fotos(contexto: Contexto) -> None:
@@ -284,6 +305,15 @@ def _municipios(cliente: ClienteSocrata) -> dict[str, Municipio]:
     return {m["divipola"]: Municipio(**m) for m in leer_json(RUTA_MUNICIPIOS)["municipios"]}
 
 
+def _particion(texto: str | None) -> tuple[int, int] | None:
+    if not texto:
+        return None
+    k, _, n = texto.partition("/")
+    if not (k.isdigit() and n.isdigit() and 0 <= int(k) < int(n)):
+        raise SystemExit("--particion debe ser K/N con 0 <= K < N (por ejemplo 0/6)")
+    return int(k), int(n)
+
+
 def main(argv: list[str] | None = None) -> int:
     # La consola de Windows usa cp1252 por defecto; los nombres llevan tildes.
     for flujo in (sys.stdout, sys.stderr):
@@ -298,6 +328,26 @@ def main(argv: list[str] | None = None) -> int:
         choices=("capitales", "todos"),
         default="capitales",
         help="en `relevamiento`: qué municipios revisar (por defecto, las capitales)",
+    )
+    parser.add_argument(
+        "--reanudar",
+        action="store_true",
+        help="en `relevamiento`: salta los municipios ya revisados hoy",
+    )
+    parser.add_argument(
+        "--solo-cruces",
+        action="store_true",
+        help="en `relevamiento`: reaplica los cruces oficiales al CSV sin rastrear sitios",
+    )
+    parser.add_argument(
+        "--particion",
+        metavar="K/N",
+        help="en `relevamiento`: revisa solo la parte K (desde 0) de N, para correr varias",
+    )
+    parser.add_argument(
+        "--unir",
+        action="store_true",
+        help="en `relevamiento`: junta las partes de --particion en el CSV final",
     )
     parser.add_argument(
         "--tolerante",
@@ -328,6 +378,10 @@ def main(argv: list[str] | None = None) -> int:
         refrescar=args.refrescar,
         tolerante=args.tolerante,
         alcance=args.alcance,
+        reanudar=args.reanudar,
+        solo_cruces=args.solo_cruces,
+        unir=args.unir,
+        particion=_particion(args.particion),
     )
     funcion, _ = COMANDOS[args.comando]
     funcion(contexto)

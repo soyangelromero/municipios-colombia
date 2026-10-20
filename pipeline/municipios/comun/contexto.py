@@ -18,6 +18,10 @@ class Contexto:
     refrescar: bool = False
     tolerante: bool = False  # en `todo`, seguir aunque una fuente falle
     alcance: str = "capitales"  # en `relevamiento`: «capitales» o «todos»
+    reanudar: bool = False  # en `relevamiento`: saltar lo ya revisado hoy
+    solo_cruces: bool = False  # en `relevamiento`: reaplicar cruces sin rastrear
+    unir: bool = False  # en `relevamiento`: juntar las partes de `particion`
+    particion: tuple[int, int] | None = None  # en `relevamiento`: parte K de N
 
     @property
     def codigos(self) -> set[str]:

@@ -551,18 +551,30 @@ def bloque_revision_automatica(datos: DatosSitio, codigo: str) -> str:
     if not filas:
         return ""
     nombres = {c.id: c.nombre for c in CRITERIOS}
-    problema = {
+    mensajes = {
         "sitio_no_encontrado": "No se encontró el sitio web oficial.",
         "no_permitido": "El sitio no permite la revisión automática (robots.txt).",
         "error": "No se pudo abrir el menú de transparencia.",
         "menu_no_legible": "El menú de transparencia no se pudo leer de forma automática: no se sabe qué publica.",
-    }.get(filas[0]["resultado"])
+    }
+    estados = {f["resultado"] for f in filas}
+    lee_el_sitio = bool(estados & {"enlace_encontrado", "no_encontrado"})
+    problema = (
+        next((m for e, m in mensajes.items() if e in estados), None) if not lee_el_sitio else None
+    )
     items = []
     for f in filas:
         if f["resultado"] == "enlace_encontrado":
             estado = f'<a href="{escape(f["evidencia"])}" rel="noopener">Enlace encontrado</a>'
+        elif f["resultado"] == "fuente_oficial":
+            estado = (
+                f'<a href="{escape(f["evidencia"])}" rel="noopener">Fuente oficial</a>: '
+                f"{escape(f.get('detalle', ''))}"
+            )
+        elif f["resultado"] == "no_encontrado":
+            estado = "No se encontró un enlace en las páginas revisadas"
         else:
-            estado = "No se encontró un enlace en esa página"
+            continue
         items.append(
             f"<li><span>{escape(nombres.get(f['criterio'], f['criterio']))}</span> <small>{estado}</small></li>"
         )
@@ -572,17 +584,15 @@ def bloque_revision_automatica(datos: DatosSitio, codigo: str) -> str:
         if sitio
         else ""
     )
-    cuerpo = (
-        f'<p class="nota">{problema}</p>'
-        if problema
-        else f'<ul class="revision">{"".join(items)}</ul>'
+    cuerpo = (f'<p class="nota">{problema}</p>' if problema else "") + (
+        f'<ul class="revision">{"".join(items)}</ul>' if items else ""
     )
     return (
         '<aside class="revision-auto"><h3>Revisión automática del sitio web '
         "<small>sin verificación humana, no puntúa</small></h3>"
         f"{cuerpo}"
-        f'<p class="nota">Un robot buscó estos criterios en el menú de transparencia el {escape(filas[0]["fecha"])}. '
-        f"Solo lee la página principal del menú, no sus subpáginas: que falte un enlace no prueba que no se publique, y que haya uno no prueba que el documento esté completo ni al día.{origen}</p></aside>"
+        f'<p class="nota">Un robot buscó estos criterios el {escape(filas[0]["fecha"])} en el menú de transparencia y hasta dos niveles de sus secciones, y los cruzó con fuentes oficiales (SECOP, SIGEP, datos.gov.co). '
+        f"Que no halle un enlace no prueba que no se publique, y que haya uno no prueba que el documento esté completo ni al día.{origen}</p></aside>"
     )
 
 

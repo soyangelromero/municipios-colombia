@@ -401,6 +401,7 @@
 .tchips li b { flex: none; font-weight: 650; color: var(--c); }
 .tchips li a { color: inherit; }
 .tchips .c-ok { --c: var(--ok); }
+.tchips .c-of { --c: rgb(143 184 255); }
 .tchips .c-na { --c: rgb(255 255 255 / 55%); }
 
 /* --- Contexto ------------------------------------------------------------------------------------ */
