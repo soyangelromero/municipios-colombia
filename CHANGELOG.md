@@ -32,6 +32,9 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). S
 ### Cambiado
 - Portada: la tarjeta «Índice municipal · promedio por departamento» crece en escritorio (400–660 px según la pantalla, barras más altas y textos algo mayores) para aprovechar el espacio libre a su izquierda del mapa; en móvil no cambia.
 
+### Cambiado: publicación más rápida
+- «Publicar sitio» guarda en la caché de Actions el resultado del pipeline (`datos/intermedios` y los mapas) con una clave por mes y por hash del código que calcula datos. Un push que solo toca la web o el generador de páginas arma el sitio en ~1–2 min (antes ~10 min, de los que ~9,8 eran el pipeline). El día 1 de cada mes (o con «Run workflow» → «refrescar») se vuelven a descargar y calcular los datos; si una fuente falla, esa corrida no guarda caché.
+
 ### Corregido: modo claro y modo oscuro (auditoría de contraste)
 - Auditoría automática de **todo el texto visible** (WCAG AA, 4,5:1) en claro y oscuro, escritorio y móvil, páginas y estados (buscador, historia, hojas, comparador, filtros): de 96 fallos a 0.
 - **Etiquetas de semáforo** (verde/amarillo/rojo) en claro: tenían fondo casi negro con letra oscura; ahora fondos claros propios y colores de texto más oscuros (`--ok`, `--warn`).

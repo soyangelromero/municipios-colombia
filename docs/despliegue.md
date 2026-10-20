@@ -123,3 +123,16 @@ Lo que depende de ti:
 2. **Google Search Console** y **Bing Webmaster Tools**: verifica el sitio y envía `…/sitemap.xml`.
 3. **Enlaces desde fuera**: notas de prensa, universidades, organizaciones de veeduría y la propia fuente (datos.gov.co) que enlacen a las fichas.
 4. Tras cada actualización mensual, el `lastmod` del sitemap se renueva solo.
+
+## Por qué «Publicar sitio» a veces tarda ~10 minutos y a veces ~2
+
+El workflow `.github/workflows/pages.yml` guarda el resultado del pipeline en la caché de Actions
+(`datos/intermedios` y `dist/data/mapas`) con la clave `datos-v1-AAAA-MM-<hash del código de datos>`:
+
+- **Push que solo toca `web/`, textos o el generador de páginas** (`exportar/`): la clave no cambia, se
+  restaura la caché y solo se corre `python -m municipios sitio` (≈1–2 min).
+- **Primer push de un mes, o cambio en `fuentes/`, `indice/`, `comun/` o `config/`**: la clave cambia, se
+  corre el pipeline completo (≈10 min) y se guarda la caché nueva (solo si ninguna fuente falló).
+- **Refrescar los datos a mano**: Actions → «Publicar sitio» → «Run workflow» → marca «refrescar».
+- Los pushes seguidos hacen cola (`concurrency: pages`): cada uno espera a que termine el anterior.
+- Actions borra las cachés que llevan 7 días sin usarse; si pasa, la siguiente corrida es completa.
